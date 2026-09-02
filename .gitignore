@@ -1,0 +1,18 @@
+# dépendances et artefacts (le site n'en a aucun : rien à construire)
+node_modules/
+dist/
+build/
+
+# système
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# éditeurs
+.vscode/
+.idea/
+*.swp
+
+# temporaires
+*.log
+.cache/

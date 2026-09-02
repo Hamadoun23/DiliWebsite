@@ -1,0 +1,13 @@
+{
+  "name": "Dilitech — Ordinateurs, accessoires et matériel réseau",
+  "short_name": "Dilitech",
+  "description": "Vente d'ordinateurs portables et accessoires informatiques. Maintenance PC, SAV, matériels réseaux. Bamako, Mali.",
+  "lang": "fr",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#302784",
+  "icons": [
+    { "src": "assets/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catalogue — Dilitech</title>
+<meta name="description" content="Catalogue Dilitech : ordinateurs portables et fixes, accessoires informatiques et matériel réseau. Recherche par marque, budget et usage, avec la disponibilité par point de vente.">
+<meta name="theme-color" content="#302784">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://www.dilitech.ml/catalogue.html">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<site-entete page="catalogue"></site-entete>
+
+<main id="contenu">
+
+  <!-- en-tête de page, sombre et courte : le catalogue doit venir vite -->
+  <section class="entete-page nuit coupe-bas sur-nuit">
+    <div class="motif circuit"></div>
+    <div class="wrap">
+      <p class="surtitre">Catalogue numérique</p>
+      <h1 class="titre titre--geant" data-titre>Tout le matériel, <em>filtré par usage.</em></h1>
+      <p class="chapeau" data-sous-titre>
+        Ordinateurs, accessoires et matériel réseau. Filtrez par marque, par
+        budget ou — c'est le plus utile — par ce que vous voulez en faire.
+      </p>
+    </div>
+  </section>
+
+  <section class="sec--serre">
+    <div class="wrap cat-page">
+
+      <!-- ============ FILTRES ============ -->
+      <aside class="filtres" id="filtres" aria-label="Filtres du catalogue">
+        <button type="button" class="filtres__fermer btn btn--ligne js-fermer-filtres">
+          <span class="ic" data-ic="fermer"></span> Fermer les filtres
+        </button>
+
+        <div class="filtres__bloc">
+          <p class="filtres__titre">Catégorie</p>
+          <div class="filtres__liste" data-f-categories></div>
+        </div>
+
+        <div class="filtres__bloc">
+          <p class="filtres__titre">Pour quel usage ?</p>
+          <div class="filtres__liste" data-f-usages></div>
+        </div>
+
+        <div class="filtres__bloc">
+          <p class="filtres__titre">Budget</p>
+          <div class="prix-plage" data-f-prix></div>
+        </div>
+
+        <div class="filtres__bloc">
+          <p class="filtres__titre">Marque</p>
+          <div class="filtres__liste" data-f-marques></div>
+        </div>
+
+        <div class="filtres__bloc">
+          <p class="filtres__titre">État</p>
+          <div class="filtres__liste" data-f-etat></div>
+        </div>
+
+        <div class="filtres__bloc">
+          <p class="filtres__titre">Disponible à</p>
+          <div class="filtres__liste" data-f-partenaires></div>
+        </div>
+
+        <button type="button" class="btn btn--ligne js-reinit-filtres">
+          Tout réinitialiser
+        </button>
+      </aside>
+
+      <!-- ============ RÉSULTATS ============ -->
+      <div class="cat-res">
+        <div class="outils" id="recherche">
+          <label class="recherche">
+            <span class="sr-only">Rechercher dans le catalogue</span>
+            <span class="ic recherche__ic" data-ic="recherche"></span>
+            <input type="search" data-q autocomplete="off"
+                   placeholder="Rechercher un produit, une marque, une référence…">
+            <button type="button" class="recherche__x" data-q-vider hidden aria-label="Effacer la recherche">
+              <span class="ic" data-ic="fermer"></span>
+            </button>
+          </label>
+
+          <button type="button" class="btn btn--ligne btn-filtres js-ouvrir-filtres">
+            <span class="ic" data-ic="filtre"></span> Filtres
+            <span class="actifs-nb" data-actifs-nb hidden></span>
+          </button>
+
+          <select class="select-tri" data-tri aria-label="Trier les résultats"></select>
+
+          <p class="compte-res" data-compte aria-live="polite"></p>
+        </div>
+
+        <div class="actifs" data-actifs></div>
+
+        <!-- Les cartes produits portent un <h3> : sans ce <h2>, la page
+             sautait du <h1> au <h3> pour un lecteur d'écran. -->
+        <h2 class="sr-only">Résultats du catalogue</h2>
+        <div data-grille></div>
+
+        <div class="charger" data-charger hidden>
+          <button type="button" class="btn btn--ligne js-charger-plus">
+            Afficher plus de produits
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<site-pied></site-pied>
+
+<a class="bulle-wa" data-wa href="#" target="_blank" rel="noopener" aria-label="Discuter sur WhatsApp"></a>
+
+<script type="module" src="js/pages/catalogue.js"></script>
+</body>
+</html>

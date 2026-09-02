@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page introuvable — Dilitech</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#302784">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<site-entete></site-entete>
+
+<main id="contenu">
+  <section class="entete-page nuit coupe-bas sur-nuit">
+    <div class="motif circuit"></div>
+    <div class="wrap">
+      <p class="surtitre">Erreur 404</p>
+      <h1 class="titre titre--geant">Cette page <em>n'existe pas.</em></h1>
+      <p class="chapeau">
+        Le lien est peut-être ancien, ou l'adresse comporte une faute de frappe.
+        Voici par où reprendre.
+      </p>
+      <div class="heros__actions">
+        <a class="btn btn--cyan" href="catalogue.html">Ouvrir le catalogue</a>
+        <a class="btn btn--ligne" href="index.html">Revenir à l'accueil</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec--serre">
+    <div class="wrap">
+      <header class="tete-sec">
+        <p class="surtitre">Nos recommandations</p>
+        <h2 class="titre titre--petit">Ce que nous conseillons <em>le plus souvent.</em></h2>
+      </header>
+      <div data-recommandes></div>
+    </div>
+  </section>
+</main>
+
+<site-pied></site-pied>
+
+<a class="bulle-wa" data-wa href="#" target="_blank" rel="noopener" aria-label="Discuter sur WhatsApp"></a>
+
+<script type="module">
+  import './js/pages/commun.js';
+  import { recommandes } from './js/core/catalogue.js';
+  import { grilleProduits } from './js/components/carte-produit.js';
+  import { rendre } from './js/core/dom.js';
+  import { activerReveal } from './js/core/ui.js';
+
+  rendre('[data-recommandes]', grilleProduits(recommandes().slice(0, 4)));
+  activerReveal();
+</script>
+</body>
+</html>

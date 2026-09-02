@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://www.dilitech.ml/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://www.dilitech.ml/catalogue.html</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.dilitech.ml/services.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.dilitech.ml/reseau.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.dilitech.ml/conseils.html</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.dilitech.ml/contact.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <url><loc>https://www.dilitech.ml/article.html?a=choisir-portable-2026</loc><priority>0.6</priority></url>
+  <url><loc>https://www.dilitech.ml/article.html?a=proteger-son-materiel-coupures</loc><priority>0.6</priority></url>
+  <url><loc>https://www.dilitech.ml/article.html?a=equiper-un-bureau-de-dix-postes</loc><priority>0.6</priority></url>
+  <url><loc>https://www.dilitech.ml/article.html?a=neuf-ou-reconditionne</loc><priority>0.6</priority></url>
+  <url><loc>https://www.dilitech.ml/article.html?a=securiser-son-poste-de-travail</loc><priority>0.6</priority></url>
+  <url><loc>https://www.dilitech.ml/article.html?a=wifi-qui-coupe-diagnostic</loc><priority>0.6</priority></url>
+</urlset>

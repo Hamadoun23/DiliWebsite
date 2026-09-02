@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact & demande de devis — Dilitech</title>
+<meta name="description" content="Contacter Dilitech à Bamako, Torokorobougou : +223 71 92 71 98, WhatsApp, e-mail. Formulaire de demande de devis pour matériel informatique, réseau, maintenance et formations.">
+<meta name="theme-color" content="#302784">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://www.dilitech.ml/contact.html">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<site-entete page="contact"></site-entete>
+
+<main id="contenu">
+
+  <section class="entete-page nuit coupe-bas sur-nuit">
+    <div class="motif circuit"></div>
+    <div class="wrap">
+      <p class="surtitre">Contact & devis</p>
+      <h1 class="titre titre--geant">Dites-nous ce que vous voulez faire. <em>Nous vous dirons avec quoi.</em></h1>
+      <p class="chapeau">
+        Une réponse humaine, par un technicien ou un commercial, sous 24 heures
+        ouvrées. Aucun paiement en ligne : nous établissons un devis, et la
+        vente se finalise avec vous.
+      </p>
+    </div>
+  </section>
+
+  <section class="sec--serre">
+    <div class="wrap contact">
+
+      <!-- ============ FORMULAIRE ============ -->
+      <div class="contact__form">
+        <h2 class="titre titre--petit">Demander <em>un devis.</em></h2>
+        <p class="chapeau" style="margin-bottom:26px">
+          Plus vous décrivez l'usage, plus la réponse sera juste. Si vous avez
+          déjà composé une sélection dans le catalogue, elle est jointe
+          automatiquement.
+        </p>
+
+        <form novalidate data-form-devis>
+          <div class="champ-duo">
+            <label class="champ">
+              <span>Nom et prénom <b aria-hidden="true">*</b></span>
+              <input name="nom" type="text" autocomplete="name" required placeholder="Ex. Awa Traoré">
+            </label>
+            <label class="champ">
+              <span>Téléphone / WhatsApp <b aria-hidden="true">*</b></span>
+              <input name="telephone" type="tel" autocomplete="tel" required placeholder="Ex. +223 71 00 00 00">
+            </label>
+          </div>
+
+          <div class="champ-duo">
+            <label class="champ">
+              <span>Structure</span>
+              <input name="structure" type="text" autocomplete="organization" placeholder="Entreprise, ONG, école… (facultatif)">
+            </label>
+            <label class="champ">
+              <span>Ville</span>
+              <input name="ville" type="text" autocomplete="address-level2" placeholder="Ex. Bamako">
+            </label>
+          </div>
+
+          <label class="champ">
+            <span>E-mail</span>
+            <input name="email" type="email" autocomplete="email" placeholder="Facultatif, si vous préférez la réponse écrite">
+          </label>
+
+          <fieldset class="champ champ--groupe">
+            <legend>Votre demande porte sur</legend>
+            <div class="puces" data-sujets></div>
+          </fieldset>
+
+          <label class="champ">
+            <span>Votre besoin <b aria-hidden="true">*</b></span>
+            <textarea name="message" rows="6" required
+              placeholder="Ex. : « Nous équipons 8 postes de saisie comptable, budget autour de 3 000 000 FCFA, il nous faut aussi le réseau et les onduleurs. »"></textarea>
+          </label>
+
+          <!-- Rappel de la sélection en cours, monté par contact.js -->
+          <div data-rappel-selection></div>
+
+          <p class="form__mention">
+            Vos coordonnées ne servent qu'à répondre à cette demande. Le message
+            part sur WhatsApp — vous pouvez le relire avant de l'envoyer.
+          </p>
+
+          <div class="form__actions">
+            <button type="submit" class="btn btn--wa btn--large">
+              <span class="ic" data-ic="whatsapp"></span> Envoyer sur WhatsApp
+            </button>
+            <button type="button" class="btn btn--ligne btn--large" data-envoyer-mail>
+              <span class="ic" data-ic="mail"></span> Envoyer par e-mail
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ============ COORDONNÉES ============ -->
+      <aside class="contact__infos" data-infos></aside>
+
+    </div>
+  </section>
+
+  <!-- ============ QUESTIONS FRÉQUENTES ============ -->
+  <section class="sec--brume">
+    <div class="wrap">
+      <header class="tete-sec">
+        <p class="surtitre">Avant de nous écrire</p>
+        <h2 class="titre">Les questions <em>qu'on nous pose le plus.</em></h2>
+      </header>
+      <div class="faq" data-faq></div>
+    </div>
+  </section>
+
+</main>
+
+<site-pied></site-pied>
+
+<a class="bulle-wa" data-wa href="#" target="_blank" rel="noopener" aria-label="Discuter sur WhatsApp"></a>
+
+<script type="module" src="js/pages/contact.js"></script>
+</body>
+</html>
