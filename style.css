@@ -1624,6 +1624,26 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 .bloc-serv__vis svg { width: 58%; stroke-width: 3.2; }
 .bloc-serv__vis .il-a { color: var(--cyan-2); }
 
+/* Le seul panneau du site qui montre une vraie photo plutôt qu'un dessin :
+   le bloc « service après-vente », parce que c'est le seul endroit où le
+   message est justement « une personne vous répond ». Photo Dilitech
+   (visuel de communication recadré), pas une image d'agence. */
+/* Aspect plus haut que les panneaux voisins (4/5 plutôt que 5/4) : le
+   cadrage d'origine est un portrait serré, un panneau large aurait laissé
+   trop de vide au-dessus des épaules. */
+.bloc-serv__vis--photo { position: relative; background: var(--navy-3); aspect-ratio: 4 / 5; }
+.bloc-serv__vis--photo img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: 50% 26%;
+  display: block;
+}
+.bloc-serv__vis--photo::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(200deg, transparent 45%, rgba(16, 11, 51, .55) 100%);
+  pointer-events: none;
+}
+
 @media (min-width: 860px) {
   .bloc-serv { grid-template-columns: 1.05fr .95fr; }
   /* Une section sur deux inverse l'ordre : le regard fait des allers-retours
