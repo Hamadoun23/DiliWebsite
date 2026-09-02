@@ -34,7 +34,7 @@ const produit = id ? cat.parId(id) : null;
 function introuvable() {
   document.title = 'Référence introuvable — Dilitech';
   racine.innerHTML = `
-    <section class="entete-page nuit coupe-bas sur-nuit">
+    <section class="entete-page nuit grain coupe-bas sur-nuit">
       <div class="motif circuit"></div>
       <div class="wrap">
         <p class="surtitre">Référence introuvable</p>
@@ -44,7 +44,7 @@ function introuvable() {
           Voici ce que nous proposons de plus proche.
         </p>
         <div class="heros__actions">
-          <a class="btn btn--cyan" href="catalogue.html">Ouvrir le catalogue</a>
+          <a class="btn btn--cyan btn--lueur" href="catalogue.html">Ouvrir le catalogue</a>
           <a class="btn btn--ligne" href="contact.html">Nous demander</a>
         </div>
       </div>

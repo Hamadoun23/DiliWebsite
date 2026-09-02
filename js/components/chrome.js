@@ -191,7 +191,7 @@ class SiteEntete extends HTMLElement {
 
 class SitePied extends HTMLElement {
   connectedCallback() {
-    this.className = 'site-pied';
+    this.className = 'site-pied grain';
     const annee = new Date().getFullYear();
 
     this.innerHTML = `

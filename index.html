@@ -28,32 +28,39 @@
   <!-- ===================================================================
        HERO — le disque du logo devient le visuel de la page
        =================================================================== -->
-  <section class="heros nuit coupe-bas">
+  <section class="heros nuit grain coupe-bas">
+    <div class="halos" aria-hidden="true">
+      <span class="halo halo--1"></span>
+      <span class="halo halo--2"></span>
+      <span class="halo halo--3"></span>
+    </div>
     <div class="motif circuit"></div>
+
     <div class="wrap heros__in">
 
       <div class="heros__txt">
-        <p class="surtitre">Bamako · Torokorobougou</p>
-        <h1>Le bon matériel,<em>pour le bon usage.</em></h1>
-        <p class="heros__lead">
+        <p class="surtitre surtitre--vive entre" style="--i:0"><i class="surtitre__pouls" aria-hidden="true"></i>Bamako · Torokorobougou</p>
+        <h1 class="heros__titre entre" style="--i:1">Le bon matériel,<em>pour le bon usage.</em></h1>
+        <p class="heros__lead entre" style="--i:2">
           Ordinateurs portables toutes marques, accessoires informatiques et
           matériel réseau — avec le conseil qui va avec. Dilitech équipe les
           entreprises, les administrations et les particuliers au Mali et dans
           six pays voisins.
         </p>
 
-        <div class="heros__actions">
-          <a class="btn btn--cyan" href="catalogue.html">Voir le catalogue</a>
+        <div class="heros__actions entre" style="--i:3">
+          <a class="btn btn--cyan btn--lueur" href="catalogue.html">Voir le catalogue</a>
           <a class="btn btn--ligne" href="contact.html">Demander un devis</a>
         </div>
 
-        <ul class="heros__preuves" data-preuves>
+        <ul class="heros__preuves entre" style="--i:4" data-preuves>
           <!-- chiffres calculés depuis le catalogue par js/pages/accueil.js -->
         </ul>
       </div>
 
       <div class="heros__visuel" aria-hidden="true">
         <div class="disque">
+          <span class="disque__glow"></span>
           <span class="disque__anneau"></span>
           <span class="disque__anneau disque__anneau--2"></span>
           <span class="disque__barre disque__barre--g"></span>
@@ -65,6 +72,10 @@
       </div>
 
     </div>
+
+    <a class="scroll-cue" href="#univers" aria-label="Découvrir le catalogue">
+      <span class="ic" data-ic="chevronBas"></span>
+    </a>
   </section>
 
   <!-- bandeau des marques distribuées -->
@@ -245,7 +256,7 @@
         et les alternatives que nous aurions choisies à votre place.
       </p>
       <div class="cta__actions">
-        <a class="btn btn--cyan" href="catalogue.html">Composer ma sélection</a>
+        <a class="btn btn--cyan btn--lueur" href="catalogue.html">Composer ma sélection</a>
         <a class="btn btn--ligne" href="contact.html">Nous écrire</a>
       </div>
       <p class="cta__note" data-cta-note></p>

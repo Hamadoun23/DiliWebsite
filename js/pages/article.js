@@ -46,14 +46,14 @@ function bloc(b) {
 function introuvable() {
   document.title = 'Article introuvable — Dilitech';
   racine.innerHTML = `
-    <section class="entete-page nuit coupe-bas sur-nuit">
+    <section class="entete-page nuit grain coupe-bas sur-nuit">
       <div class="motif circuit"></div>
       <div class="wrap">
         <p class="surtitre">Article introuvable</p>
         <h1 class="titre titre--geant">Cette page <em>n'existe pas.</em></h1>
         <p class="chapeau">Le lien est peut-être ancien. Voici tous nos conseils.</p>
         <div class="heros__actions">
-          <a class="btn btn--cyan" href="conseils.html">Voir tous les conseils</a>
+          <a class="btn btn--cyan btn--lueur" href="conseils.html">Voir tous les conseils</a>
         </div>
       </div>
     </section>`;
@@ -75,7 +75,7 @@ function monter(a) {
   const suivant = ARTICLES[(i + 1) % ARTICLES.length];
 
   racine.innerHTML = `
-  <section class="entete-page nuit coupe-bas sur-nuit">
+  <section class="entete-page nuit grain coupe-bas sur-nuit">
     <div class="motif circuit"></div>
     <div class="wrap art-tete">
       <nav class="fil fil--sombre" aria-label="Fil d'Ariane">
@@ -141,7 +141,7 @@ function monter(a) {
         votre besoin, nous vous répondons.
       </p>
       <div class="cta__actions">
-        <a class="btn btn--cyan" href="contact.html">Nous écrire</a>
+        <a class="btn btn--cyan btn--lueur" href="contact.html">Nous écrire</a>
         <a class="btn btn--ligne" href="conseils.html">Tous les conseils</a>
       </div>
     </div>

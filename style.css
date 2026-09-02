@@ -100,6 +100,15 @@
 
   --ease: cubic-bezier(.22, .61, .36, 1);
   --ease-net: cubic-bezier(.65, 0, .35, 1);
+  /* Courbe « premium » : accélération nette puis arrivée très douce — celle
+     qu'on retrouve sur les interfaces soignées (Linear, Vercel, Toguna). */
+  --ease-expo: cubic-bezier(.16, 1, .3, 1);
+  /* Petit rebond, réservé aux micro-interactions (boutons, pastilles). */
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+
+  /* --- lueurs --- */
+  --glow-cyan: rgba(0, 159, 227, .45);
+  --glow-cyan-doux: rgba(0, 159, 227, .22);
 
   color-scheme: light;
 }
@@ -109,6 +118,64 @@
 .circuit {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%23FFFFFF' stroke-width='1'%3E%3Cpath d='M0 18h20M28 18h44M18 0v12M18 24v48M54 0v30M54 38v34M0 54h30M38 54h34'/%3E%3C/g%3E%3Cg fill='%23FFFFFF'%3E%3Ccircle cx='18' cy='18' r='2.4'/%3E%3Ccircle cx='54' cy='54' r='2.4'/%3E%3Ccircle cx='54' cy='34' r='1.6'/%3E%3Ccircle cx='34' cy='18' r='1.6'/%3E%3C/g%3E%3C/svg%3E");
   background-size: 72px 72px;
+}
+
+/* Grain fin superposé aux surfaces sombres les plus en vue (hero, appel
+   final) : bruit fractal en SVG, sans dépendance, quasi imperceptible mais
+   ce qui casse l'effet « dégradé plat » d'un fond uni et donne la texture
+   qu'ont les interfaces travaillées. */
+.grain { position: relative; }
+.grain::after {
+  content: "";
+  position: absolute; inset: 0;
+  /* Doit peindre SOUS le contenu statique (.wrap) : dans l'ordre de
+     peinture CSS, un élément positionné à z-index:auto passe pourtant
+     AU-DESSUS du flux statique — seul un z-index négatif le repasse
+     dessous, comme .motif un peu plus haut. */
+  z-index: -1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+  opacity: .05;
+  pointer-events: none;
+}
+
+/* Halos flous en dérive lente : la profondeur des sections sombres vient de
+   ces taches de lumière qui bougent, pas d'un dégradé figé. Chaque halo est
+   une simple pastille radiale + flou, animée en transform (peu coûteux). */
+.halos { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: -1; }
+.halo {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(72px);
+  opacity: .5;
+  will-change: transform;
+  animation: derive 22s var(--ease) infinite alternate;
+}
+.halo--1 {
+  width: 46vw; height: 46vw; max-width: 620px; max-height: 620px;
+  top: -14%; right: -8%;
+  background: radial-gradient(circle, var(--cyan) 0%, transparent 70%);
+  animation-duration: 26s;
+}
+.halo--2 {
+  width: 36vw; height: 36vw; max-width: 480px; max-height: 480px;
+  bottom: -18%; left: -6%;
+  background: radial-gradient(circle, var(--navy-clair) 0%, transparent 72%);
+  opacity: .6;
+  animation-duration: 32s;
+  animation-delay: -6s;
+}
+.halo--3 {
+  width: 24vw; height: 24vw; max-width: 320px; max-height: 320px;
+  top: 38%; left: 32%;
+  background: radial-gradient(circle, var(--cyan-2) 0%, transparent 74%);
+  opacity: .32;
+  animation-duration: 19s;
+  animation-delay: -11s;
+}
+@keyframes derive {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to   { transform: translate3d(4%, -6%, 0) scale(1.14); }
 }
 
 /* =========================================================================
@@ -298,24 +365,58 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 .btn {
   --btn-fond: var(--navy);
   --btn-txt: #fff;
+  position: relative;
   display: inline-flex; align-items: center; justify-content: center; gap: 9px;
   padding: 13px 22px;
   border-radius: 999px;
+  overflow: hidden;             /* rogne le reflet ::before sur la pilule */
   font-size: .89rem; font-weight: 700; letter-spacing: .01em;
   background: var(--btn-fond); color: var(--btn-txt);
   border: 1.5px solid transparent;
-  transition: transform .2s var(--ease), box-shadow .25s var(--ease),
+  transition: transform .32s var(--ease-expo), box-shadow .32s var(--ease-expo),
               background-color .2s var(--ease), color .2s var(--ease),
               border-color .2s var(--ease);
   white-space: nowrap;
 }
-.btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px -10px rgba(48, 39, 132, .55); }
-.btn:active { transform: translateY(0); }
+/* Reflet qui balaie le bouton au survol — la texture « verre » qu'on
+   retrouve sur les boutons premium, posée en pur CSS. */
+.btn::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(115deg, transparent 32%, rgba(255, 255, 255, .38) 50%, transparent 68%);
+  transform: translateX(-130%);
+  transition: transform .62s var(--ease-expo);
+  pointer-events: none;
+}
+.btn:hover::before { transform: translateX(130%); }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -12px rgba(48, 39, 132, .55); }
+.btn:active { transform: translateY(0) scale(.98); }
 
 .btn--plein  { --btn-fond: var(--navy); }
 .btn--cyan   { --btn-fond: var(--cyan); --btn-txt: #04263A; }
 .btn--wa     { --btn-fond: var(--wa);   --btn-txt: #042A15; }
 .btn--large  { width: 100%; padding: 15px 24px; font-size: .95rem; }
+
+/* Halo lumineux au survol — réservé aux appels principaux (un seul par
+   section, sinon l'effet se banalise). */
+.btn--lueur:hover {
+  box-shadow: 0 14px 28px -12px rgba(48, 39, 132, .55), 0 0 0 6px var(--glow-cyan-doux);
+}
+/* Le halo suit le curseur (--mx/--my posés par activerLueurBoutons() dans
+   js/core/ui.js) : signature volontairement rare, posée sur une poignée de
+   boutons seulement — la répéter sur chaque bouton du site la banaliserait
+   au lieu de la rendre précieuse. */
+.btn--lueur { --mx: 50%; --my: 30%; }
+.btn--lueur::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(140px circle at var(--mx) var(--my), rgba(255, 255, 255, .4), transparent 72%);
+  opacity: 0;
+  transition: opacity .35s var(--ease);
+  pointer-events: none;
+}
+.btn--lueur:hover::after { opacity: 1; }
+@media (hover: none) { .btn--lueur::after { display: none; } }
 
 .btn--ligne {
   --btn-fond: transparent; --btn-txt: var(--navy);
@@ -368,14 +469,23 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 /* --- barre de navigation --- */
 .nav {
   position: sticky; top: 0; z-index: 810;
-  background: rgba(255, 255, 255, .88);
-  backdrop-filter: blur(14px) saturate(1.4);
+  background: rgba(255, 255, 255, .78);
+  backdrop-filter: blur(18px) saturate(1.6);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
   border-bottom: 1px solid transparent;
-  transition: border-color .25s var(--ease), box-shadow .25s var(--ease);
+  transition: border-color .3s var(--ease), box-shadow .4s var(--ease-expo), background-color .3s var(--ease);
 }
 .site-entete.est-pose .nav {
   border-bottom-color: var(--line-2);
-  box-shadow: 0 8px 26px -20px rgba(18, 19, 43, .5);
+  box-shadow: 0 20px 40px -28px rgba(18, 19, 43, .4);
+}
+/* Filet dégradé, plus vivant qu'une bordure unie — la même idée que le
+   soulignement animé des liens, posée une fois pour toute la barre. */
+.site-entete.est-pose .nav::after {
+  content: "";
+  position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan) 50%, transparent);
+  opacity: .5;
 }
 .nav__in {
   height: var(--nav-h);
@@ -415,7 +525,14 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 .nav__ico:hover { background: var(--mist); color: var(--navy); }
 .nav__ico .ic { width: 20px; height: 20px; }
 
-.btn--devis { position: relative; padding: 11px 18px; font-size: .84rem; }
+/* `overflow: visible` : la pastille de compte (span positionné hors de la
+   boîte, top/right négatifs) serait autrement rognée par le `overflow:
+   hidden` que `.btn` pose pour le reflet au survol. */
+.btn--devis { position: relative; overflow: visible; padding: 11px 18px; font-size: .84rem; }
+/* Sans le rognage de `.btn`, le reflet en losange dépasserait des coins très
+   arrondis de cette pilule compacte : on le retire plutôt que de le laisser
+   déborder en carré. */
+.btn--devis::before { content: none; }
 .btn--devis .ic { width: 18px; height: 18px; }
 .site-entete.a-selection .btn--devis { --btn-fond: var(--cyan); --btn-txt: #04263A; }
 
@@ -500,7 +617,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 
 .heros {
   position: relative;
-  padding-block: clamp(56px, 8vw, 104px) clamp(96px, 12vw, 156px);
+  padding-block: clamp(56px, 8vw, 104px) clamp(120px, 14vw, 176px);
   overflow: hidden;
 }
 .heros__in {
@@ -509,8 +626,38 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   align-items: center;
 }
 
+/* --- entrée animée, une seule fois au chargement ------------------------
+   Indépendante du système `.reveal` (qui attend le défilement) : le hero
+   est déjà visible à l'ouverture de la page, il doit jouer tout de suite.
+   Chaque élément porte `style="--i:N"` : la cascade se lit dans l'ordre. */
+.entre {
+  animation: entree .8s var(--ease-expo) backwards;
+  animation-delay: calc(var(--i, 0) * 90ms + 60ms);
+}
+@keyframes entree {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .heros__txt { max-width: 640px; }
-.heros h1 {
+
+.surtitre--vive { display: inline-flex; }
+.surtitre__pouls {
+  position: relative;
+  display: inline-block;
+  width: 7px; height: 7px; margin-right: 3px;
+  border-radius: 50%;
+  background: var(--cyan-2);
+  box-shadow: 0 0 0 0 var(--glow-cyan);
+  animation: pouls 2.2s var(--ease) infinite;
+}
+@keyframes pouls {
+  0%   { box-shadow: 0 0 0 0 var(--glow-cyan); }
+  70%  { box-shadow: 0 0 0 8px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+.heros__titre {
   font-weight: 800;
   font-size: clamp(2.35rem, 6.4vw, 4.15rem);
   line-height: 1.02;
@@ -518,11 +665,24 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   color: #fff;
   text-wrap: balance;
 }
-.heros h1 em {
+.heros__titre em {
   display: block;
   font-style: normal; font-weight: 200;
-  color: var(--cyan-2);
+  /* Le même contraste que le logo (gras marine / maigre bleu clair), mais
+     avec un lent chromage qui balaie le texte — la touche « showroom »
+     empruntée aux sites automobiles premium, transposée dans les bleus
+     de la marque plutôt que dans un métal doré. */
+  background: linear-gradient(
+    100deg,
+    var(--cyan-2) 20%, #fff 45%, var(--cyan-3) 60%, var(--cyan-2) 85%
+  );
+  background-size: 220% auto;
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent;
+  animation: chrome 8s linear infinite;
 }
+@keyframes chrome { to { background-position: -220% center; } }
+
 .heros__lead {
   margin-top: 22px;
   font-size: clamp(1rem, 1.55vw, 1.14rem);
@@ -531,30 +691,91 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 }
 .heros__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
 
+/* --- bande de preuves, façon fiche technique ----------------------------
+   Verre dépoli, séparateurs verticaux entre les chiffres : on reprend le
+   langage « spec-strip » d'une fiche produit premium plutôt qu'une simple
+   ligne de statistiques. */
 .heros__preuves {
-  display: flex; flex-wrap: wrap; gap: 12px 34px;
-  margin-top: 40px; padding-top: 28px;
-  border-top: 1px solid var(--line-s2);
+  display: flex; flex-wrap: wrap;
+  margin-top: 40px; padding: 22px 26px;
+  background: rgba(255, 255, 255, .045);
+  border: 1px solid var(--line-s2);
+  border-radius: var(--r);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.heros__preuve {
+  position: relative;
+  padding-inline: 26px;
+  flex: 1 1 0;
+  min-width: 84px;
+}
+.heros__preuve:first-child { padding-left: 0; }
+.heros__preuve:not(:first-child)::before {
+  content: "";
+  position: absolute; left: 0; top: 2px; bottom: 2px;
+  width: 1px; background: var(--line-s);
 }
 .heros__preuve b {
   display: block;
   font-size: 1.75rem; font-weight: 800; line-height: 1.1;
   color: #fff;
+  font-variant-numeric: tabular-nums;
 }
 .heros__preuve span {
-  font-size: .74rem; font-weight: 600; letter-spacing: .12em;
+  display: block; margin-top: 4px;
+  font-size: .68rem; font-weight: 700; letter-spacing: .12em;
   text-transform: uppercase; color: var(--sur-sombre-3);
 }
+
+/* --- l'invite à défiler, en bas du hero --- */
+.scroll-cue {
+  position: absolute;
+  left: 50%; bottom: calc(var(--coupe) + 26px);
+  transform: translateX(-50%);
+  z-index: 2;
+  display: grid; place-items: center;
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  border: 1px solid var(--line-s);
+  color: var(--sur-sombre-2);
+  background: rgba(0, 0, 0, .22);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  animation: cueBob 2.6s ease-in-out infinite;
+  transition: border-color .3s var(--ease), color .3s var(--ease), box-shadow .3s var(--ease);
+}
+.scroll-cue:hover {
+  border-color: var(--cyan-2); color: #fff;
+  box-shadow: 0 0 26px var(--glow-cyan-doux);
+}
+.scroll-cue .ic { width: 18px; height: 18px; }
+@keyframes cueBob {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%      { transform: translateX(-50%) translateY(7px); }
+}
+@media (max-width: 640px) { .scroll-cue { display: none; } }
 
 /* --- le disque : le signe du logo devient le visuel du hero --- */
 .heros__visuel { position: relative; display: grid; place-items: center; min-height: 300px; }
 
 .disque { position: relative; width: min(430px, 82vw); aspect-ratio: 1; display: grid; place-items: center; }
+
+/* Halo ambiant : une simple tache de lumière bleue derrière le disque,
+   qui donne au dessin au trait la profondeur d'une vraie photo produit
+   éclairée en studio. */
+.disque__glow {
+  position: absolute; inset: -18%;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--glow-cyan-doux) 0%, transparent 68%);
+  filter: blur(30px);
+}
+
 .disque__fond {
   position: absolute; inset: 0; border-radius: 50%;
   background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, .16), rgba(255, 255, 255, .03) 62%);
   border: 1.5px solid rgba(255, 255, 255, .26);
   backdrop-filter: blur(2px);
+  box-shadow: 0 40px 90px -30px rgba(0, 0, 0, .55), inset 0 1px 0 rgba(255, 255, 255, .3);
 }
 .disque__anneau {
   position: absolute; inset: -7%;
@@ -683,12 +904,13 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   border: 1px solid var(--line-2);
   border-radius: var(--r);
   overflow: hidden;
-  transition: transform .28s var(--ease), box-shadow .28s var(--ease), border-color .28s var(--ease);
+  transition: transform .42s var(--ease-expo), box-shadow .42s var(--ease-expo), border-color .3s var(--ease);
 }
 .carte:hover {
-  transform: translateY(-4px);
-  border-color: rgba(48, 39, 132, .2);
-  box-shadow: 0 24px 44px -30px rgba(18, 19, 43, .55);
+  transform: translateY(-7px);
+  border-color: rgba(0, 159, 227, .45);
+  box-shadow: 0 30px 54px -28px rgba(18, 19, 43, .38), 0 0 0 1px rgba(0, 159, 227, .08),
+              0 16px 40px -22px var(--glow-cyan-doux);
 }
 
 .carte__visuel {
@@ -928,8 +1150,21 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 .filtres__fermer { display: none; width: 100%; margin-bottom: 6px; }
 
 /* --- en-tête de page (bandeau sombre court) --- */
-.entete-page { padding-block: clamp(44px, 6vw, 78px) clamp(62px, 8vw, 104px); }
+.entete-page { padding-block: clamp(44px, 6vw, 78px) clamp(62px, 8vw, 104px); overflow: hidden; }
 .entete-page .chapeau { max-width: 58ch; }
+/* Même profondeur que le hero de l'accueil, en plus léger : une seule tache
+   de lumière plutôt que trois halos en dérive — ces bandeaux sont plus
+   courts et se répètent sur huit pages, inutile d'y répéter le plein jeu. */
+.entete-page::before {
+  content: "";
+  position: absolute; z-index: -1;
+  top: -35%; right: -8%;
+  width: min(52vw, 620px); aspect-ratio: 1;
+  background: radial-gradient(circle, var(--cyan) 0%, transparent 68%);
+  filter: blur(80px);
+  opacity: .28;
+  pointer-events: none;
+}
 
 /* =========================================================================
    13. FICHE PRODUIT
@@ -1304,13 +1539,27 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 /* --- arguments (le « pourquoi Dilitech ») --- */
 .args { display: grid; gap: 20px; }
 .arg {
+  position: relative;
   padding: clamp(22px, 2.6vw, 30px);
   border-radius: var(--r);
   background: rgba(255, 255, 255, .055);
   border: 1px solid var(--line-s2);
-  transition: background-color .3s var(--ease), border-color .3s var(--ease), transform .3s var(--ease);
+  /* Verre dépoli véritable plutôt qu'un simple aplat translucide : le flou
+     capte ce qu'il y a derrière (les halos du fond), ce qui donne à la
+     carte une épaisseur qu'un fond blanc à 5 % n'a pas. */
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14);
+  transition: background-color .3s var(--ease), border-color .38s var(--ease-expo),
+              transform .38s var(--ease-expo), box-shadow .38s var(--ease-expo);
 }
-.arg:hover { background: rgba(255, 255, 255, .09); border-color: var(--line-s); transform: translateY(-4px); }
+.arg:hover {
+  background: rgba(255, 255, 255, .09);
+  border-color: rgba(0, 159, 227, .4);
+  transform: translateY(-6px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .16), 0 22px 40px -22px rgba(0, 0, 0, .45),
+              0 0 32px -8px var(--glow-cyan-doux);
+}
 .arg__n {
   font-size: .72rem; font-weight: 800; letter-spacing: .16em;
   color: var(--cyan-2); margin-bottom: 14px;
@@ -1398,9 +1647,13 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   display: flex; gap: 15px; align-items: flex-start;
   padding: 20px 22px;
   background: var(--paper); border: 1px solid var(--line-2); border-radius: var(--r);
-  transition: transform .26s var(--ease), border-color .26s var(--ease);
+  transition: transform .38s var(--ease-expo), border-color .3s var(--ease), box-shadow .38s var(--ease-expo);
 }
-.filiere:hover { transform: translateY(-3px); border-color: rgba(48, 39, 132, .2); }
+.filiere:hover {
+  transform: translateY(-6px);
+  border-color: rgba(0, 159, 227, .4);
+  box-shadow: 0 22px 40px -28px rgba(18, 19, 43, .35), 0 10px 26px -18px var(--glow-cyan-doux);
+}
 .filiere__ic {
   display: grid; place-items: center; flex: none;
   width: 42px; height: 42px; border-radius: 11px;
@@ -1442,7 +1695,11 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   background: var(--paper); border: 1px solid var(--line-2); border-radius: var(--r);
   transition: transform .28s var(--ease), border-color .28s var(--ease), box-shadow .28s var(--ease);
 }
-.pdv:hover { transform: translateY(-4px); border-color: rgba(48, 39, 132, .2); box-shadow: 0 22px 40px -32px rgba(18, 19, 43, .5); }
+.pdv:hover {
+  transform: translateY(-7px);
+  border-color: rgba(0, 159, 227, .4);
+  box-shadow: 0 26px 48px -30px rgba(18, 19, 43, .4), 0 14px 32px -20px var(--glow-cyan-doux);
+}
 .pdv--siege { border-color: rgba(0, 159, 227, .4); background: linear-gradient(168deg, rgba(0, 159, 227, .07), transparent 62%); }
 .pdv__tete { display: flex; align-items: center; gap: 11px; }
 /* Pastille de code pays plutôt qu'un drapeau emoji : les indicateurs
@@ -1618,6 +1875,18 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
    ========================================================================= */
 
 .cta { text-align: center; }
+/* Lueur d'ambiance derrière l'appel, sans qu'aucune page n'ait à poser de
+   balisage : une tache radiale posée une fois pour toutes les sections
+   `.cta`, exactement comme le halo qui baigne les boutons de la charte. */
+.cta::before {
+  content: "";
+  position: absolute; z-index: -1;
+  left: 50%; bottom: -8%; transform: translateX(-50%);
+  width: min(760px, 130%); height: 280px;
+  background: radial-gradient(50% 100% at 50% 100%, var(--glow-cyan-doux), transparent 72%);
+  filter: blur(4px);
+  pointer-events: none;
+}
 .cta__in { display: grid; justify-items: center; gap: 10px; max-width: 720px; margin-inline: auto; }
 .cta__actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 26px; }
 .cta__note { font-size: .82rem; color: var(--sur-sombre-3); margin-top: 16px; }
@@ -1633,6 +1902,13 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   padding-top: clamp(52px, 6vw, 82px);
   font-size: .89rem;
 }
+/* Filet dégradé au raccord avec la section qui précède : la coupure entre
+   deux aplats sombres a besoin d'un repère, pas d'une bordure franche. */
+.site-pied::before {
+  content: "";
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line-s) 50%, transparent);
+}
 .pied__haut { display: grid; gap: 34px; padding-bottom: 44px; }
 .pied__marque { display: grid; gap: 16px; align-content: start; }
 .pied__promesse { color: var(--sur-sombre-2); max-width: 40ch; font-size: .92rem; }
@@ -1644,9 +1920,13 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   background: rgba(255, 255, 255, .07);
   border: 1px solid var(--line-s2);
   color: #fff;
-  transition: background-color .2s var(--ease), transform .2s var(--ease), border-color .2s var(--ease);
+  transition: background-color .2s var(--ease), transform .3s var(--ease-expo),
+              border-color .2s var(--ease), box-shadow .3s var(--ease-expo);
 }
-.pied__reseaux a:hover { background: var(--cyan); border-color: var(--cyan); transform: translateY(-3px); }
+.pied__reseaux a:hover {
+  background: var(--cyan); border-color: var(--cyan); transform: translateY(-3px);
+  box-shadow: 0 10px 24px -8px var(--glow-cyan);
+}
 
 /* Déclinaison claire du même bloc, sur la page contact. Déclarée APRÈS la
    version sombre : à spécificité égale, c'est la dernière qui l'emporte. */
@@ -1747,17 +2027,14 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 
 .reveal {
   opacity: 0;
-  transform: translateY(18px);
-  transition: opacity .62s var(--ease), transform .62s var(--ease);
+  transform: translateY(26px) scale(.98);
+  transition: opacity .7s var(--ease-expo), transform .7s var(--ease-expo);
+  /* Posé par activerReveal() (js/core/ui.js) selon le rang de l'élément
+     parmi ses frères — toute rangée de cartes se dévoile donc en cascade,
+     sans qu'il faille écrire une règle nth-child par grille. */
+  transition-delay: calc(var(--i, 0) * 70ms);
 }
 .reveal.est-vu { opacity: 1; transform: none; }
-/* Décalage en cascade dans une grille : le regard suit la lecture. */
-.grille-produits .reveal:nth-child(2)  { transition-delay: .05s; }
-.grille-produits .reveal:nth-child(3)  { transition-delay: .1s; }
-.grille-produits .reveal:nth-child(4)  { transition-delay: .15s; }
-.grille-produits .reveal:nth-child(5)  { transition-delay: .05s; }
-.grille-produits .reveal:nth-child(6)  { transition-delay: .1s; }
-.grille-produits .reveal:nth-child(7)  { transition-delay: .15s; }
 
 /* =========================================================================
    22. ADAPTATION AUX ÉCRANS  (mobile d'abord : ce qui suit élargit)

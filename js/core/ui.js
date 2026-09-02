@@ -29,6 +29,19 @@ export function activerReveal(racine = document) {
     return;
   }
 
+  /* Cascade automatique : chaque élément reçoit son rang parmi les frères
+     de CE lot (pas dans toute la page), posé comme variable CSS `--i` que
+     `.reveal` lit dans son `transition-delay`. Une rangée de cartes se
+     dévoile donc de gauche à droite sans qu'aucune grille n'ait à écrire
+     ses propres règles nth-child — plafonné à 6 pour qu'une longue liste
+     ne fasse pas traîner l'apparition des dernières cartes. */
+  const rangParParent = new Map();
+  for (const n of cibles) {
+    const rang = rangParParent.get(n.parentElement) ?? 0;
+    rangParParent.set(n.parentElement, rang + 1);
+    n.style.setProperty('--i', Math.min(rang, 6));
+  }
+
   observateurReveal ??= new IntersectionObserver(
     (entrees, obs) => {
       for (const e of entrees) {
@@ -218,6 +231,21 @@ export function activerChromeDePage() {
   remonte?.addEventListener('click', () =>
     scrollTo({ top: 0, behavior: animationsReduites() ? 'auto' : 'smooth' })
   );
+}
+
+/* --- lueur qui suit le curseur -------------------------------------------
+   Réservée aux boutons `.btn--lueur` (un ou deux par page, les appels
+   principaux) : une délégation unique sur `document`, jamais un écouteur
+   par bouton — le coût reste nul même si la page en affiche plusieurs. */
+export function activerLueurBoutons(racine = document) {
+  if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  racine.addEventListener('pointermove', (e) => {
+    const b = e.target.closest?.('.btn--lueur');
+    if (!b) return;
+    const r = b.getBoundingClientRect();
+    b.style.setProperty('--mx', `${((e.clientX - r.left) / r.width) * 100}%`);
+    b.style.setProperty('--my', `${((e.clientY - r.top) / r.height) * 100}%`);
+  });
 }
 
 /* --- images différées ---------------------------------------------------- */

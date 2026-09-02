@@ -100,6 +100,69 @@ blanc → brume → blanc → **ancre marine** → blanc → brume → pied mari
   où une photo arrive, renseigner `img` sur le produit suffit : la photo
   recouvre le dessin, qui reste en repli si l'image casse.
 
+## Passe « premium » (septembre 2026)
+
+Après la livraison initiale, le client a demandé un niveau de finition
+équivalent au site événementiel **Toguna Motors**
+(`EventMotors/WebsiteEvent`, thème unique noir + or, GSAP, verre dépoli,
+lueurs). Décision validée avec lui : **garder le rythme clair/sombre
+existant** (pas de bascule en tout-sombre — un catalogue avec beaucoup de
+texte et de tableaux de specs reste plus lisible sur fond clair), et élever
+la CRAFT partout — sans ajouter GSAP ni aucune dépendance, pour rester
+cohérent avec le reste du site (100 % statique, modules ES natifs).
+
+Ce qui a été repris de l'inspiration Toguna, **transposé dans les bleus de
+la marque** plutôt que copié tel quel (Toguna est or/automobile, Dilitech
+est bleu/tech — mélanger les deux langages aurait brouillé l'identité) :
+
+- **Halos en dérive lente** (`.halos` / `.halo`) — des taches de lumière
+  floutées animées en `transform`, pas en dégradé (coût CPU nul). Le hero de
+  l'accueil en a trois ; les huit autres en-têtes de page (`.entete-page`)
+  en ont une seule, plus légère, posée en pur CSS (`::before`) pour ne
+  toucher aucun fichier HTML individuellement.
+- **Grain** (`.grain`, classe posée sur l'élément) — bruit fractal en SVG à
+  5 % d'opacité, `mix-blend-mode: overlay`. Casse l'effet « dégradé plat ».
+  ⚠ Le pseudo-élément `::after` peint SOUS le contenu statique du flux
+  uniquement grâce à `z-index: -1` — sans lui, en CSS, un élément positionné
+  passe TOUJOURS au-dessus du flux statique, quel que soit son ordre dans le
+  DOM. Le motif `.circuit` existant suit la même règle.
+- **Titre chromé** (`.heros__titre em`, hero de l'accueil uniquement) —
+  dégradé animé blanc/cyan qui balaie le texte, écho au « chrome shine » de
+  Toguna. Volontairement **réservé au plus grand titre du site** : le rejouer
+  sur chaque `<h2>` de chaque page aurait été too much.
+- **Bande de preuves en verre** (`.heros__preuves`) — `backdrop-filter`,
+  séparateurs verticaux entre les chiffres : le langage « fiche technique »
+  de Toguna, appliqué aux trois compteurs (références / marques / villes).
+- **Boutons** : reflet diagonal au survol sur `.btn` (`::before`, rogné par
+  `overflow: hidden` — `.btn--devis` en a été exclu car sa pastille de
+  compte déborde intentionnellement de la boîte, voir le commentaire sur
+  place) ; **lueur qui suit le curseur** sur `.btn--lueur`
+  (`activerLueurBoutons()` dans `js/core/ui.js`, une seule délégation sur
+  `document`, jamais un écouteur par bouton). Volontairement posée sur une
+  poignée de boutons par page (l'appel principal de chaque section de
+  clôture) — la généraliser l'aurait banalisée.
+- **Cartes** : lift + ombre teintée cyan au survol sur toutes les familles
+  (`.carte`, `.univ`, `.serv`, `.art`, `.pdv`, `.filiere`), courbe
+  `--ease-expo`. `.arg` (section « pourquoi », fond sombre) est passée en
+  **vrai verre dépoli** (`backdrop-filter: blur`), pas un aplat translucide.
+- **Cascade d'apparition automatique** — `activerReveal()` calcule le rang
+  de chaque élément parmi ses frères et pose `--i` en CSS ; `.reveal` lit
+  cette variable dans son `transition-delay`. Toute nouvelle grille de
+  cartes se dévoile donc en cascade sans qu'aucune règle `nth-child` ne soit
+  à écrire nulle part — c'était le cas avant (des règles à la main,
+  seulement sur `.grille-produits`), ce n'est plus vrai depuis.
+- Le hero de l'accueil a sa **propre entrée au chargement**
+  (`.entre`, indépendante du système `.reveal` qui attend le défilement :
+  le hero est déjà visible à l'ouverture de la page).
+- **Incohérence corrigée en chemin** : le CTA de fermeture de `reseau.html`
+  était resté sur fond clair alors que toutes les autres pages referment sur
+  une ancre sombre avant le pied de page. Aligné sur le même motif
+  (`.nuit coupe-haut sur-nuit`).
+
+Tout respecte `prefers-reduced-motion` — la règle globale existante
+(`animation-duration: .001ms !important`) neutralise aussi les halos et le
+chromage sans qu'il ait fallu l'étendre.
+
 ## Stack
 
 - **100 % statique** : HTML / CSS / **modules ES natifs**. Aucun framework,
