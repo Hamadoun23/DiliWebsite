@@ -26,14 +26,19 @@
 <main id="contenu">
 
   <!-- ===================================================================
-       HERO — le disque du logo devient le visuel de la page
+       HERO — vraie photographie plutôt qu'un dessin : un ordinateur, dans
+       le noir, comme la charte le veut. Photo sous licence Unsplash
+       (Martin Katler), recadrée et assombrie pour rester dans les bleus de
+       la marque plutôt que ses tons d'origine. Voir claudeprompt.md pour
+       la source et la licence.
        =================================================================== -->
   <section class="heros nuit grain coupe-bas">
-    <div class="halos" aria-hidden="true">
+    <div class="heros__photo" style="background-image:url('assets/img/hero-laptop.jpg')" aria-hidden="true"></div>
+    <div class="halos halos--photo" aria-hidden="true">
       <span class="halo halo--1"></span>
-      <span class="halo halo--2"></span>
       <span class="halo halo--3"></span>
     </div>
+    <div class="heros__scrim" aria-hidden="true"></div>
     <div class="motif circuit"></div>
 
     <div class="wrap heros__in">
@@ -56,19 +61,6 @@
         <ul class="heros__preuves entre" style="--i:4" data-preuves>
           <!-- chiffres calculés depuis le catalogue par js/pages/accueil.js -->
         </ul>
-      </div>
-
-      <div class="heros__visuel" aria-hidden="true">
-        <div class="disque">
-          <span class="disque__glow"></span>
-          <span class="disque__anneau"></span>
-          <span class="disque__anneau disque__anneau--2"></span>
-          <span class="disque__barre disque__barre--g"></span>
-          <span class="disque__barre disque__barre--d"></span>
-          <span class="disque__fond"></span>
-          <span class="disque__illus" data-heros-illus></span>
-          <div class="orbite" data-orbite></div>
-        </div>
       </div>
 
     </div>

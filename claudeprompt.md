@@ -163,6 +163,74 @@ Tout respecte `prefers-reduced-motion` — la règle globale existante
 (`animation-duration: .001ms !important`) neutralise aussi les halos et le
 chromage sans qu'il ait fallu l'étendre.
 
+## Deuxième retour : hero avec vraie photo (septembre 2026)
+
+Le premier jet de la passe premium (ci-dessus, tout en dessin/CSS) n'a pas
+convaincu le client : il voulait le niveau **EventMotors/WebsiteEvent**
+(`event.toguna-motors.com`), avec de vraies photos plutôt que des
+illustrations au trait. Il a fourni trois captures Pinterest en référence
+(monitor mockup, jet privé « Aeroluxe », drone « MDR Ultra Light » —
+toutes : produit qui flotte dans un fond noir, avec une lueur).
+
+**Sur le sourcing d'image** : le client a d'abord demandé de « télécharger
+depuis Pinterest ». Refusé — un pin agrège des images de sources et de
+licences très variées (souvent repostées sans mention), impossible à tracer
+pour un usage commercial client. À la place : photographie **sous licence
+Unsplash** (gratuite, usage commercial explicitement autorisé, aucune
+autorisation à demander), trouvée par recherche puis téléchargée.
+
+⚠ **Piège d'environnement** : le `Bash` de cet environnement n'a **aucun
+accès réseau sortant** (`curl` timeout sur tout hôte externe) — seuls les
+outils `WebFetch`/`WebSearch` peuvent atteindre l'extérieur, et ils ne
+renvoient que du texte, pas des octets bruts. **`PowerShell` en revanche a
+un accès réseau normal** : `Invoke-WebRequest` fonctionne. C'est le chemin
+à reprendre pour tout téléchargement de fichier binaire futur dans ce
+projet.
+
+- **Photo retenue** : *black laptop computer turned on in dim light*, par
+  **Martin Katler** (@martinkatler) sur Unsplash, licence Unsplash. URL
+  source :
+  `https://unsplash.com/photos/black-laptop-computer-turned-on-in-dim-light-o9XN28KdyN8`.
+  Choisie plutôt que la photo d'Andras Vas (*MacBook Pro turned on*,
+  `Bd7gNnWJBkU`) parce que cette dernière est l'une des photos de stock les
+  plus réutilisées du web (elle traîne sur des centaines de templates) — la
+  reprendre aurait fait « site fait avec un template » plutôt que
+  « site sur mesure ». Enregistrée dans `assets/img/hero-laptop.jpg`.
+- **Le portable est un MacBook — Dilitech vend toutes marques.** Point
+  assumé, pas oublié : le client a explicitement demandé cette imagerie.
+  Mais si un jour la question se pose (« pourquoi un Mac sur le site d'un
+  revendeur multi-marques ? »), la réponse honnête est qu'aucune
+  alternative neutre de cette qualité dramatique n'a été trouvée en licence
+  libre dans le temps imparti — à revoir si le client founit ses propres
+  photos de vitrine.
+- **Traitement colorimétrique** : la photo source est nativement
+  rose/orange/bleu (rétroéclairage RGB générique). `filter: saturate(.5)
+  brightness(.8) contrast(1.08)` sur `.heros__photo` la ramène vers des
+  bleus proches de la charte, et les halos cyan existants (`.halos`,
+  `mix-blend-mode: screen`) sont repositionnés par-dessus pour renforcer la
+  couleur de marque au lieu de simplement flotter à côté.
+- **Composition** : source portrait (2400×3600) affichée en fond de hero
+  large via `background-size: cover` — la majeure partie de la hauteur
+  sort du cadre. `background-position: 68% 73%` a été trouvé **par
+  itération visuelle** (calcul de la fenêtre visible, puis capture d'écran,
+  puis ajustement) pour que le clavier reste dans le cadre plutôt que le
+  bureau vide sous la machine. Si la photo change, refaire cette itération
+  — ne pas deviner la valeur.
+- L'ancien visuel (disque + barres du logo en SVG, orbite de pastilles de
+  marques) a été **entièrement retiré** — plus utilisé nulle part ailleurs
+  sur le site, sa CSS morte a été supprimée avec lui (`.disque*`,
+  `.orbite*`, `@keyframes tourner/flotter`), ainsi que les deux lignes de
+  `js/pages/accueil.js` qui le remplissaient.
+- **Aussi intégrée** : une vraie photo Dilitech (pas du stock) dans le bloc
+  Service après-vente de `services.html` — recadrée depuis un visuel de
+  communication du client, voir `assets/img/agent-sav.jpg` et le
+  commentaire au-dessus de `.bloc-serv__vis--photo` dans `style.css`.
+
+**Reste à faire si le client fournit ses propres photos** : remplacer
+`assets/img/hero-laptop.jpg` par une vraie photo Dilitech (showroom, un
+poste en vente) suffit — aucune classe CSS à toucher, `background-position`
+à réitérer comme ci-dessus si le cadrage source diffère.
+
 ## Stack
 
 - **100 % statique** : HTML / CSS / **modules ES natifs**. Aucun framework,

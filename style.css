@@ -755,70 +755,36 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 }
 @media (max-width: 640px) { .scroll-cue { display: none; } }
 
-/* --- le disque : le signe du logo devient le visuel du hero --- */
-.heros__visuel { position: relative; display: grid; place-items: center; min-height: 300px; }
+/* --- la photo : un vrai ordinateur, dans le noir ------------------------
+   Remplace l'ancien disque en SVG. Trois couches empilées derrière le
+   texte (voir l'index négatif de chacune, même règle que .motif un peu
+   plus haut : un élément positionné passe TOUJOURS au-dessus du flux
+   statique, seul un z-index négatif le repasse dessous) :
+     1. .heros__photo — la photo elle-même, désaturée et assombrie pour
+        rester dans les bleus de la marque plutôt que ses tons d'origine
+        (l'écran de la machine est nativement rose/orange sur la source) ;
+     2. .halos — le même halo cyan qu'ailleurs sur le site, en mode
+        « additif » ici : il RECOLORE la lueur de l'écran au lieu de
+        simplement flotter par-dessus ;
+     3. .heros__scrim — le dégradé qui rend le texte lisible à gauche. */
+.heros__photo {
+  position: absolute; inset: 0; z-index: -3;
+  background-image: url('assets/img/hero-laptop.jpg');
+  background-size: cover;
+  background-position: 68% 73%;
+  filter: saturate(.5) brightness(.8) contrast(1.08);
+}
+.halos--photo { z-index: -2; mix-blend-mode: screen; }
+.halos--photo .halo--1 { top: auto; bottom: -20%; right: 4%; opacity: .8; }
+.halos--photo .halo--3 { bottom: 6%; right: 22%; left: auto; opacity: .5; }
 
-.disque { position: relative; width: min(430px, 82vw); aspect-ratio: 1; display: grid; place-items: center; }
-
-/* Halo ambiant : une simple tache de lumière bleue derrière le disque,
-   qui donne au dessin au trait la profondeur d'une vraie photo produit
-   éclairée en studio. */
-.disque__glow {
-  position: absolute; inset: -18%;
-  border-radius: 50%;
-  background: radial-gradient(circle, var(--glow-cyan-doux) 0%, transparent 68%);
-  filter: blur(30px);
+.heros__scrim {
+  position: absolute; inset: 0; z-index: -1;
+  background:
+    linear-gradient(100deg, var(--navy-ink) 0%, rgba(16, 11, 51, .92) 32%, rgba(16, 11, 51, .38) 62%, transparent 88%),
+    linear-gradient(0deg, var(--navy-ink) 0%, transparent 30%, transparent 72%, rgba(16, 11, 51, .5) 100%);
 }
 
-.disque__fond {
-  position: absolute; inset: 0; border-radius: 50%;
-  background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, .16), rgba(255, 255, 255, .03) 62%);
-  border: 1.5px solid rgba(255, 255, 255, .26);
-  backdrop-filter: blur(2px);
-  box-shadow: 0 40px 90px -30px rgba(0, 0, 0, .55), inset 0 1px 0 rgba(255, 255, 255, .3);
-}
-.disque__anneau {
-  position: absolute; inset: -7%;
-  border-radius: 50%;
-  border: 1.5px dashed rgba(0, 159, 227, .38);
-  animation: tourner 46s linear infinite;
-}
-.disque__anneau--2 { inset: -16%; border-style: solid; border-color: rgba(255, 255, 255, .09); animation-duration: 74s; animation-direction: reverse; }
-@keyframes tourner { to { transform: rotate(360deg); } }
-
-/* Les deux barres du logo, en grand, de part et d'autre du disque. */
-.disque__barre {
-  position: absolute; top: 12%; bottom: 12%;
-  width: clamp(11px, 2.4vw, 17px);
-  border-radius: 999px;
-  background: linear-gradient(180deg, var(--cyan) 0%, rgba(0, 159, 227, .25) 100%);
-}
-.disque__barre--g { left: -3.5%; }
-.disque__barre--d { right: -3.5%; background: linear-gradient(180deg, rgba(255, 255, 255, .85) 0%, rgba(255, 255, 255, .2) 100%); }
-
-.disque__illus { position: relative; width: 68%; color: #fff; }
-.disque__illus svg { width: 100%; height: auto; stroke-width: 3; }
-.disque__illus .il-a { color: var(--cyan-2); }
-
-/* Pastilles de marques en orbite */
-.orbite { position: absolute; inset: 0; pointer-events: none; }
-.orbite__puce {
-  position: absolute;
-  padding: 7px 14px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, .1);
-  border: 1px solid rgba(255, 255, 255, .2);
-  backdrop-filter: blur(6px);
-  font-size: .73rem; font-weight: 700; letter-spacing: .04em;
-  color: #fff;
-  white-space: nowrap;
-  animation: flotter 7s var(--ease) infinite;
-}
-@keyframes flotter { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
-.orbite__puce:nth-child(1) { top: 4%;  left: -8%;  animation-delay: 0s; }
-.orbite__puce:nth-child(2) { top: 30%; right: -14%; animation-delay: .9s; }
-.orbite__puce:nth-child(3) { bottom: 16%; left: -14%; animation-delay: 1.8s; }
-.orbite__puce:nth-child(4) { bottom: -2%; right: 2%;  animation-delay: 2.6s; }
 
 /* =========================================================================
    9. MARQUEE DES MARQUES
@@ -2066,7 +2032,6 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 }
 
 @media (min-width: 860px) {
-  .heros__in { grid-template-columns: 1.08fr .92fr; }
   .fiche { grid-template-columns: 1fr 1fr; }
   .univers { grid-template-columns: repeat(3, 1fr); }
   .services { grid-template-columns: repeat(3, 1fr); }

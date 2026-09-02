@@ -19,7 +19,9 @@ import { $, $$, esc, rendre } from '../core/dom.js';
 import { icone } from '../core/icones.js';
 import { activerReveal, activerCompteurs } from '../core/ui.js';
 
-/* --- hero : chiffres et visuel ---------------------------------------- */
+/* --- hero : chiffres ---------------------------------------------------
+   Le visuel du hero est désormais une photo (voir index.html) : rien à
+   calculer côté JS pour lui. Seule la bande de preuves reste dynamique. */
 
 function hero() {
   const s = cat.statistiques();
@@ -39,19 +41,6 @@ function hero() {
       )
       .join('')
   );
-
-  /* Le visuel du hero montre la machine mise en avant du moment. */
-  const vedette = cat.recommandes().find((p) => p.cat === 'ordinateurs') ?? cat.tous()[0];
-  rendre('[data-heros-illus]', illustration(vedette.illus));
-
-  /* Quatre marques en orbite, prises parmi les plus représentées. */
-  const parMarque = {};
-  for (const p of cat.tous()) parMarque[p.marque] = (parMarque[p.marque] ?? 0) + 1;
-  const top = Object.entries(parMarque)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 4)
-    .map(([m]) => m);
-  rendre('[data-orbite]', top.map((m) => `<span class="orbite__puce">${esc(m)}</span>`).join(''));
 }
 
 /* --- bandeau des marques ---------------------------------------------- */
