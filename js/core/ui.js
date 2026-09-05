@@ -248,6 +248,23 @@ export function activerLueurBoutons(racine = document) {
   });
 }
 
+/**
+ * Spotlight qui suit le curseur dans le hero de l'accueil — technique
+ * portée telle quelle du site VP (`initHeroSpotlight` dans
+ * WebsiteVP/js/common.js) : un seul `mousemove` sur le hero, --mx/--my en
+ * pourcentage, lus par le dégradé radial de `.hero__spotlight` en CSS.
+ * Écran tactile ou souris imprécise : on ne pose même pas l'écouteur.
+ */
+export function activerSpotlightHero(id = '#hero') {
+  const hero = $(id);
+  if (!hero || !matchMedia('(pointer: fine)').matches) return;
+  hero.addEventListener('mousemove', (e) => {
+    const r = hero.getBoundingClientRect();
+    hero.style.setProperty('--mx', `${((e.clientX - r.left) / r.width) * 100}%`);
+    hero.style.setProperty('--my', `${((e.clientY - r.top) / r.height) * 100}%`);
+  });
+}
+
 /* --- images différées ---------------------------------------------------- */
 
 /**

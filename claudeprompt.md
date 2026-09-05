@@ -163,7 +163,7 @@ Tout respecte `prefers-reduced-motion` — la règle globale existante
 (`animation-duration: .001ms !important`) neutralise aussi les halos et le
 chromage sans qu'il ait fallu l'étendre.
 
-## Deuxième et troisième retours : le hero (septembre 2026)
+## Historique du hero — trois refontes avant la version retenue (septembre 2026)
 
 Le premier jet de la passe premium (dessin SVG + halos CSS) n'a pas
 convaincu le client : il voulait le niveau **EventMotors/WebsiteEvent**
@@ -263,6 +263,90 @@ retours de `background-position` déjà rien que pour la deuxième tentative).
 la recette Pillow ci-dessus sur la nouvelle photo) — le CSS n'a rien à
 changer, il ne fait que poser et éclaircir l'image qu'on lui donne.
 
+
+## Quatrième refonte : le hero est repris directement de VP (celle qui reste)
+
+Après la troisième tentative (photo détourée flottante ci-dessus), le client a
+recadré la demande : **« récupère le code de VP et adapte-le, ne te casse pas
+la tête »** — VP = `Downloads/Dilitech/WebsiteVP`, le site de la marque de
+couture **Vêtement Palace** (vpofficiel.com), un autre projet Dymo Labs. Plutôt
+que de continuer à deviner par itérations, la structure et le CSS du hero de
+VP (`WebsiteVP/index.html` + `WebsiteVP/style.css`, classes `.hero*`,
+`.cta-pill`, `.cta-link`) ont été **repris tels quels**, avec uniquement la
+palette, la police et le contenu adaptés. C'est la version en place
+aujourd'hui — **les trois tentatives précédentes ci-dessus sont de
+l'historique, pas l'état courant.**
+
+Ce qui a été gardé à l'identique de VP (mécanique et structure) :
+- Photo plein cadre (`.hero__media img`) + double dégradé de lisibilité
+  (`.hero__overlay`, radial + linéaire) ;
+- **Mot fantôme en filigrane** (`.hero__ghost`) : VP affiche « Palace » en
+  contour (`-webkit-text-stroke`, fond transparent) derrière le titre ;
+  Dilitech affiche **« TECH »** — le demi-mot maigre du logo, cohérent avec
+  la charte ;
+- **Spotlight qui suit le curseur** (`.hero__spotlight`) : un halo radial
+  positionné par `--mx`/`--my`, posés par un seul `mousemove` sur le hero.
+  Porté dans `activerSpotlightHero()` (`js/core/ui.js`), appelé uniquement
+  par `js/pages/accueil.js` (page d'accueil seulement, comme chez VP) ;
+- **Pilule magnétique** (`.cta-pill`) pour l'appel principal — le fond se
+  remplit au survol (`::before` qui grandit en `scaleX`), l'icône flèche
+  pivote à 45° — et **lien souligné avec puce verte** (`.cta-link`,
+  `.cta-link__dot` couleur `--wa`) pour l'appel secondaire ;
+- Cadre inset fin (`.hero__frame`), libellé vertical en bord gauche
+  (`.hero__side`, `writing-mode: vertical-rl`), pagination à points
+  décorative sur le bord droit (`.hero__dots` — purement statique chez VP
+  comme ici, ce n'est pas un vrai carrousel) ;
+- Bande de bas de hero (`.hero__foot`) : chiffres à gauche (`.hero__stats`/
+  `.hero__stat`, `b` + `span`, séparés par une bordure), réseaux sociaux à
+  droite (`.hero__foot-social`).
+
+Ce qui a été volontairement changé (pas une reprise à l'identique) :
+- **Couleur** : l'or de VP (`--gold-light` #C9AD74 sur fond sombre,
+  `--gold-dark` #7C6127 sur fond clair) devient le cyan Dilitech
+  (`--cyan-2`, `--cyan-ink`) ; `--ink` devient `--navy-ink`.
+- **Police** : VP utilise Bodoni Moda (serif italique) en display. La charte
+  Dilitech impose Montserrat partout — **aucune police serif n'a été
+  ajoutée**. Le titre garde donc la règle maison du site (gras marine →
+  très maigre bleu clair, `.hero__title em`) plutôt que l'italique doré de
+  VP : c'est le seul endroit où la reprise s'écarte du gabarit d'origine,
+  et c'est délibéré (ne pas trahir la charte pour coller à VP).
+- **La photo n'est pas recolorée en bleu** : contrairement aux deux
+  tentatives précédentes qui essayaient de teinter la photo vers le cyan,
+  ici — comme VP qui laisse le mannequin en gris désaturé et réserve l'or
+  aux éléments d'interface — la photo reste **neutre** (`filter: grayscale
+  brightness contrast saturate`, aucune teinte de couleur) et c'est
+  l'interface (fantôme, spotlight, halos, pilule) qui porte le cyan. Plus
+  simple, et ça a réglé d'un coup le problème de teinte qui demandait des
+  réglages fins à chaque nouvelle photo.
+- **Nav non reprise** : VP passe sa nav en `position: fixed` overlay
+  transparent qui devient opaque au scroll (`.nav--overlay`, classe
+  `.scrolled` en JS). La nav de Dilitech reste `position: sticky` avec son
+  bandeau de coordonnées au-dessus — non touchée. Piège évité : le hero de
+  VP a `padding-top: var(--nav-h)` pour compenser sa nav en overlay ; **ne
+  pas copier ce padding ici**, la nav de Dilitech occupe déjà sa propre
+  place dans le flux, l'ajouter pousserait le contenu deux fois. `.hero`
+  utilise `min-height: calc(100vh - var(--nav-h) - var(--bandeau-h))` à la
+  place.
+- **Photo source** : recadrée en amont (Python/Pillow) sur un ratio large
+  (~1.55:1, voir `assets/img/hero-laptop-large.jpg`) plutôt que d'utiliser
+  `object-fit: cover` sur la photo verticale d'origine (2400×3600) — cover
+  sur un ratio aussi éloigné du hero recadre trop fort et redevient
+  sensible à la hauteur exacte de l'écran, le problème déjà rencontré à la
+  tentative précédente.
+- L'asset `assets/img/hero-laptop-flottant.webp` (photo détourée de la
+  tentative précédente) est **supprimé**, plus référencé nulle part.
+
+**Reste à faire si le client fournit ses propres photos** : remplacer
+`assets/img/hero-laptop-large.jpg` par un nouveau recadrage large (même
+ratio ~1.55:1) — le CSS n'a rien à changer, `.hero__media img` se charge du
+reste (`object-fit: cover` + filtre neutre).
+
+**À regarder si on porte d'autres pages de VP** : `WebsiteVP/claudeprompt.md`
+documente toute la direction artistique (section « Direction artistique »)
+et liste les pièges déjà rencontrés côté VP (ex. section retirée du HTML
+sans retirer le `$("#id")` correspondant dans le JS, qui interrompt
+silencieusement le reste du script) — à lire avant de reprendre autre chose
+de ce site.
 
 ## Stack
 

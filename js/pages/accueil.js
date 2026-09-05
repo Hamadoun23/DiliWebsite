@@ -17,7 +17,7 @@ import { illustration } from '../data/illustrations.js';
 import { carteProduit } from '../components/carte-produit.js';
 import { $, $$, esc, rendre } from '../core/dom.js';
 import { icone } from '../core/icones.js';
-import { activerReveal, activerCompteurs } from '../core/ui.js';
+import { activerReveal, activerCompteurs, activerSpotlightHero } from '../core/ui.js';
 
 /* --- hero : chiffres ---------------------------------------------------
    Le visuel du hero est désormais une photo (voir index.html) : rien à
@@ -34,13 +34,15 @@ function hero() {
       { n: s.villes,     mot: 'villes' },
     ]
       .map(
-        (p) => `<li class="heros__preuve">
+        (p) => `<li class="hero__stat">
                   <b data-compteur="${p.n}">0</b>
                   <span>${esc(p.mot)}</span>
                 </li>`
       )
       .join('')
   );
+
+  activerSpotlightHero();
 }
 
 /* --- bandeau des marques ---------------------------------------------- */

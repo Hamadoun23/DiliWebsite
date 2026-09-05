@@ -615,29 +615,9 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
    8. HERO
    ========================================================================= */
 
-/* .heros--v2 est volontairement SANS .nuit/.grain/.coupe-bas : ces trois
-   classes habillent des aplats de dégradé, pas une vraie photo. Un
-   quadrillage de points ou un grain plaqué sur une photographie a l'air
-   d'un gabarit posé par-dessus, pas d'une mise en scène — c'est ce qui
-   sonnait faux dans la version précédente. Fond quasi noir, un seul
-   geste (la machine qui émerge du noir), rien d'autre en décor. */
-.heros--v2 {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  min-height: 92vh;
-  display: flex;
-  align-items: center;
-  padding-block: clamp(120px, 16vh, 200px) clamp(64px, 10vh, 120px);
-  background: radial-gradient(140% 100% at 80% 20%, #17123f 0%, #0a0722 46%, #050313 100%);
-}
-
-.heros__in { width: 100%; }
-
 /* --- entrée animée, une seule fois au chargement ------------------------
    Indépendante du système `.reveal` (qui attend le défilement) : le hero
-   est déjà visible à l'ouverture de la page, il doit jouer tout de suite.
-   Chaque élément porte `style="--i:N"` : la cascade se lit dans l'ordre. */
+   est déjà visible à l'ouverture de la page, il doit jouer tout de suite. */
 .entre {
   animation: entree .8s var(--ease-expo) backwards;
   animation-delay: calc(var(--i, 0) * 90ms + 60ms);
@@ -647,15 +627,12 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.heros__txt { max-width: 640px; }
-
-.surtitre--vive { display: inline-flex; }
 .surtitre__pouls {
   position: relative;
   display: inline-block;
   width: 7px; height: 7px; margin-right: 3px;
   border-radius: 50%;
-  background: var(--cyan-2);
+  background: currentColor;
   box-shadow: 0 0 0 0 var(--glow-cyan);
   animation: pouls 2.2s var(--ease) infinite;
 }
@@ -665,47 +642,208 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   100% { box-shadow: 0 0 0 0 transparent; }
 }
 
-.heros__titre {
+/* =========================================================================
+   HERO ÉDITORIAL — porté du site VP (Vêtement Palace, WebsiteVP/style.css,
+   règles `.hero*`/`.cta-pill`/`.cta-link` d'origine). Le client a demandé
+   de reprendre directement ce système plutôt que d'en réinventer un :
+   structure et mécanique intactes, palette et police adaptées à la charte
+   Dilitech ci-dessous.
+     — couleur : l'or (`--gold-light` #C9AD74, `--gold-dark` #7C6127) est
+       devenu le cyan de la marque (`--cyan-2`, `--cyan-ink`) ; l'encre
+       `--ink` est devenue `--navy-ink`.
+     — police : VP utilise Bodoni Moda (serif italique) en display ; la
+       charte Dilitech impose Montserrat partout, donc le titre garde ICI
+       la règle maison (gras marine → très maigre bleu clair) plutôt que
+       l'italique doré de VP — c'est le seul endroit où on s'écarte du
+       gabarit d'origine, pour ne pas trahir la charte.
+   ========================================================================= */
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  /* VP place sa nav en `position: fixed` par-dessus le hero et compense
+     avec ce padding — la nav de Dilitech est `sticky` (dans le flux, pas
+     en overlay), le hero commence donc déjà sous elle : pas de padding à
+     ajouter ici, sous peine de pousser le contenu deux fois. */
+  min-height: calc(100vh - var(--nav-h) - var(--bandeau-h));
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  color: #fff;
+}
+
+.hero__media { position: absolute; inset: 0; z-index: -3; overflow: hidden; background: var(--navy-ink); }
+.hero__media img {
+  width: 100%; height: 100%; object-fit: cover; object-position: center 38%;
+  /* La photo reste quasi neutre : c'est l'interface (fantôme, spotlight,
+     halos, pilule) qui porte la couleur de marque — pas un recolorage de
+     la photo elle-même, exactement comme VP laisse la photo du modèle en
+     désaturé et réserve l'or aux éléments d'interface. */
+  filter: grayscale(.5) brightness(.6) contrast(1.15) saturate(.75);
+}
+.hero__overlay {
+  position: absolute; inset: 0; z-index: -2;
+  background:
+    radial-gradient(ellipse at center 42%, rgba(16, 11, 51, .18) 0%, rgba(16, 11, 51, .6) 62%, rgba(16, 11, 51, .92) 100%),
+    linear-gradient(180deg, rgba(16, 11, 51, .6) 0%, rgba(16, 11, 51, .05) 22%, rgba(16, 11, 51, .12) 58%, rgba(16, 11, 51, .9) 100%);
+}
+/* Les mêmes halos en dérive qu'ailleurs sur le site (voir section 1) —
+   recolorent la scène en cyan plutôt que de recolorer la photo. */
+.halos--hero { z-index: -1; mix-blend-mode: screen; }
+.halos--hero .halo--1 { top: -12%; left: -8%; opacity: .7; }
+.halos--hero .halo--3 { top: auto; bottom: 4%; right: 10%; left: auto; opacity: .4; }
+
+/* Le mot fantôme en filigrane — signature VP reprise telle quelle. Le
+   demi-mot « TECH » du logo plutôt que le nom complet : plus court, et il
+   fait écho à la moitié maigre du wordmark. */
+.hero__ghost {
+  position: absolute; z-index: -1; left: 0; right: 0; top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font); font-weight: 800; text-transform: uppercase;
+  font-size: clamp(6rem, 22vw, 18rem); line-height: 1; letter-spacing: -.01em;
+  text-align: center; white-space: nowrap; pointer-events: none;
+  color: transparent; -webkit-text-stroke: 1px rgba(255, 255, 255, .12);
+}
+
+/* Spotlight qui suit le curseur — activerSpotlightHero() dans js/core/ui.js,
+   même mécanique que VP (mousemove → --mx/--my en %), juste posée sur le
+   hero entier plutôt que sur un bouton. */
+.hero__spotlight {
+  position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(560px circle at var(--mx, 50%) var(--my, 35%), var(--glow-cyan), transparent 62%);
+  opacity: 0; transition: opacity .5s var(--ease);
+}
+.hero:hover .hero__spotlight { opacity: 1; }
+@media (pointer: coarse) { .hero__spotlight { display: none; } }
+
+.hero__frame { position: absolute; z-index: 1; inset: 18px; border: 1px solid rgba(255, 255, 255, .14); pointer-events: none; }
+.hero__side {
+  position: absolute; z-index: 1; left: 34px; top: 50%; transform: translateY(-50%) rotate(180deg);
+  writing-mode: vertical-rl; font-size: .64rem; font-weight: 600; letter-spacing: .32em; text-transform: uppercase;
+  color: rgba(255, 255, 255, .4);
+}
+@media (max-width: 900px) { .hero__frame, .hero__side { display: none; } }
+
+.hero__meta {
+  position: relative; z-index: 1; flex: 0 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: var(--wrap); margin: 0 auto; padding: 30px clamp(24px, 4vw, 50px) 0; width: 100%;
+  font-size: .72rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase;
+  color: rgba(255, 255, 255, .55);
+}
+.hero__eyebrow-top { color: var(--cyan-2); }
+@media (max-width: 560px) { .hero__meta { display: none; } }
+
+.hero__inner {
+  position: relative; z-index: 1; flex: 1;
+  display: flex; align-items: center; justify-content: center;
+  max-width: 760px; margin: 0 auto; padding: 24px 32px; width: 100%;
+  text-align: center;
+}
+.hero__text { display: flex; flex-direction: column; align-items: center; }
+
+.hero__eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: .7rem; font-weight: 700; letter-spacing: .3em; text-transform: uppercase;
+  color: var(--cyan-2);
+}
+
+.hero__title {
   font-weight: 800;
-  /* Plus grand et plus serré que le reste du site : c'est LE titre que la
-     charte veut monumental, celui que toutes les références montrées par
-     le client traitent en très grand plutôt qu'en corps de texte élevé. */
-  font-size: clamp(2.9rem, 7vw, 5.4rem);
-  line-height: .98;
+  font-size: clamp(2.6rem, 6.4vw, 4.6rem);
+  line-height: 1;
   letter-spacing: -.04em;
   color: #fff;
   text-wrap: balance;
+  margin: 20px 0 22px;
 }
-.heros__titre em {
+.hero__title em {
   display: block;
   font-style: normal; font-weight: 200;
-  /* Le même contraste que le logo (gras marine / maigre bleu clair), mais
-     avec un lent chromage qui balaie le texte — la touche « showroom »
-     empruntée aux sites automobiles premium, transposée dans les bleus
-     de la marque plutôt que dans un métal doré. */
-  background: linear-gradient(
-    100deg,
-    var(--cyan-2) 20%, #fff 45%, var(--cyan-3) 60%, var(--cyan-2) 85%
-  );
-  background-size: 220% auto;
-  -webkit-background-clip: text; background-clip: text;
-  color: transparent;
-  animation: chrome 8s linear infinite;
+  color: var(--cyan-2);
 }
-@keyframes chrome { to { background-position: -220% center; } }
+.hero__sub {
+  font-size: .98rem; color: rgba(255, 255, 255, .68);
+  max-width: 46ch; margin: 0 auto 36px; letter-spacing: .01em;
+}
+.hero__actions { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; align-items: center; }
 
-.heros__lead {
-  margin-top: 22px;
-  font-size: clamp(1rem, 1.55vw, 1.14rem);
-  color: var(--sur-sombre-2);
-  max-width: 52ch;
+/* --- pilule magnétique : l'appel principal --------------------------- */
+.cta-pill {
+  position: relative; display: inline-flex; align-items: center; gap: 20px;
+  padding: 6px 6px 6px 28px; border: 1px solid rgba(255, 255, 255, .35); border-radius: 999px;
+  overflow: hidden; isolation: isolate; transition: border-color .4s var(--ease);
 }
+.cta-pill::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: 999px;
+  background: var(--cyan-2); transform: scaleX(0); transform-origin: left;
+  transition: transform .5s var(--ease-expo);
+}
+.cta-pill:hover { border-color: var(--cyan-2); }
+.cta-pill:hover::before { transform: scaleX(1); }
+.cta-pill__label {
+  font-size: .74rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  color: #fff; transition: color .4s var(--ease); white-space: nowrap;
+}
+.cta-pill:hover .cta-pill__label { color: var(--navy-ink); }
+.cta-pill__orb {
+  width: 40px; height: 40px; border-radius: 50%; background: var(--cyan-2); color: var(--navy-ink);
+  display: grid; place-items: center; flex-shrink: 0;
+  transition: transform .5s var(--ease-expo), background .4s var(--ease);
+}
+.cta-pill__orb svg { width: 17px; height: 17px; }
+.cta-pill:hover .cta-pill__orb { background: var(--navy-ink); color: var(--cyan-2); transform: rotate(45deg); }
+
+/* --- lien souligné : l'appel secondaire ------------------------------- */
+.cta-link {
+  position: relative; display: inline-flex; align-items: center; gap: 10px;
+  font-size: .74rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: rgba(255, 255, 255, .8); padding-bottom: 6px; transition: color .35s var(--ease);
+}
+.cta-link__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--wa); flex-shrink: 0; }
+.cta-link::after {
+  content: ""; position: absolute; left: 0; bottom: 0; width: 100%; height: 1px;
+  background: var(--cyan-2); transform: scaleX(.18); transform-origin: left;
+  transition: transform .4s var(--ease-expo);
+}
+.cta-link:hover { color: #fff; }
+.cta-link:hover::after { transform: scaleX(1); }
+
+/* --- pied du hero : chiffres + réseaux -------------------------------- */
+.hero__foot {
+  position: relative; z-index: 1; flex: 0 0 auto;
+  display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+  max-width: var(--wrap); margin: 0 auto; padding: 0 clamp(24px, 4vw, 50px) 34px; width: 100%;
+}
+.hero__stats { display: flex; }
+.hero__stat { padding-right: 26px; margin-right: 26px; border-right: 1px solid rgba(255, 255, 255, .18); text-align: left; }
+.hero__stat:last-child { border-right: none; margin-right: 0; padding-right: 0; }
+.hero__stat b { font-size: 1.35rem; font-weight: 800; color: #fff; display: block; font-variant-numeric: tabular-nums; }
+.hero__stat > span { font-size: .64rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(255, 255, 255, .5); }
+.hero__foot-social { display: flex; gap: 16px; }
+.hero__foot-social a { color: rgba(255, 255, 255, .6); transition: color .3s var(--ease); }
+.hero__foot-social a:hover { color: var(--cyan-2); }
+.hero__foot-social .ic { width: 16px; height: 16px; }
+
+.hero__dots {
+  position: absolute; z-index: 1; right: 30px; top: 50%; transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.hero__dots i { width: 5px; height: 5px; border-radius: 50%; background: rgba(255, 255, 255, .3); display: block; transition: all .3s var(--ease); }
+.hero__dots i.is-active { background: var(--cyan-2); width: 6px; height: 6px; }
+@media (max-width: 900px) { .hero__dots { display: none; } }
+
+@media (max-width: 640px) {
+  .hero { min-height: 100svh; }
+  .hero__foot { justify-content: center; text-align: center; }
+  .hero__stats { justify-content: center; width: 100%; }
+}
+
+/* Simple rangée de boutons — reste utilisée par les en-têtes « introuvable »
+   (404.html, article.js, produit.js), pas par le hero de l'accueil. */
 .heros__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
 
-/* --- bande de preuves, façon fiche technique ----------------------------
-   Verre dépoli, séparateurs verticaux entre les chiffres : on reprend le
-   langage « spec-strip » d'une fiche produit premium plutôt qu'une simple
-   ligne de statistiques. */
+/* --- bande de preuves, façon fiche technique (reprise sur reseau.html) --
+   Verre dépoli, séparateurs verticaux entre les chiffres. */
 .heros__preuves {
   display: flex; flex-wrap: wrap;
   margin-top: 40px; padding: 22px 26px;
@@ -739,16 +877,6 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   text-transform: uppercase; color: var(--sur-sombre-3);
 }
 
-/* Variante « nue » du même bloc de preuves, pour le hero de l'accueil :
-   aucun panneau de verre, juste les chiffres et un trait fin entre eux —
-   la petite badge de fiche technique des références (Aeroluxe : « Flights
-   6.1K · Clients 12.8K »), pas une carte à part entière. */
-.heros__preuves2 {
-  display: flex; flex-wrap: wrap; gap: 0;
-  margin-top: 44px;
-}
-.heros__preuves2 .heros__preuve b { font-size: 1.55rem; }
-
 /* --- l'invite à défiler, en bas du hero --- */
 .scroll-cue {
   position: absolute;
@@ -775,45 +903,6 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   50%      { transform: translateX(-50%) translateY(7px); }
 }
 @media (max-width: 640px) { .scroll-cue { display: none; } }
-
-/* --- la machine flotte dans le noir -------------------------------------
-   La photo (assets/img/hero-laptop-flottant.webp) est PRÉ-DÉTOURÉE en amont
-   (fondu radial vers la transparence, voir claudeprompt.md pour la
-   recette) : ici on ne fait que la poser et l'éclairer, aucun cache ni
-   dégradé de lisibilité à gérer en CSS — c'est tout l'intérêt de détourer
-   la photo plutôt que de la recadrer en `background-position` au pixel,
-   ce qui avait échoué à la première tentative (recadrage qui « saute »
-   selon la hauteur réelle du hero, jamais identique en prévisualisation
-   et en vrai). */
-.heros__scene {
-  position: absolute; z-index: -1;
-  right: clamp(-12%, -4vw, 4%);
-  bottom: clamp(-6%, -2vh, 2%);
-  width: min(64vw, 1020px);
-  pointer-events: none;
-}
-.heros__glow {
-  position: absolute;
-  left: 8%; right: 8%; bottom: 18%; height: 46%;
-  background: radial-gradient(ellipse, var(--glow-cyan) 0%, transparent 72%);
-  filter: blur(60px);
-  opacity: .55;
-}
-.heros__photo {
-  position: relative;
-  display: block; width: 100%; height: auto;
-  /* Même correction de teinte que la première tentative : la source est
-     nativement rose/orange, on la ramène vers les bleus de la marque. */
-  filter: saturate(.55) brightness(.92) contrast(1.05);
-}
-
-@media (max-width: 900px) {
-  .heros__scene { width: min(84vw, 640px); opacity: .9; }
-}
-@media (max-width: 640px) {
-  .heros__scene { position: relative; right: auto; bottom: auto; width: 100%; margin-top: 28px; }
-  .heros--v2 { min-height: 0; display: block; padding-bottom: 56px; }
-}
 
 
 /* =========================================================================

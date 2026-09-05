@@ -26,44 +26,79 @@
 <main id="contenu">
 
   <!-- ===================================================================
-       HERO — un ordinateur qui émerge du noir, pas une texture par-dessus.
-       Aucun motif décoratif ici : sur une vraie photo, un quadrillage
-       plaqué dessus a l'air d'un gabarit, pas d'une mise en scène. La
-       photo est détourée par un masque radial (feather) qui la fond dans
-       le noir plutôt que de la couper au carré. Photo sous licence
-       Unsplash (Martin Katler) — voir claudeprompt.md pour la licence.
+       HERO — composition éditoriale portée du site VP (Vêtement Palace,
+       WebsiteVP/index.html : mot fantôme en filigrane, spotlight qui suit
+       le curseur, cadre inset, libellé vertical, pagination à points,
+       pilule magnétique). Structure et mécanique JS reprises telles
+       quelles ; palette et typographie ramenées à la charte Dilitech
+       (Montserrat seul, bleus de la marque au lieu de l'or). Voir
+       claudeprompt.md pour le détail de ce qui a été gardé/changé.
+       Photo sous licence Unsplash (Martin Katler).
        =================================================================== -->
-  <section class="heros heros--v2 sur-nuit">
-    <div class="wrap heros__in">
-      <div class="heros__txt">
-        <p class="surtitre surtitre--vive entre" style="--i:0"><i class="surtitre__pouls" aria-hidden="true"></i>Bamako · Torokorobougou</p>
-        <h1 class="heros__titre entre" style="--i:1">Le bon matériel,<em>pour le bon usage.</em></h1>
-        <p class="heros__lead entre" style="--i:2">
+  <header class="hero" id="hero">
+    <div class="hero__media">
+      <img src="assets/img/hero-laptop-large.jpg" alt="" fetchpriority="high">
+      <div class="hero__overlay"></div>
+      <div class="halos halos--hero" aria-hidden="true">
+        <span class="halo halo--1"></span>
+        <span class="halo halo--3"></span>
+      </div>
+      <div class="hero__spotlight"></div>
+    </div>
+    <div class="hero__ghost" aria-hidden="true">TECH</div>
+
+    <div class="hero__meta">
+      <span class="hero__eyebrow-top">Catalogue 2026</span>
+      <span class="hero__meta-contact">Bamako, Mali</span>
+    </div>
+
+    <div class="hero__inner">
+      <div class="hero__text entre" style="--i:0">
+        <p class="hero__eyebrow">
+          <i class="surtitre__pouls" aria-hidden="true"></i>Ordinateurs · Réseau · SAV
+        </p>
+        <h1 class="hero__title">Le bon matériel,<em>pour le bon usage.</em></h1>
+        <p class="hero__sub">
           Ordinateurs portables toutes marques, accessoires informatiques et
           matériel réseau — avec le conseil qui va avec.
         </p>
-
-        <div class="heros__actions entre" style="--i:3">
-          <a class="btn btn--cyan btn--lueur" href="catalogue.html">Voir le catalogue</a>
-          <a class="btn btn--ligne" href="contact.html">Demander un devis</a>
+        <div class="hero__actions">
+          <a href="catalogue.html" class="cta-pill">
+            <span class="cta-pill__label">Voir le catalogue</span>
+            <span class="cta-pill__orb">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </span>
+          </a>
+          <a href="contact.html" class="cta-link">
+            <span class="cta-link__dot"></span>
+            Demander un devis
+          </a>
         </div>
-
-        <ul class="heros__preuves2 entre" style="--i:4" data-preuves></ul>
       </div>
     </div>
 
-    <!-- L'ordinateur flotte dans le noir : la photo est déjà détourée par
-         un fondu radial (voir assets/img/hero-laptop-flottant.webp), donc
-         aucun cadre, aucune découpe carrée à masquer ici. -->
-    <div class="heros__scene" aria-hidden="true">
-      <span class="heros__glow"></span>
-      <img class="heros__photo" src="assets/img/hero-laptop-flottant.webp" alt="" loading="eager" fetchpriority="high">
+    <div class="hero__foot">
+      <ul class="hero__stats" data-preuves></ul>
+      <div class="hero__foot-social">
+        <a href="https://wa.me/22371927198" target="_blank" rel="noopener" aria-label="WhatsApp">
+          <span class="ic" data-ic="whatsapp"></span>
+        </a>
+        <a href="https://www.facebook.com/profile.php?id=100064903981504" target="_blank" rel="noopener" aria-label="Facebook">
+          <span class="ic" data-ic="facebook"></span>
+        </a>
+        <a href="https://www.linkedin.com/company/dilitech" target="_blank" rel="noopener" aria-label="LinkedIn">
+          <span class="ic" data-ic="linkedin"></span>
+        </a>
+      </div>
     </div>
+    <div class="hero__dots"><i class="is-active"></i><i></i><i></i></div>
+    <div class="hero__side" aria-hidden="true">Bamako — Mali</div>
+    <div class="hero__frame" aria-hidden="true"></div>
 
     <a class="scroll-cue" href="#univers" aria-label="Découvrir le catalogue">
       <span class="ic" data-ic="chevronBas"></span>
     </a>
-  </section>
+  </header>
 
   <!-- bandeau des marques distribuées -->
   <div class="marques" aria-label="Marques distribuées">
