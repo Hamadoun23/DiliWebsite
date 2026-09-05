@@ -163,73 +163,106 @@ Tout respecte `prefers-reduced-motion` — la règle globale existante
 (`animation-duration: .001ms !important`) neutralise aussi les halos et le
 chromage sans qu'il ait fallu l'étendre.
 
-## Deuxième retour : hero avec vraie photo (septembre 2026)
+## Deuxième et troisième retours : le hero (septembre 2026)
 
-Le premier jet de la passe premium (ci-dessus, tout en dessin/CSS) n'a pas
+Le premier jet de la passe premium (dessin SVG + halos CSS) n'a pas
 convaincu le client : il voulait le niveau **EventMotors/WebsiteEvent**
-(`event.toguna-motors.com`), avec de vraies photos plutôt que des
-illustrations au trait. Il a fourni trois captures Pinterest en référence
-(monitor mockup, jet privé « Aeroluxe », drone « MDR Ultra Light » —
-toutes : produit qui flotte dans un fond noir, avec une lueur).
+(`event.toguna-motors.com`), avec une vraie photo. Il a fourni trois
+références Pinterest : un mockup d'écran, le jet privé « Aeroluxe », le
+drone « MDR Ultra Light ». Point commun des trois : **énormément de vide,
+un seul geste visuel fort, aucune texture qui parasite**, un produit qui
+semble flotter dans le noir avec une lueur.
 
-**Sur le sourcing d'image** : le client a d'abord demandé de « télécharger
-depuis Pinterest ». Refusé — un pin agrège des images de sources et de
-licences très variées (souvent repostées sans mention), impossible à tracer
-pour un usage commercial client. À la place : photographie **sous licence
-Unsplash** (gratuite, usage commercial explicitement autorisé, aucune
-autorisation à demander), trouvée par recherche puis téléchargée.
+**Deuxième tentative** (conservée un temps, puis abandonnée) : la photo en
+fond plein cadre avec `background-size: cover` + `background-position`, un
+dégradé de lisibilité par-dessus, et le motif `.circuit` (le quadrillage de
+points) laissé actif comme sur les autres sections sombres. Rejetée par le
+client : le quadrillage plaqué sur une vraie photo a l'air d'un gabarit, pas
+d'une mise en scène, et le cadrage `cover` « saute » selon la hauteur réelle
+du hero (jamais identique en aperçu et en vrai — a demandé plusieurs allers-
+retours de `background-position` déjà rien que pour la deuxième tentative).
 
-⚠ **Piège d'environnement** : le `Bash` de cet environnement n'a **aucun
-accès réseau sortant** (`curl` timeout sur tout hôte externe) — seuls les
-outils `WebFetch`/`WebSearch` peuvent atteindre l'extérieur, et ils ne
-renvoient que du texte, pas des octets bruts. **`PowerShell` en revanche a
-un accès réseau normal** : `Invoke-WebRequest` fonctionne. C'est le chemin
-à reprendre pour tout téléchargement de fichier binaire futur dans ce
-projet.
+**Troisième tentative, celle qui est restée** — `.heros--v2` :
 
-- **Photo retenue** : *black laptop computer turned on in dim light*, par
-  **Martin Katler** (@martinkatler) sur Unsplash, licence Unsplash. URL
-  source :
+- **Aucun `.nuit`/`.grain`/`.coupe-bas` sur cette section.** Ces classes
+  habillent des aplats de dégradé ; sur une vraie photo elles font gabarit.
+  Fond propre : `radial-gradient(...)` quasi noir, un seul dégradé, rien
+  d'autre. (`.sur-nuit` reste posé, lui — c'est un simple modificateur de
+  couleur de texte/bouton, sans effet de fond : sans lui, le bouton
+  « Demander un devis » et l'eyebrow ressortaient dans leurs teintes pensées
+  pour fond clair, quasi invisibles sur le nouveau fond sombre.)
+- **La photo est prédécoupée en amont, pas recadrée en CSS.** Fini le
+  `background-position` réglé à l'aveugle : un masque radial (alpha, fondu
+  gaussien) est appliqué à la photo AVANT de l'exporter, sur les
+  **quatre côtés** — la première version du masque ne dégradait que le haut
+  et laissait les trois autres bords nets, ce qui créait un rectangle
+  fantôme visible dès que la teinte de fond CSS ne tombait pas exactement
+  sur le noir de la photo. Recette (Python/Pillow) :
+  1. recadrer sur la zone utile (l'écran qui luit + le clavier, en
+     laissant de la marge noire tout autour pour que le fondu ait la place
+     de retomber à zéro avant le bord du cadre) ;
+  2. dessiner un masque en niveaux de gris : une ellipse pleine, **strictement
+     à l'intérieur** du cadre (marge visible sur les 4 côtés, jamais une
+     ellipse qui déborde) ;
+  3. flouter ce masque (`GaussianBlur`, rayon ≈ 15 % de la plus petite
+     dimension) ;
+  4. `image.putalpha(masque)`, exporter en **WebP** (garde la
+     transparence, bien plus léger qu'un PNG pour ce genre de photo).
+  Résultat : `assets/img/hero-laptop-flottant.webp`. En CSS, la photo n'est
+  plus qu'un `<img>` posé et légèrement éclairci (`filter: saturate/
+  brightness/contrast` pour la ramener des tons rose/orange natifs vers les
+  bleus de la marque) — zéro dégradé de lisibilité à gérer, la photo se
+  fond toute seule dans le fond.
+- **Titre monumental** : `clamp(2.9rem, 7vw, 5.4rem)`, `line-height: .98`,
+  sans contrainte de largeur en caractères (une tentative avec `max-width:
+  14ch` cassait la phrase n'importe où — « Le bon » / « matériel, » sur deux
+  lignes — au lieu de suivre le sens ; `text-wrap: balance` seul suffit).
+- **Bande de preuves « nue »** (`.heros__preuves2`, nouvelle classe) : les
+  mêmes chiffres que partout, mais sans le panneau de verre — juste les
+  nombres et un trait fin, comme les petites étiquettes de fiche technique
+  d'Aeroluxe (« Flights 6.1K · Clients 12.8K »). **Ne pas confondre** avec
+  `.heros__preuves` (panneau de verre complet), toujours utilisée telle
+  quelle sur `reseau.html` — les deux classes coexistent, chacune sur sa
+  page, et partagent le même `.heros__preuve` pour l'item (nombre + label).
+- **Sourcing de la photo** : le client a d'abord demandé de télécharger
+  depuis Pinterest — refusé, un pin agrège des sources et des licences trop
+  variées pour un usage client. Photo sous **licence Unsplash** à la place
+  (gratuite, usage commercial explicite) : *black laptop computer turned on
+  in dim light*, par **Martin Katler** (@martinkatler),
   `https://unsplash.com/photos/black-laptop-computer-turned-on-in-dim-light-o9XN28KdyN8`.
-  Choisie plutôt que la photo d'Andras Vas (*MacBook Pro turned on*,
-  `Bd7gNnWJBkU`) parce que cette dernière est l'une des photos de stock les
-  plus réutilisées du web (elle traîne sur des centaines de templates) — la
-  reprendre aurait fait « site fait avec un template » plutôt que
-  « site sur mesure ». Enregistrée dans `assets/img/hero-laptop.jpg`.
-- **Le portable est un MacBook — Dilitech vend toutes marques.** Point
-  assumé, pas oublié : le client a explicitement demandé cette imagerie.
-  Mais si un jour la question se pose (« pourquoi un Mac sur le site d'un
-  revendeur multi-marques ? »), la réponse honnête est qu'aucune
-  alternative neutre de cette qualité dramatique n'a été trouvée en licence
-  libre dans le temps imparti — à revoir si le client founit ses propres
-  photos de vitrine.
-- **Traitement colorimétrique** : la photo source est nativement
-  rose/orange/bleu (rétroéclairage RGB générique). `filter: saturate(.5)
-  brightness(.8) contrast(1.08)` sur `.heros__photo` la ramène vers des
-  bleus proches de la charte, et les halos cyan existants (`.halos`,
-  `mix-blend-mode: screen`) sont repositionnés par-dessus pour renforcer la
-  couleur de marque au lieu de simplement flotter à côté.
-- **Composition** : source portrait (2400×3600) affichée en fond de hero
-  large via `background-size: cover` — la majeure partie de la hauteur
-  sort du cadre. `background-position: 68% 73%` a été trouvé **par
-  itération visuelle** (calcul de la fenêtre visible, puis capture d'écran,
-  puis ajustement) pour que le clavier reste dans le cadre plutôt que le
-  bureau vide sous la machine. Si la photo change, refaire cette itération
-  — ne pas deviner la valeur.
+  Pas la photo d'Andras Vas (`Bd7gNnWJBkU`, *MacBook Pro turned on*) bien
+  que ce soit LA référence quand on cherche « macbook dark unsplash » —
+  c'est l'une des photos de stock les plus réutilisées du web (des centaines
+  de templates), la reprendre aurait fait « site fait avec un template »
+  plutôt que sur mesure.
+- **Le portable est un MacBook — Dilitech vend toutes marques.** Assumé, pas
+  oublié : le client a demandé cette imagerie explicitement. Si la question
+  revient un jour, la vraie réponse est qu'aucune alternative neutre de
+  cette qualité dramatique n'a été trouvée en licence libre dans le temps
+  imparti. Le mieux reste que le client fournisse ses propres photos
+  (showroom, un poste en vente) — voir plus bas.
+- ⚠ **Piège d'environnement, toujours vrai** : le `Bash` de cet
+  environnement n'a **aucun accès réseau sortant** (`curl` fait timeout sur
+  tout hôte externe) — seuls `WebFetch`/`WebSearch` atteignent l'extérieur,
+  et ils ne rendent que du texte, pas des octets. **`PowerShell` a un accès
+  réseau normal** (`Invoke-WebRequest` fonctionne) : c'est le chemin à
+  reprendre pour tout téléchargement de fichier binaire sur ce projet.
+- **Aussi intégrée pendant cette passe** : une vraie photo Dilitech (pas du
+  stock) dans le bloc Service après-vente de `services.html` — recadrée
+  depuis un visuel de communication du client. Voir
+  `assets/img/agent-sav.jpg` et le commentaire au-dessus de
+  `.bloc-serv__vis--photo` dans `style.css`.
 - L'ancien visuel (disque + barres du logo en SVG, orbite de pastilles de
-  marques) a été **entièrement retiré** — plus utilisé nulle part ailleurs
-  sur le site, sa CSS morte a été supprimée avec lui (`.disque*`,
-  `.orbite*`, `@keyframes tourner/flotter`), ainsi que les deux lignes de
-  `js/pages/accueil.js` qui le remplissaient.
-- **Aussi intégrée** : une vraie photo Dilitech (pas du stock) dans le bloc
-  Service après-vente de `services.html` — recadrée depuis un visuel de
-  communication du client, voir `assets/img/agent-sav.jpg` et le
-  commentaire au-dessus de `.bloc-serv__vis--photo` dans `style.css`.
+  marques, de la toute première version du hero) a été **entièrement
+  retiré** — plus utilisé nulle part ailleurs, sa CSS morte est partie avec
+  lui (`.disque*`, `.orbite*`, `@keyframes tourner/flotter`), ainsi que les
+  deux lignes de `js/pages/accueil.js` qui le remplissaient.
 
 **Reste à faire si le client fournit ses propres photos** : remplacer
-`assets/img/hero-laptop.jpg` par une vraie photo Dilitech (showroom, un
-poste en vente) suffit — aucune classe CSS à toucher, `background-position`
-à réitérer comme ci-dessus si le cadrage source diffère.
+`assets/img/hero-laptop-flottant.webp` par un nouveau détourage (reprendre
+la recette Pillow ci-dessus sur la nouvelle photo) — le CSS n'a rien à
+changer, il ne fait que poser et éclaircir l'image qu'on lui donne.
+
 
 ## Stack
 

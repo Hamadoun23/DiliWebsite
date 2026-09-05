@@ -26,31 +26,21 @@
 <main id="contenu">
 
   <!-- ===================================================================
-       HERO — vraie photographie plutôt qu'un dessin : un ordinateur, dans
-       le noir, comme la charte le veut. Photo sous licence Unsplash
-       (Martin Katler), recadrée et assombrie pour rester dans les bleus de
-       la marque plutôt que ses tons d'origine. Voir claudeprompt.md pour
-       la source et la licence.
+       HERO — un ordinateur qui émerge du noir, pas une texture par-dessus.
+       Aucun motif décoratif ici : sur une vraie photo, un quadrillage
+       plaqué dessus a l'air d'un gabarit, pas d'une mise en scène. La
+       photo est détourée par un masque radial (feather) qui la fond dans
+       le noir plutôt que de la couper au carré. Photo sous licence
+       Unsplash (Martin Katler) — voir claudeprompt.md pour la licence.
        =================================================================== -->
-  <section class="heros nuit grain coupe-bas">
-    <div class="heros__photo" style="background-image:url('assets/img/hero-laptop.jpg')" aria-hidden="true"></div>
-    <div class="halos halos--photo" aria-hidden="true">
-      <span class="halo halo--1"></span>
-      <span class="halo halo--3"></span>
-    </div>
-    <div class="heros__scrim" aria-hidden="true"></div>
-    <div class="motif circuit"></div>
-
+  <section class="heros heros--v2 sur-nuit">
     <div class="wrap heros__in">
-
       <div class="heros__txt">
         <p class="surtitre surtitre--vive entre" style="--i:0"><i class="surtitre__pouls" aria-hidden="true"></i>Bamako · Torokorobougou</p>
         <h1 class="heros__titre entre" style="--i:1">Le bon matériel,<em>pour le bon usage.</em></h1>
         <p class="heros__lead entre" style="--i:2">
           Ordinateurs portables toutes marques, accessoires informatiques et
-          matériel réseau — avec le conseil qui va avec. Dilitech équipe les
-          entreprises, les administrations et les particuliers au Mali et dans
-          six pays voisins.
+          matériel réseau — avec le conseil qui va avec.
         </p>
 
         <div class="heros__actions entre" style="--i:3">
@@ -58,11 +48,16 @@
           <a class="btn btn--ligne" href="contact.html">Demander un devis</a>
         </div>
 
-        <ul class="heros__preuves entre" style="--i:4" data-preuves>
-          <!-- chiffres calculés depuis le catalogue par js/pages/accueil.js -->
-        </ul>
+        <ul class="heros__preuves2 entre" style="--i:4" data-preuves></ul>
       </div>
+    </div>
 
+    <!-- L'ordinateur flotte dans le noir : la photo est déjà détourée par
+         un fondu radial (voir assets/img/hero-laptop-flottant.webp), donc
+         aucun cadre, aucune découpe carrée à masquer ici. -->
+    <div class="heros__scene" aria-hidden="true">
+      <span class="heros__glow"></span>
+      <img class="heros__photo" src="assets/img/hero-laptop-flottant.webp" alt="" loading="eager" fetchpriority="high">
     </div>
 
     <a class="scroll-cue" href="#univers" aria-label="Découvrir le catalogue">

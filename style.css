@@ -615,16 +615,24 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
    8. HERO
    ========================================================================= */
 
-.heros {
+/* .heros--v2 est volontairement SANS .nuit/.grain/.coupe-bas : ces trois
+   classes habillent des aplats de dégradé, pas une vraie photo. Un
+   quadrillage de points ou un grain plaqué sur une photographie a l'air
+   d'un gabarit posé par-dessus, pas d'une mise en scène — c'est ce qui
+   sonnait faux dans la version précédente. Fond quasi noir, un seul
+   geste (la machine qui émerge du noir), rien d'autre en décor. */
+.heros--v2 {
   position: relative;
-  padding-block: clamp(56px, 8vw, 104px) clamp(120px, 14vw, 176px);
+  isolation: isolate;
   overflow: hidden;
-}
-.heros__in {
-  display: grid;
-  gap: clamp(38px, 6vw, 64px);
+  min-height: 92vh;
+  display: flex;
   align-items: center;
+  padding-block: clamp(120px, 16vh, 200px) clamp(64px, 10vh, 120px);
+  background: radial-gradient(140% 100% at 80% 20%, #17123f 0%, #0a0722 46%, #050313 100%);
 }
+
+.heros__in { width: 100%; }
 
 /* --- entrée animée, une seule fois au chargement ------------------------
    Indépendante du système `.reveal` (qui attend le défilement) : le hero
@@ -659,9 +667,12 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 
 .heros__titre {
   font-weight: 800;
-  font-size: clamp(2.35rem, 6.4vw, 4.15rem);
-  line-height: 1.02;
-  letter-spacing: -.035em;
+  /* Plus grand et plus serré que le reste du site : c'est LE titre que la
+     charte veut monumental, celui que toutes les références montrées par
+     le client traitent en très grand plutôt qu'en corps de texte élevé. */
+  font-size: clamp(2.9rem, 7vw, 5.4rem);
+  line-height: .98;
+  letter-spacing: -.04em;
   color: #fff;
   text-wrap: balance;
 }
@@ -728,10 +739,20 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   text-transform: uppercase; color: var(--sur-sombre-3);
 }
 
+/* Variante « nue » du même bloc de preuves, pour le hero de l'accueil :
+   aucun panneau de verre, juste les chiffres et un trait fin entre eux —
+   la petite badge de fiche technique des références (Aeroluxe : « Flights
+   6.1K · Clients 12.8K »), pas une carte à part entière. */
+.heros__preuves2 {
+  display: flex; flex-wrap: wrap; gap: 0;
+  margin-top: 44px;
+}
+.heros__preuves2 .heros__preuve b { font-size: 1.55rem; }
+
 /* --- l'invite à défiler, en bas du hero --- */
 .scroll-cue {
   position: absolute;
-  left: 50%; bottom: calc(var(--coupe) + 26px);
+  left: 50%; bottom: 28px;
   transform: translateX(-50%);
   z-index: 2;
   display: grid; place-items: center;
@@ -755,34 +776,43 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 }
 @media (max-width: 640px) { .scroll-cue { display: none; } }
 
-/* --- la photo : un vrai ordinateur, dans le noir ------------------------
-   Remplace l'ancien disque en SVG. Trois couches empilées derrière le
-   texte (voir l'index négatif de chacune, même règle que .motif un peu
-   plus haut : un élément positionné passe TOUJOURS au-dessus du flux
-   statique, seul un z-index négatif le repasse dessous) :
-     1. .heros__photo — la photo elle-même, désaturée et assombrie pour
-        rester dans les bleus de la marque plutôt que ses tons d'origine
-        (l'écran de la machine est nativement rose/orange sur la source) ;
-     2. .halos — le même halo cyan qu'ailleurs sur le site, en mode
-        « additif » ici : il RECOLORE la lueur de l'écran au lieu de
-        simplement flotter par-dessus ;
-     3. .heros__scrim — le dégradé qui rend le texte lisible à gauche. */
-.heros__photo {
-  position: absolute; inset: 0; z-index: -3;
-  background-image: url('assets/img/hero-laptop.jpg');
-  background-size: cover;
-  background-position: 68% 73%;
-  filter: saturate(.5) brightness(.8) contrast(1.08);
+/* --- la machine flotte dans le noir -------------------------------------
+   La photo (assets/img/hero-laptop-flottant.webp) est PRÉ-DÉTOURÉE en amont
+   (fondu radial vers la transparence, voir claudeprompt.md pour la
+   recette) : ici on ne fait que la poser et l'éclairer, aucun cache ni
+   dégradé de lisibilité à gérer en CSS — c'est tout l'intérêt de détourer
+   la photo plutôt que de la recadrer en `background-position` au pixel,
+   ce qui avait échoué à la première tentative (recadrage qui « saute »
+   selon la hauteur réelle du hero, jamais identique en prévisualisation
+   et en vrai). */
+.heros__scene {
+  position: absolute; z-index: -1;
+  right: clamp(-12%, -4vw, 4%);
+  bottom: clamp(-6%, -2vh, 2%);
+  width: min(64vw, 1020px);
+  pointer-events: none;
 }
-.halos--photo { z-index: -2; mix-blend-mode: screen; }
-.halos--photo .halo--1 { top: auto; bottom: -20%; right: 4%; opacity: .8; }
-.halos--photo .halo--3 { bottom: 6%; right: 22%; left: auto; opacity: .5; }
+.heros__glow {
+  position: absolute;
+  left: 8%; right: 8%; bottom: 18%; height: 46%;
+  background: radial-gradient(ellipse, var(--glow-cyan) 0%, transparent 72%);
+  filter: blur(60px);
+  opacity: .55;
+}
+.heros__photo {
+  position: relative;
+  display: block; width: 100%; height: auto;
+  /* Même correction de teinte que la première tentative : la source est
+     nativement rose/orange, on la ramène vers les bleus de la marque. */
+  filter: saturate(.55) brightness(.92) contrast(1.05);
+}
 
-.heros__scrim {
-  position: absolute; inset: 0; z-index: -1;
-  background:
-    linear-gradient(100deg, var(--navy-ink) 0%, rgba(16, 11, 51, .92) 32%, rgba(16, 11, 51, .38) 62%, transparent 88%),
-    linear-gradient(0deg, var(--navy-ink) 0%, transparent 30%, transparent 72%, rgba(16, 11, 51, .5) 100%);
+@media (max-width: 900px) {
+  .heros__scene { width: min(84vw, 640px); opacity: .9; }
+}
+@media (max-width: 640px) {
+  .heros__scene { position: relative; right: auto; bottom: auto; width: 100%; margin-top: 28px; }
+  .heros--v2 { min-height: 0; display: block; padding-bottom: 56px; }
 }
 
 
