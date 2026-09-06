@@ -84,7 +84,7 @@ export const PRODUITS = [
   /* ===== ORDINATEURS · portables professionnels ====================== */
   {
     cat: 'ordinateurs', sous: 'portables-pro', marque: 'HP', illus: 'ultrabook',
-    img: 'assets/img/produits/hp-elitebook-840.jpg',
+    img: 'assets/img/produits/ordinateurs/portables-pro/hp-elitebook-840.jpg',
     nom: 'HP EliteBook 840 G9', prix: 895000, etat: 'neuf', garantie: '12 mois',
     usages: ['professionnel', 'bureautique', 'entreprise'], tag: 'best',
     resume: "Le portable d'affaires que nous déployons le plus en parc : châssis aluminium, clavier confortable et une autonomie qui tient une journée de terrain.",
@@ -95,7 +95,7 @@ export const PRODUITS = [
   },
   {
     cat: 'ordinateurs', sous: 'portables-pro', marque: 'Dell', illus: 'ultrabook',
-    img: 'assets/img/produits/dell-latitude.jpg',
+    img: 'assets/img/produits/ordinateurs/portables-pro/dell-latitude.jpg',
     nom: 'Dell Latitude 5440', prix: 725000, etat: 'neuf', garantie: '12 mois',
     usages: ['professionnel', 'bureautique', 'entreprise'], tag: null,
     resume: "Le cheval de trait des flottes d'entreprise : pièces détachées faciles à trouver, station d'accueil standard, réparable des années.",
@@ -106,7 +106,7 @@ export const PRODUITS = [
   },
   {
     cat: 'ordinateurs', sous: 'portables-pro', marque: 'Lenovo', illus: 'ultrabook',
-    img: 'assets/img/produits/thinkpad-t14.jpg',
+    img: 'assets/img/produits/ordinateurs/portables-pro/thinkpad-t14.jpg',
     nom: 'Lenovo ThinkPad T14 Gen 4', prix: 840000, etat: 'neuf', garantie: '12 mois',
     usages: ['professionnel', 'entreprise', 'mobilite'], tag: null,
     resume: "Le meilleur clavier du marché et un châssis testé militaire. À conseiller à qui écrit toute la journée et voyage beaucoup.",
@@ -117,7 +117,7 @@ export const PRODUITS = [
   },
   {
     cat: 'ordinateurs', sous: 'portables-pro', marque: 'Apple', illus: 'ultrabook',
-    img: 'assets/img/produits/macbook-air.jpg',
+    img: 'assets/img/produits/ordinateurs/portables-pro/macbook-air.jpg',
     nom: 'Apple MacBook Air 13" M3', prix: 1150000, prixBarre: 1290000, etat: 'neuf', garantie: '12 mois',
     usages: ['professionnel', 'creation', 'bureautique', 'mobilite'], tag: 'promo',
     resume: "Silencieux, froid, deux jours d'autonomie réelle. Le portable de direction et de communication par excellence.",
@@ -128,7 +128,7 @@ export const PRODUITS = [
   },
   {
     cat: 'ordinateurs', sous: 'portables-pro', marque: 'HP', illus: 'portable',
-    img: 'assets/img/produits/hp-probook.jpg',
+    img: 'assets/img/produits/ordinateurs/portables-pro/hp-probook.jpg',
     nom: 'HP ProBook 450 G10', prix: 585000, etat: 'neuf', garantie: '12 mois',
     usages: ['professionnel', 'bureautique', 'entreprise'], tag: null,
     resume: "Le compromis que nous recommandons pour équiper une équipe entière sans faire exploser le budget matériel.",
@@ -139,6 +139,7 @@ export const PRODUITS = [
   },
   {
     cat: 'ordinateurs', sous: 'portables-pro', marque: 'Dell', illus: 'ultrabook',
+    img: 'assets/img/produits/ordinateurs/portables-pro/dell-latitude.jpg',
     nom: 'Dell Latitude 7420 — reconditionné', prix: 385000, etat: 'reconditionne', garantie: '6 mois',
     usages: ['professionnel', 'bureautique'], tag: 'best',
     resume: "Passé par notre atelier : batterie remplacée, SSD neuf, système réinstallé. Le meilleur rapport qualité-prix de la boutique.",
@@ -181,6 +182,7 @@ export const PRODUITS = [
   },
   {
     cat: 'ordinateurs', sous: 'portables-etudes', marque: 'HP', illus: 'portable',
+    img: 'assets/img/produits/ordinateurs/portables-pro/hp-elitebook-840.jpg',
     nom: 'HP EliteBook 840 G6 — reconditionné', prix: 215000, etat: 'reconditionne', garantie: '6 mois',
     usages: ['etudes', 'bureautique'], tag: 'best',
     resume: "Un châssis professionnel pour un budget d'entrée de gamme. Batterie et SSD remplacés en atelier, 6 mois de garantie Dilitech.",
@@ -223,6 +225,7 @@ export const PRODUITS = [
   },
   {
     cat: 'ordinateurs', sous: 'portables-creation', marque: 'Apple', illus: 'ultrabook',
+    img: 'assets/img/produits/ordinateurs/portables-creation/macbook-pro.jpg',
     nom: 'Apple MacBook Pro 14" M3 Pro', prix: 1890000, etat: 'neuf', garantie: '12 mois',
     usages: ['creation', 'professionnel'], tag: null,
     resume: "Pour le montage vidéo 4K et la photo : l'écran le plus juste que nous ayons en rayon, calibré d'usine.",

@@ -51,7 +51,13 @@ rendre(
 
 rendre(
   '[data-infos]',
-  `<div class="bloc-info">
+  `<figure class="bloc-info bloc-info--photo">
+     <img src="assets/img/equipe/portrait-vendredi.jpg"
+          alt="Un membre de l'équipe Dilitech au showroom de Torokorobougou" loading="lazy">
+     <figcaption>Toute l'équipe Dilitech est joignable directement — pas de standard, pas de filtrage.</figcaption>
+   </figure>
+
+   <div class="bloc-info">
      <p class="bloc-info__titre">${icone('broche')} Showroom & atelier</p>
      <p class="bloc-info__gros">${esc(SIEGE.quartier)}</p>
      <p class="bloc-info__txt">${esc(CONTACT.ville)}, ${esc(CONTACT.pays)}</p>

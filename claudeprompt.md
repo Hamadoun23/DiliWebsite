@@ -408,6 +408,76 @@ charges), soit parce que la photo est plus candide que "fiche produit"
 cover ne recadre pas au hasard, la même leçon que pour le hero (recadrer en
 connaissance du contenu plutôt que laisser `object-fit` deviner).
 
+## Deuxième passe photos : couverture élargie, portrait, et vrai déplacement des assets (septembre 2026)
+
+Le client a réagi à une capture d'écran de la grille « Notre sélection du
+moment » où 3 des 4 cartes montraient encore un dessin générique : consigne
+sans ambiguïté — *« il faut tout changer, utilise les images des ordi
+partout, utilise le poster aussi, regarde comment est FaraFinaTignè et fais
+pareil, les images du dossier Docs doivent être déplacées vers les assets du
+site »*. Quatre choses distinctes en découlent.
+
+**1. Trois photos produit de plus.** En reprenant le lot de 14 photos déjà
+classées, trois correspondances marque/modèle supplémentaires étaient
+honnêtes :
+
+| Produit | Photo |
+|---|---|
+| Dell Latitude 7420 — reconditionné (`DT-PC-006`) | `dell-latitude.jpg` (même photo que le 5440 : même carrosserie Latitude, capot fermé) |
+| HP EliteBook 840 G6 — reconditionné (`DT-PC-010`) | `hp-elitebook-840.jpg` (même photo que le G9 : même famille EliteBook) |
+| Apple MacBook Pro 14" M3 Pro (`DT-PC-014`) | `macbook-pro.jpg` — nouveau recadrage, les trois MacBook empilés (`macbooks-empiles.jpeg`) recadrés sur celui du dessus |
+
+Ce qui reste en dessin et pourquoi n'a pas changé depuis la passe précédente :
+HP 250 G9 (photos dispo trop premium pour une gamme d'entrée, survendrait le
+produit), Lenovo IdeaPad Slim 3 (les photos Lenovo disponibles montrent le
+sigle « ThinkPad », contradiction de marque), Acer/Asus (aucune photo de ces
+marques), gaming (aucune photo à esthétique gaming), tours et AIO (aucune
+photo de bureau — poser une photo de portable dessus mentirait sur le format).
+Les accessoires (souris, écran, webcam, SSD) restent en dessin aussi : le
+lot de photos ne couvre que des ordinateurs portables, pas de périphériques.
+**8 des 19 `ordinateurs` ont désormais une vraie photo** — c'est la limite
+honnête du matériel disponible, pas un choix arbitraire de s'arrêter là.
+
+**2. Le poster « Bonne journée de vendredi ».** Le client a explicitement
+demandé d'utiliser ce visuel malgré son caractère daté et religieux — instruction
+directe qui prime sur le jugement éditorial initial de l'écarter. Recadré
+(portrait 450×1080, cadrage resserré à droite du visuel pour couper le texte
+« BONNE JOURNÉE DE VENDREDI » et ne garder que la photo) en
+`site/assets/img/equipe/portrait-vendredi.jpg`. Posé en tête de
+`contact.html`, dans `[data-infos]` (`js/pages/contact.js`) : une carte
+`.bloc-info--photo` avant « Showroom & atelier », avec une légende intemporelle
+(« Toute l'équipe Dilitech est joignable directement ») plutôt que le
+message du visuel d'origine, daté. `object-position: 50% 38%` cadre sur le
+visage — vérifié par capture d'écran, la première tentative à `20%` ne
+montrait que le bonnet.
+
+**3. Taxonomie des assets, sur le modèle FaraFinaTignè.** Le projet
+`FaraFinaTigne/site` range ses photos en
+`assets/produits/<categorie>/<sous-categorie>/nom.webp`. Les photos produit
+de Dilitech suivent maintenant le même principe :
+`site/assets/img/produits/ordinateurs/portables-pro/*.jpg` et
+`.../portables-creation/macbook-pro.jpg` (mécanique : chemins mis à jour dans
+`js/data/produits.js` par substitution, rien d'autre à changer côté JS —
+le champ `img` est une chaîne opaque pour `carte-produit.js`).
+
+**4. Déplacement réel des images de `Docs/`.** Jusqu'ici le classement
+(`Docs/classement/…`) était une *copie* : les originaux restaient dans
+`Docs/` et `Docs/images/`. Consigne du client : déplacer, pas dupliquer.
+Tout ce qui est image a quitté `Docs/` pour
+`site/assets/originaux/{communication,produits-brut,references}/` — les
+originaux bruts derrière les photos déjà utilisées sur le site (pas servis
+publiquement, mais physiquement dans les assets du site comme demandé) :
+- `communication/` — les 6 posters réseaux sociaux + `post-bon-weekend.png`
+  + le poster vendredi (le doublon `post-vendredi.jpeg`/`post-vendredi-source.jpeg`,
+  identique au hash MD5, a été dédupliqué).
+- `produits-brut/` — les 14 photos téléphone d'origine.
+- `references/` — 3 fichiers `.jfif` (« télécharger (N) ») dont le contenu
+  n'a pas été vérifié individuellement (nom typique de téléchargement
+  navigateur, probablement une inspiration Pinterest et non du contenu
+  Dilitech) ; déplacés par prudence plutôt que supprimés sans certitude.
+`Docs/` ne contient plus que les deux PDF de charte graphique — ce ne sont
+pas des images, l'instruction ne les visait pas.
+
 ## Stack
 
 - **100 % statique** : HTML / CSS / **modules ES natifs**. Aucun framework,
