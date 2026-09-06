@@ -58,13 +58,26 @@ function marques() {
 
 /* --- les trois univers ------------------------------------------------- */
 
+/* La catégorie phare (ordinateurs) porte une vraie photo — les deux autres
+   reprennent le dégradé de marque plutôt que de rester sur fond blanc plat :
+   voir claudeprompt.md, section « refonte hero + nav + cartes ». */
+const PHOTO_UNIVERS = {
+  ordinateurs: 'assets/img/produits/ordinateurs/portables-pro/hp-elitebook-840.jpg',
+};
+
 function univers() {
   rendre(
     '[data-univers]',
     cat.CATEGORIES.map((c) => {
       const n = cat.filtrer({ cat: c.code }).length;
+      const photo = PHOTO_UNIVERS[c.code];
       return `
-        <article class="univ reveal">
+        <article class="univ reveal${photo ? ' univ--photo' : ' univ--sombre'}">
+          ${
+            photo
+              ? `<span class="univ--photo__media" aria-hidden="true"><img src="${esc(photo)}" alt="" loading="lazy"></span>`
+              : ''
+          }
           <p class="univ__nb">${n} réf.</p>
           <span class="univ__illus">${illustration(c.illus)}</span>
           <h3 class="univ__nom">${esc(c.nom)}</h3>
