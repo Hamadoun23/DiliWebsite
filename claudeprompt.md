@@ -348,6 +348,66 @@ sans retirer le `$("#id")` correspondant dans le JS, qui interrompt
 silencieusement le reste du script) — à lire avant de reprendre autre chose
 de ce site.
 
+## Vraies photos produits, enfin (septembre 2026)
+
+Le client a fourni un dossier `Docs/images/` avec **14 photos réelles prises
+au dépôt/showroom de Torokorobougou** (Dell, Microsoft Surface, Apple
+MacBook, Lenovo ThinkPad, HP — cartons, étagères, vitrine) et demandé de les
+« classer dans les assets du site et les utiliser ». C'est la première fois
+que de vraies photos produit sont disponibles — jusqu'ici tout le catalogue
+tournait sur les dessins au trait de `js/data/illustrations.js` (voir plus
+haut, section « Ce qui a été écarté »).
+
+**Classement** (hors du dossier `site/`, qui ne doit contenir que des
+assets déployés et prêts) :
+- `Docs/classement/produits-stock/` — les 14 photos d'origine, renommées
+  clairement (`dell-ferme.jpeg`, `thinkpad-ecran-couleur.jpeg`…).
+- `Docs/classement/communication-reseaux/` — les 6 visuels de communication
+  déjà repérés lors de la phase 1 (posts Facebook/Instagram), idem.
+
+**Utilisées sur le site** — 5 correspondances marque/modèle fiables,
+recadrées (Python/Pillow : crop 4:3 centré sur la machine + autocontrast +
+unsharp mask léger, pour uniformiser des photos prises par téléphone dans
+des conditions de lumière différentes) et posées dans
+`site/assets/img/produits/` :
+
+| Produit catalogue | Photo utilisée |
+|---|---|
+| HP EliteBook 840 G9 (`DT-PC-001`) | `hp-elitebook-840.jpg` — la façade ouverte, l'autocollant « ELITEBOOK » est lisible sur la coque |
+| Dell Latitude 5440 (`DT-PC-002`) | `dell-latitude.jpg` — capot fermé |
+| Lenovo ThinkPad T14 Gen 4 (`DT-PC-003`) | `thinkpad-t14.jpg` — ouvert, posé sur son carton |
+| Apple MacBook Air 13" M3 (`DT-PC-004`) | `macbook-air.jpg` — fermé, avec chargeur et câble |
+| HP ProBook 450 G10 (`DT-PC-005`) | `hp-probook.jpg` — capot fermé, fond de vitrine flou |
+
+Champ `img` ajouté sur ces 5 entrées dans `js/data/produits.js` — c'est le
+mécanisme déjà prévu depuis la phase 1 (`carte-produit.js` affiche la photo
+par-dessus le dessin si `img` est renseigné, et retombe sur le dessin si
+l'image ne charge pas). **Aucun autre produit n'a été touché** : forcer une
+photo sur un modèle qu'on n'est pas sûr d'identifier (ex. le Lenovo Legion
+gaming, très différent visuellement d'un ThinkPad) aurait été trompeur —
+mieux vaut un dessin honnête qu'une photo qui ne correspond pas.
+
+**Aussi utilisées** — trois photos d'ambiance (étagères de cartons,
+vitrine floue, carton ThinkPad) en petite galerie sur `reseau.html`, section
+siège (`.siege-photos`, sous le bloc `.siege` existant) : la légende assume
+que ce sont des photos de téléphone prises sur place plutôt que de les
+maquiller en studio — c'est ce qui les rend crédibles, pas malgré ce détail
+mais grâce à lui. Voir `js/pages/reseau.js` et `assets/img/atelier/`.
+
+**Non utilisées, et pourquoi** : les autres photos du lot (Surface, les
+trois MacBook empilés, le ThinkPad qui démarre avec quelqu'un en arrière-
+plan, le gros plan clavier) sont classées mais pas posées sur le site —
+soit parce qu'aucun produit du catalogue ne correspond (pas de Surface au
+catalogue, un 2-en-1 tactile n'est pas dans le périmètre du cahier des
+charges), soit parce que la photo est plus candide que "fiche produit"
+(quelqu'un en arrière-plan). Elles restent disponibles dans
+`Docs/classement/produits-stock/` si un usage se présente.
+
+**Format des cartes** : `.carte__visuel` est en `aspect-ratio: 4/3` avec
+`object-fit: cover` — le crop en amont vise cette proportion pour que le
+cover ne recadre pas au hasard, la même leçon que pour le hero (recadrer en
+connaissance du contenu plutôt que laisser `object-fit` deviner).
+
 ## Stack
 
 - **100 % statique** : HTML / CSS / **modules ES natifs**. Aucun framework,

@@ -1878,6 +1878,32 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   .siege { grid-template-columns: 1.2fr .8fr; }
 }
 
+/* --- le stock en photo : preuve plutôt qu'affirmation ------------------
+   Trois photos prises à l'entrepôt de Torokorobougou (pas des visuels
+   d'agence) : la légende assume le grain d'une photo de téléphone plutôt
+   que de la maquiller en studio, c'est ce qui la rend crédible. */
+.siege-photos { margin-top: clamp(30px, 4vw, 52px); }
+.siege-photos__legende {
+  font-size: .71rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--cyan-ink); margin-bottom: 16px;
+}
+.siege-photos__grille {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+}
+.siege-photos__grille img {
+  width: 100%; height: 260px; object-fit: cover;
+  border-radius: var(--r-s);
+  transition: transform .5s var(--ease-expo), box-shadow .5s var(--ease-expo);
+}
+.siege-photos__grille img:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 22px 40px -24px rgba(18, 19, 43, .4);
+}
+@media (max-width: 700px) {
+  .siege-photos__grille { grid-template-columns: 1fr; }
+  .siege-photos__grille img { height: 220px; }
+}
+
 /* --- articles --- */
 .articles { display: grid; gap: 20px; }
 .art {

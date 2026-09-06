@@ -96,6 +96,17 @@ rendre(
          <b>${referencesDe(SIEGE.code)}</b><span>références tenues au siège</span>
        </div>
      </div>
+   </div>
+
+   <!-- Le stock, en photo : pas des visuels d'agence, l'entrepôt et la
+        vitrine réels de Torokorobougou. -->
+   <div class="siege-photos reveal">
+     <p class="siege-photos__legende">Le stock, en vrai — Torokorobougou</p>
+     <div class="siege-photos__grille">
+       <img src="assets/img/atelier/atelier-1.jpg" alt="Étagères de portables en stock à l'entrepôt Dilitech" loading="lazy">
+       <img src="assets/img/atelier/atelier-2.jpg" alt="Vitrine de la boutique Dilitech avec plusieurs modèles exposés" loading="lazy">
+       <img src="assets/img/atelier/atelier-3.jpg" alt="Cartons de portables neufs réceptionnés à l'entrepôt Dilitech" loading="lazy">
+     </div>
    </div>`
 );
 

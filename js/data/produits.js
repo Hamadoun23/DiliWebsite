@@ -84,6 +84,7 @@ export const PRODUITS = [
   /* ===== ORDINATEURS · portables professionnels ====================== */
   {
     cat: 'ordinateurs', sous: 'portables-pro', marque: 'HP', illus: 'ultrabook',
+    img: 'assets/img/produits/hp-elitebook-840.jpg',
     nom: 'HP EliteBook 840 G9', prix: 895000, etat: 'neuf', garantie: '12 mois',
     usages: ['professionnel', 'bureautique', 'entreprise'], tag: 'best',
     resume: "Le portable d'affaires que nous déployons le plus en parc : châssis aluminium, clavier confortable et une autonomie qui tient une journée de terrain.",
@@ -94,6 +95,7 @@ export const PRODUITS = [
   },
   {
     cat: 'ordinateurs', sous: 'portables-pro', marque: 'Dell', illus: 'ultrabook',
+    img: 'assets/img/produits/dell-latitude.jpg',
     nom: 'Dell Latitude 5440', prix: 725000, etat: 'neuf', garantie: '12 mois',
     usages: ['professionnel', 'bureautique', 'entreprise'], tag: null,
     resume: "Le cheval de trait des flottes d'entreprise : pièces détachées faciles à trouver, station d'accueil standard, réparable des années.",
@@ -104,6 +106,7 @@ export const PRODUITS = [
   },
   {
     cat: 'ordinateurs', sous: 'portables-pro', marque: 'Lenovo', illus: 'ultrabook',
+    img: 'assets/img/produits/thinkpad-t14.jpg',
     nom: 'Lenovo ThinkPad T14 Gen 4', prix: 840000, etat: 'neuf', garantie: '12 mois',
     usages: ['professionnel', 'entreprise', 'mobilite'], tag: null,
     resume: "Le meilleur clavier du marché et un châssis testé militaire. À conseiller à qui écrit toute la journée et voyage beaucoup.",
@@ -114,6 +117,7 @@ export const PRODUITS = [
   },
   {
     cat: 'ordinateurs', sous: 'portables-pro', marque: 'Apple', illus: 'ultrabook',
+    img: 'assets/img/produits/macbook-air.jpg',
     nom: 'Apple MacBook Air 13" M3', prix: 1150000, prixBarre: 1290000, etat: 'neuf', garantie: '12 mois',
     usages: ['professionnel', 'creation', 'bureautique', 'mobilite'], tag: 'promo',
     resume: "Silencieux, froid, deux jours d'autonomie réelle. Le portable de direction et de communication par excellence.",
@@ -124,6 +128,7 @@ export const PRODUITS = [
   },
   {
     cat: 'ordinateurs', sous: 'portables-pro', marque: 'HP', illus: 'portable',
+    img: 'assets/img/produits/hp-probook.jpg',
     nom: 'HP ProBook 450 G10', prix: 585000, etat: 'neuf', garantie: '12 mois',
     usages: ['professionnel', 'bureautique', 'entreprise'], tag: null,
     resume: "Le compromis que nous recommandons pour équiper une équipe entière sans faire exploser le budget matériel.",
