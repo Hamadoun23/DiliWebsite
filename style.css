@@ -447,7 +447,16 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
    7. EN-TÊTE
    ========================================================================= */
 
-.site-entete { position: relative; z-index: 800; display: block; }
+/* La nav flotte désormais par-dessus le contenu (position: fixed) plutôt que
+   de rester dans le flux (sticky) : c'est ce qui permet à une bande sombre
+   de départ (hero, entête de page) de commencer à y = 0 et de se voir juste
+   derrière une nav transparente, comme chez VP/EventMotors, au lieu d'être
+   coupée net par une barre blanche opaque. `#contenu` compense l'espace que
+   la nav ne réserve plus — sauf quand la première section est justement
+   cette bande sombre, qui veut occuper tout l'écran depuis le sommet. */
+.site-entete { position: fixed; top: 0; left: 0; right: 0; z-index: 800; display: block; }
+#contenu { padding-top: calc(var(--nav-h) + var(--bandeau-h)); }
+.site-entete--sombre ~ #contenu { padding-top: 0; }
 
 /* --- bandeau d'activité --- */
 .bandeau {
@@ -468,7 +477,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 
 /* --- barre de navigation --- */
 .nav {
-  position: sticky; top: 0; z-index: 810;
+  position: relative; z-index: 810;
   background: rgba(255, 255, 255, .78);
   backdrop-filter: blur(18px) saturate(1.6);
   -webkit-backdrop-filter: blur(18px) saturate(1.6);
@@ -479,6 +488,35 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   border-bottom-color: var(--line-2);
   box-shadow: 0 20px 40px -28px rgba(18, 19, 43, .4);
 }
+
+/* --- nav en surimpression sur une bande sombre --------------------------
+   Transparente et texte clair tant qu'on n'a pas défilé (la bande sombre se
+   voit à travers), puis se solidifie exactement comme la nav normale une
+   fois `.est-pose` posée par activerChromeDePage(). Le bandeau d'activité
+   se réduit à rien au même moment : la nav gagne en hauteur ce qu'elle
+   perdait avant en présence permanente du bandeau. */
+.site-entete--sombre .bandeau,
+.site-entete--sombre .nav {
+  background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+.site-entete--sombre:not(.est-pose) .bandeau {
+  height: 0; line-height: 0; overflow: hidden; opacity: 0;
+}
+.site-entete--sombre:not(.est-pose) .nav__liens a,
+.site-entete--sombre:not(.est-pose) .nav__ico,
+.site-entete--sombre:not(.est-pose) .marque__mot b { color: rgba(255, 255, 255, .92); }
+.site-entete--sombre:not(.est-pose) .marque__mot i { color: var(--cyan-2); }
+.site-entete--sombre:not(.est-pose) .marque__signe { fill: #fff; }
+.site-entete--sombre:not(.est-pose) .nav__liens a[aria-current="page"],
+.site-entete--sombre:not(.est-pose) .nav__liens a:hover { color: #fff; }
+.site-entete--sombre:not(.est-pose) .nav__ico:hover { background: rgba(255, 255, 255, .14); color: #fff; }
+.site-entete--sombre.est-pose .bandeau,
+.site-entete--sombre.est-pose .nav {
+  background: rgba(255, 255, 255, .78);
+  backdrop-filter: blur(18px) saturate(1.6); -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  transition: background-color .3s var(--ease), height .3s var(--ease), opacity .3s var(--ease);
+}
+.site-entete--sombre .bandeau { transition: height .3s var(--ease), opacity .3s var(--ease); }
 /* Filet dégradé, plus vivant qu'une bordure unie — la même idée que le
    soulignement animé des liens, posée une fois pour toute la barre. */
 .site-entete.est-pose .nav::after {
@@ -669,22 +707,43 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   display: flex; flex-direction: column;
   overflow: hidden;
   color: #fff;
+  background: var(--nuit);
 }
 
-.hero__media { position: absolute; inset: 0; z-index: -3; overflow: hidden; background: var(--navy-ink); }
+/* La photo occupe la partie droite du hero, pas toute sa surface : notre
+   matière (une vraie capture d'écran très colorée, sans zone neutre où
+   poser du texte lisible, contrairement à un portrait comme chez VP) ne
+   supporte pas un assombrissement uniforme sans perdre ce qui la rend
+   intéressante. Le texte vit donc sur le dégradé de marque (--nuit) à
+   gauche, la photo reste vive à droite, et un fondu (mask-image) les
+   raccorde sans coupure nette au milieu. */
+.hero__media {
+  position: absolute; top: 0; right: 0; bottom: 0; left: 42%; z-index: -3;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 14%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 14%);
+}
 .hero__media img {
-  width: 100%; height: 100%; object-fit: cover; object-position: center 38%;
-  /* La photo reste quasi neutre : c'est l'interface (fantôme, spotlight,
-     halos, pilule) qui porte la couleur de marque — pas un recolorage de
-     la photo elle-même, exactement comme VP laisse la photo du modèle en
-     désaturé et réserve l'or aux éléments d'interface. */
-  filter: grayscale(.5) brightness(.6) contrast(1.15) saturate(.75);
+  width: 100%; height: 100%; object-fit: cover; object-position: 68% 42%;
+  filter: brightness(.86) contrast(1.1) saturate(1.15);
 }
 .hero__overlay {
   position: absolute; inset: 0; z-index: -2;
+  /* Juste assez pour que les barres du haut et du bas (méta, preuves,
+     réseaux) restent lisibles par-dessus la photo — pas un voile général. */
   background:
-    radial-gradient(ellipse at center 42%, rgba(16, 11, 51, .18) 0%, rgba(16, 11, 51, .6) 62%, rgba(16, 11, 51, .92) 100%),
-    linear-gradient(180deg, rgba(16, 11, 51, .6) 0%, rgba(16, 11, 51, .05) 22%, rgba(16, 11, 51, .12) 58%, rgba(16, 11, 51, .9) 100%);
+    linear-gradient(180deg, rgba(6, 5, 20, .8) 0%, transparent 16%, transparent 78%, rgba(6, 5, 20, .8) 100%);
+}
+@media (max-width: 900px) {
+  /* Plus de panneau plein pour porter le texte : la photo redevient
+     pleine largeur, donc l'assombrissement doit à lui seul garantir la
+     lisibilité sur toute la hauteur, pas seulement en haut/bas. */
+  .hero__media { left: 0; -webkit-mask-image: none; mask-image: none; }
+  .hero__media img { filter: brightness(.4) contrast(1.05) saturate(.9); }
+  .hero__overlay {
+    background:
+      linear-gradient(180deg, rgba(6, 5, 20, .78) 0%, rgba(6, 5, 20, .55) 30%, rgba(6, 5, 20, .72) 65%, rgba(6, 5, 20, .95) 100%);
+  }
 }
 /* Les mêmes halos en dérive qu'ailleurs sur le site (voir section 1) —
    recolorent la scène en cyan plutôt que de recolorer la photo. */
@@ -726,20 +785,30 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 .hero__meta {
   position: relative; z-index: 1; flex: 0 0 auto;
   display: flex; align-items: center; justify-content: space-between;
-  max-width: var(--wrap); margin: 0 auto; padding: 30px clamp(24px, 4vw, 50px) 0; width: 100%;
+  max-width: var(--wrap); margin: 0 auto;
+  /* La nav flotte, transparente, par-dessus le hero (voir .site-entete--sombre) :
+     ce padding la dégage pour que l'amorce (« CATALOGUE 2026 ») ne se
+     superpose pas aux liens du menu. */
+  padding: calc(var(--nav-h) + 26px) clamp(24px, 4vw, 50px) 0; width: 100%;
   font-size: .72rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase;
   color: rgba(255, 255, 255, .55);
 }
 .hero__eyebrow-top { color: var(--cyan-2); }
+/* Le côté droit du bandeau (« Bamako, Mali ») et les icônes sociales du bas
+   passent au-dessus de la photo, pas du panneau sombre : leur clarté varie
+   avec ce qu'il y a dessous (des cartons clairs, ici), d'où cette ombre. */
+.hero__meta-contact, .hero__foot-social a { text-shadow: 0 1px 8px rgba(0, 0, 0, .5); }
 @media (max-width: 560px) { .hero__meta { display: none; } }
 
 .hero__inner {
   position: relative; z-index: 1; flex: 1;
-  display: flex; align-items: center; justify-content: center;
-  max-width: 760px; margin: 0 auto; padding: 24px 32px; width: 100%;
-  text-align: center;
+  display: flex; align-items: center; justify-content: flex-start;
+  max-width: var(--wrap); margin: 0 auto; padding: 24px clamp(24px, 4vw, 50px); width: 100%;
+  text-align: left;
 }
-.hero__text { display: flex; flex-direction: column; align-items: center; }
+.hero__text { display: flex; flex-direction: column; align-items: flex-start; max-width: 420px; }
+@media (max-width: 900px) { .hero__inner { justify-content: center; text-align: center; }
+  .hero__text { align-items: center; max-width: 560px; } }
 
 .hero__eyebrow {
   display: inline-flex; align-items: center; gap: 10px;
@@ -749,8 +818,8 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 
 .hero__title {
   font-weight: 800;
-  font-size: clamp(2.6rem, 6.4vw, 4.6rem);
-  line-height: 1;
+  font-size: clamp(2.1rem, 3.4vw, 3.15rem);
+  line-height: 1.05;
   letter-spacing: -.04em;
   color: #fff;
   text-wrap: balance;
@@ -763,9 +832,13 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 }
 .hero__sub {
   font-size: .98rem; color: rgba(255, 255, 255, .68);
-  max-width: 46ch; margin: 0 auto 36px; letter-spacing: .01em;
+  max-width: 46ch; margin: 0 0 36px; letter-spacing: .01em;
 }
-.hero__actions { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; align-items: center; }
+.hero__actions { display: flex; gap: 30px; flex-wrap: wrap; justify-content: flex-start; align-items: center; }
+@media (max-width: 900px) {
+  .hero__sub { margin: 0 auto 36px; }
+  .hero__actions { justify-content: center; flex-direction: column; gap: 20px; }
+}
 
 /* --- pilule magnétique : l'appel principal --------------------------- */
 .cta-pill {
@@ -998,17 +1071,33 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
               0 16px 40px -22px var(--glow-cyan-doux);
 }
 
+/* Sans vraie photo, le dessin ne flotte plus seul sur un fond clair (c'est
+   ce qui lisait comme un pictogramme oublié) : il est posé sur le même
+   dégradé de marque que le hero et les bandes sombres du site, avec une
+   fine trame en fond — une tuile qui a l'air dessinée exprès, pas un
+   placeholder. */
 .carte__visuel {
   position: relative;
   display: grid; place-items: center;
   aspect-ratio: 4 / 3;
-  background: linear-gradient(168deg, var(--mist) 0%, #fff 100%);
+  background: var(--nuit);
   border-bottom: 1px solid var(--line-2);
   overflow: hidden;
 }
-.carte__illus { width: 62%; color: var(--navy); transition: transform .38s var(--ease); }
-.carte__illus .il-a { color: var(--cyan); }
-.carte:hover .carte__illus { transform: scale(1.06) rotate(-1.5deg); }
+.carte__visuel::before {
+  content: ""; position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, .06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, .06) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.carte__illus {
+  position: relative; width: 46%; color: rgba(255, 255, 255, .94);
+  filter: drop-shadow(0 10px 22px rgba(6, 5, 20, .4));
+  transition: transform .38s var(--ease);
+}
+.carte__illus .il-a { color: var(--cyan-2); }
+.carte:hover .carte__illus { transform: scale(1.08) rotate(-1.5deg); }
 /* Une vraie photo, quand elle existe, recouvre le dessin. */
 .carte__visuel img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
@@ -1235,7 +1324,12 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 .filtres__fermer { display: none; width: 100%; margin-bottom: 6px; }
 
 /* --- en-tête de page (bandeau sombre court) --- */
-.entete-page { padding-block: clamp(44px, 6vw, 78px) clamp(62px, 8vw, 104px); overflow: hidden; }
+.entete-page {
+  /* Même logique que .hero__meta : la nav flotte en transparence par-dessus
+     cette bande, il lui faut donc sa hauteur en plus du rythme habituel. */
+  padding-block: calc(var(--nav-h) + clamp(30px, 4vw, 50px)) clamp(62px, 8vw, 104px);
+  overflow: hidden;
+}
 .entete-page .chapeau { max-width: 58ch; }
 /* Même profondeur que le hero de l'accueil, en plus léger : une seule tache
    de lumière plutôt que trois halos en dérive — ces bandeaux sont plus

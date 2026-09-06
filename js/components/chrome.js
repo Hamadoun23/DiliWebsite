@@ -56,6 +56,13 @@ class SiteEntete extends HTMLElement {
   connectedCallback() {
     const actif = this.getAttribute('page') ?? '';
     this.className = 'site-entete';
+    /* Par défaut la page ouvre sur une bande sombre (`.entete-page.nuit` ou
+       le hero de l'accueil) : la nav peut s'y superposer en transparence et
+       se solidifier au défilement, comme chez VP/EventMotors. Les pages qui
+       ouvrent directement sur une section claire (fiche produit, article —
+       leur en-tête est injecté en JS, pas une bande sombre fixe) le signalent
+       avec `fond="clair"` : la nav y reste opaque dès le premier pixel. */
+    if (this.getAttribute('fond') !== 'clair') this.classList.add('site-entete--sombre');
 
     this.innerHTML = `
       <!-- bandeau d'activité : ce que fait Dilitech, dès le premier pixel -->

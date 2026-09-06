@@ -478,6 +478,96 @@ publiquement, mais physiquement dans les assets du site comme demandé) :
 `Docs/` ne contient plus que les deux PDF de charte graphique — ce ne sont
 pas des images, l'instruction ne les visait pas.
 
+## Refonte hero + nav + cartes (septembre 2026) — après un « supprime tout »
+
+Le client a rejeté le rendu en bloc, en des termes sans détour : *« ce site
+n'a aucune vie, revoit totalement, supprime tout ce que t'as fait, reprend
+un truc premium comme VP et EventMotors »*, avec instruction explicite
+d'installer Playwright et de comparer moi-même les trois sites. Fait : les
+deux projets de référence ont été servis localement (`WebsiteVP` port 5611,
+`EventMotors/WebsiteEvent` port 5612) et capturés à côté de Dilitech pour un
+diagnostic image par image plutôt qu'une impression.
+
+**Ce que la comparaison a montré, concrètement** :
+- Le hero de VP est **plein cadre** (la photo occupe 100 % du hero) ; celui
+  de Dilitech ne montrait qu'un bandeau de clavier en bas de cadre, le reste
+  en noir — parce que **la photo source elle-même** (`hero-laptop-large.jpg`,
+  un stock générique) était vide aux trois quarts. Aucun réglage CSS ne
+  répare une photo vide : il fallait en changer.
+- La nav de VP/EventMotors est **posée en transparence sur le hero sombre**
+  et se solidifie au défilement ; celle de Dilitech était une barre blanche
+  fixe qui coupait le hero net sous elle — aucune continuité entre chrome et
+  contenu.
+- Les tuiles produit sans photo (accessoires, réseau) affichaient un dessin
+  au trait flottant sur fond blanc/gris clair : lu comme un placeholder
+  oublié plutôt qu'un choix, exactement le reproche du client (« icônes
+  bizarres »).
+
+**Ce qui a changé** :
+
+1. **Nouvelle image de hero, issue du stock réel Dilitech.** Plus de photo
+   de stock : `hero-laptop-large.jpg` est maintenant un agrandissement
+   (×2,6, Lanczos + `autocontrast` + `UnsharpMask`) de
+   `thinkpad-ecran-couleur.jpeg` — un ThinkPad à l'écran arc-en-ciel très
+   vif, posé devant des cartons floutés de l'entrepôt de Torokorobougou.
+   Photo authentique, mais source téléphone à 810×1080 : l'agrandissement
+   reste visible de près, acceptable en fond de hero, pas au-delà.
+
+2. **Hero recomposé en deux zones, pas en plein cadre texte-sur-photo.**
+   Contrairement au portrait VP (un visage a une zone neutre naturelle pour
+   poser du texte), un écran arc-en-ciel est vif sur toute sa surface :
+   aucun assombrissement uniforme ne rend le texte lisible sans aussi tuer
+   ce qui rend la photo intéressante. Solution — `.hero__media` n'occupe
+   plus que les 58 % droits du hero (`left: 42%`), avec un fondu
+   (`mask-image`) plutôt qu'une coupure nette ; le texte vit sur le
+   dégradé de marque `--nuit` à gauche (le même que les bandes sombres du
+   reste du site). Le texte est donc passé de centré à aligné à gauche
+   (`.hero__inner`, `.hero__text`, `.hero__sub`, `.hero__actions`), et
+   `.hero__title` a rétréci (`clamp(2.1rem, 3.4vw, 3.15rem)`) pour tenir
+   dans une colonne de 420px. Le mot fantôme (`.hero__ghost`, « TECH ») a
+   été retiré de cette page : il ajoutait du bruit sur une photo déjà
+   chargée, sans la zone calme qui le rendait élégant chez VP.
+   En dessous de 900px, plus de place pour deux colonnes : la photo repasse
+   plein cadre (`.hero__media { left: 0 }`) et un assombrissement beaucoup
+   plus fort (`brightness(.4)` sur l'image + dégradé quasi opaque) porte
+   seul la lisibilité.
+
+3. **La nav flotte désormais par-dessus le contenu.** `.site-entete` est
+   passé de `position: relative` (nav `sticky` dans le flux) à
+   `position: fixed`. Toutes les pages dont la première section est une
+   bande sombre (`.entete-page.nuit` ou le hero de l'accueil — la majorité)
+   en profitent : la nav y est transparente, texte clair, jusqu'au
+   défilement (`.site-entete--sombre`, classe posée par `chrome.js` par
+   défaut). Les deux pages qui ouvrent sur une section claire — fiche
+   produit et article, dont l'en-tête est injecté en JS plutôt qu'une bande
+   fixe — déclarent `<site-entete fond="clair">` : la nav y reste opaque dès
+   le premier pixel. `#contenu` récupère le `padding-top` que la nav ne
+   réserve plus, sauf sur les pages sombres où la bande veut commencer à
+   y = 0 (`.site-entete--sombre ~ #contenu { padding-top: 0 }`). Le bandeau
+   d'activité (numéro, adresse) se réduit à zéro pendant qu'on n'a pas
+   défilé sur une page sombre, pour ne pas doubler la hauteur de chrome
+   par-dessus une photo.
+
+4. **Les tuiles produit sans photo reprennent le dégradé de marque.**
+   `.carte__visuel` passe du fond clair (`--mist` → blanc) au même dégradé
+   `--nuit` que le hero et les bandes sombres, avec une fine trame
+   (grille 24px, blanc à 6 %) en repère plutôt qu'un vide. Le dessin
+   (`.carte__illus`) passe en blanc/cyan sur ce fond sombre, agrandi
+   (46 % au lieu de 62 %, l'espace est repris par la trame) avec une ombre
+   portée. Résultat : une carte sans photo a maintenant l'air d'un choix de
+   direction artistique — pas d'un gabarit qui attend sa photo. Le dessin
+   au trait lui-même n'a pas été redessiné (portée trop large pour cette
+   passe) ; c'est sa mise en scène qui change.
+
+Vérifié : les 9 pages, 3 largeurs (390/768/1440), zéro erreur console, zéro
+débordement horizontal (voir script de la passe précédente, réutilisé).
+
+**Ce qui reste ouvert**, par manque de matière ou de temps dans cette passe :
+le style des pictogrammes eux-mêmes (toujours du trait fin, pas redessiné) ;
+les sections de l'accueil sous le hero (univers, services, aperçu réseau,
+articles) n'ont pas été retouchées ; les autres pages n'ont eu que le
+bénéfice de la nav flottante, pas une refonte de leurs propres sections.
+
 ## Stack
 
 - **100 % statique** : HTML / CSS / **modules ES natifs**. Aucun framework,
