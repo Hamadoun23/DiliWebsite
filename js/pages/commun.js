@@ -24,7 +24,8 @@ import {
   activerReveal,
   activerCompteurs,
   activerChromeDePage,
-  activerLueurBoutons,
+  activerLueurSections,
+  activerAncresAccueil,
   surveillerImages,
   toast,
 } from '../core/ui.js';
@@ -119,7 +120,8 @@ function demarrer() {
   remplirIcones();
   brancherBulleWhatsApp();
   activerChromeDePage();
-  activerLueurBoutons();
+  activerLueurSections();
+  activerAncresAccueil();
   activerReveal();
   activerCompteurs();
   surveillerImages();

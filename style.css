@@ -52,22 +52,27 @@
   --cyan-3:    #9BDDF7;
   --cyan-ink:  #00719F;   /* petits labels sur fond clair */
 
-  /* --- surfaces --- */
-  --paper:  #FFFFFF;
-  --mist:   #F3F5FA;
-  --mist-2: #E9EDF7;
+  /* --- surfaces ---
+     Site basculé en sombre à la demande du client, sur le modèle du hero
+     (voir --nuit ci-dessous) : « papier » et « brume » n'écrivent plus du
+     texte foncé sur fond clair mais des surfaces claires sur fond sombre.
+     Les jetons gardent leurs noms (repris partout dans le CSS) ; seules
+     leurs valeurs s'inversent. */
+  --paper:  #12111D;   /* cartes, panneaux — la surface « élevée » */
+  --mist:   #0B0A14;   /* variante légèrement en retrait de --paper */
+  --mist-2: #191730;   /* variante légèrement au-dessus de --paper */
 
   /* --- encres --- */
-  --tx-1: #12132B;
-  --tx-2: #545A73;
-  --tx-3: #878DA3;
+  --tx-1: #F4F5FA;
+  --tx-2: #B9BCDA;
+  --tx-3: #8A8FB5;
   --sur-sombre:   #FFFFFF;
   --sur-sombre-2: #C6C9E4;
   --sur-sombre-3: #9296C4;
 
   /* --- traits --- */
-  --line:   rgba(18, 19, 43, .13);
-  --line-2: rgba(18, 19, 43, .07);
+  --line:   rgba(255, 255, 255, .14);
+  --line-2: rgba(255, 255, 255, .07);
   --line-s: rgba(255, 255, 255, .16);
   --line-s2:rgba(255, 255, 255, .08);
 
@@ -79,12 +84,15 @@
   --ok:      #12885A;
   --alerte:  #B4560A;
 
-  /* Le fond sombre de la marque : halo bleu clair en haut à droite, puis
-     descente du marine vers le noir bleuté. Repris des visuels du client. */
+  /* Le fond sombre de la marque : halo cyan en haut à droite, halo marine
+     en bas, sur une base qui va au noir quasi pur plutôt qu'au marine clair
+     — mis au point sur le hero de l'accueil (le premier essai restait un
+     dégradé marine/violet trop lumineux, voir claudeprompt.md), puis repris
+     ici pour que toutes les sections sombres du site s'accordent avec lui. */
   --nuit:
-    radial-gradient(760px 520px at 88% -14%, rgba(0, 159, 227, .30) 0%, transparent 62%),
-    radial-gradient(620px 460px at 4% 108%, rgba(0, 159, 227, .12) 0%, transparent 60%),
-    linear-gradient(158deg, var(--navy-clair) 0%, var(--navy) 40%, var(--navy-3) 100%);
+    radial-gradient(760px 520px at 88% -14%, rgba(0, 159, 227, .16) 0%, transparent 62%),
+    radial-gradient(620px 460px at 4% 108%, rgba(48, 39, 132, .28) 0%, transparent 60%),
+    linear-gradient(158deg, #0a0714 0%, #050308 45%, #000000 100%);
 
   /* --- typographie --- */
   --font: "Montserrat", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -110,7 +118,7 @@
   --glow-cyan: rgba(0, 159, 227, .45);
   --glow-cyan-doux: rgba(0, 159, 227, .22);
 
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 /* Motif « circuit » : points aux intersections et amorces de pistes.
@@ -198,7 +206,12 @@ body {
   font-weight: 400;
   line-height: 1.68;
   color: var(--tx-1);
-  background: var(--paper);
+  /* Simple filet de sécurité pour les quelques pixels qui ne sont couverts
+     par aucune section (marges des coupes en diagonale, notamment) : chaque
+     section peint désormais son propre fond (voir la règle `section` plus
+     bas), donc pas besoin ici de `background-attachment: fixed` — fragile
+     sur mobile (Safari iOS en particulier gère mal cette propriété). */
+  background: var(--nuit);
   overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -226,9 +239,34 @@ ul, ol { list-style: none; }
   overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
 }
 
-section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
+/* Chaque section peint sa propre instance du dégradé du hero (var(--nuit))
+   plutôt que de compter sur un fond de page fixe : plus fiable (certains
+   navigateurs mobiles gèrent mal `background-attachment: fixed`) et surtout
+   plus riche — chaque section garde son propre halo, pas seulement celle
+   qui atterrit au bon endroit dans un dégradé figé. `.sec--brume` (fond
+   légèrement différent) et `.nuit` (déjà ce même dégradé) restent
+   prioritaires, cette règle ne les concerne pas. */
+section {
+  position: relative; isolation: isolate;
+  padding-block: clamp(64px, 8.5vw, 122px);
+  background: var(--nuit);
+}
 .sec--brume { background: var(--mist); }
 .sec--serre { padding-block: clamp(48px, 6vw, 84px); }
+
+/* --- lueur qui suit le curseur, posée sur chaque section --------------
+   Même mécanique que le spotlight du hero (--mx/--my posés par
+   activerLueurSections() dans js/core/ui.js), généralisée à tout le site :
+   survoler n'importe quelle section fait apparaître le même halo cyan
+   discret. `isolation: isolate` (ci-dessus) garde le z-index négatif
+   confiné à la section, sans passer sous les sections voisines. */
+section::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 30%), var(--glow-cyan-doux), transparent 62%);
+  opacity: 0; transition: opacity .5s var(--ease);
+}
+section:hover::before { opacity: 1; }
+@media (pointer: coarse) { section::before { display: none; } }
 
 /* --- icônes ------------------------------------------------------------ */
 .ic {
@@ -249,7 +287,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   font-size: clamp(1.95rem, 4.6vw, 3.35rem);
   line-height: 1.06;
   letter-spacing: -.03em;
-  color: var(--navy);
+  color: var(--tx-1);
   text-wrap: balance;
 }
 .titre em {
@@ -338,7 +376,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 .marque { display: inline-flex; align-items: center; gap: 11px; }
 .marque__signe {
   width: auto; height: 26px;
-  fill: var(--navy);
+  fill: var(--tx-1);
   flex: none;
 }
 .marque__mot {
@@ -347,7 +385,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   line-height: 1;
   white-space: nowrap;
 }
-.marque__mot b { font-weight: 800; color: var(--navy); }
+.marque__mot b { font-weight: 800; color: var(--tx-1); }
 .marque__mot i { font-style: normal; font-weight: 200; color: var(--cyan); }
 
 /* Déclinaison sur fond sombre : le signe passe en blanc. */
@@ -362,67 +400,37 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
    6. BOUTONS
    ========================================================================= */
 
+/* Coins courts plutôt que la pilule complète, et plus ni reflet balayant
+   ni lever + ombre colorée ni halo suiveur de curseur au survol (les trois
+   étaient le même réflexe « gabarit générique » repéré sur le bouton du
+   hero — voir claudeprompt.md) : un simple éclaircissement, partout. */
 .btn {
   --btn-fond: var(--navy);
   --btn-txt: #fff;
   position: relative;
   display: inline-flex; align-items: center; justify-content: center; gap: 9px;
   padding: 13px 22px;
-  border-radius: 999px;
-  overflow: hidden;             /* rogne le reflet ::before sur la pilule */
+  border-radius: 8px;
   font-size: .89rem; font-weight: 700; letter-spacing: .01em;
   background: var(--btn-fond); color: var(--btn-txt);
   border: 1.5px solid transparent;
-  transition: transform .32s var(--ease-expo), box-shadow .32s var(--ease-expo),
-              background-color .2s var(--ease), color .2s var(--ease),
-              border-color .2s var(--ease);
+  transition: filter .25s var(--ease), background-color .2s var(--ease),
+              color .2s var(--ease), border-color .2s var(--ease);
   white-space: nowrap;
 }
-/* Reflet qui balaie le bouton au survol — la texture « verre » qu'on
-   retrouve sur les boutons premium, posée en pur CSS. */
-.btn::before {
-  content: "";
-  position: absolute; inset: 0;
-  background: linear-gradient(115deg, transparent 32%, rgba(255, 255, 255, .38) 50%, transparent 68%);
-  transform: translateX(-130%);
-  transition: transform .62s var(--ease-expo);
-  pointer-events: none;
-}
-.btn:hover::before { transform: translateX(130%); }
-.btn:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -12px rgba(48, 39, 132, .55); }
-.btn:active { transform: translateY(0) scale(.98); }
+.btn:hover { filter: brightness(1.1); }
+.btn:active { filter: brightness(.96); }
 
 .btn--plein  { --btn-fond: var(--navy); }
 .btn--cyan   { --btn-fond: var(--cyan); --btn-txt: #04263A; }
 .btn--wa     { --btn-fond: var(--wa);   --btn-txt: #042A15; }
 .btn--large  { width: 100%; padding: 15px 24px; font-size: .95rem; }
 
-/* Halo lumineux au survol — réservé aux appels principaux (un seul par
-   section, sinon l'effet se banalise). */
-.btn--lueur:hover {
-  box-shadow: 0 14px 28px -12px rgba(48, 39, 132, .55), 0 0 0 6px var(--glow-cyan-doux);
-}
-/* Le halo suit le curseur (--mx/--my posés par activerLueurBoutons() dans
-   js/core/ui.js) : signature volontairement rare, posée sur une poignée de
-   boutons seulement — la répéter sur chaque bouton du site la banaliserait
-   au lieu de la rendre précieuse. */
-.btn--lueur { --mx: 50%; --my: 30%; }
-.btn--lueur::after {
-  content: "";
-  position: absolute; inset: 0;
-  background: radial-gradient(140px circle at var(--mx) var(--my), rgba(255, 255, 255, .4), transparent 72%);
-  opacity: 0;
-  transition: opacity .35s var(--ease);
-  pointer-events: none;
-}
-.btn--lueur:hover::after { opacity: 1; }
-@media (hover: none) { .btn--lueur::after { display: none; } }
-
 .btn--ligne {
   --btn-fond: transparent; --btn-txt: var(--navy);
   border-color: var(--line);
 }
-.btn--ligne:hover { border-color: var(--navy); background: rgba(48, 39, 132, .05); box-shadow: none; }
+.btn--ligne:hover { filter: none; border-color: var(--navy); background: rgba(48, 39, 132, .05); }
 
 .sur-nuit .btn--ligne, .nuit .btn--ligne {
   --btn-txt: #fff; border-color: var(--line-s);
@@ -478,7 +486,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 /* --- barre de navigation --- */
 .nav {
   position: relative; z-index: 810;
-  background: rgba(255, 255, 255, .78);
+  background: rgba(10, 9, 17, .78);
   backdrop-filter: blur(18px) saturate(1.6);
   -webkit-backdrop-filter: blur(18px) saturate(1.6);
   border-bottom: 1px solid transparent;
@@ -512,7 +520,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 .site-entete--sombre:not(.est-pose) .nav__ico:hover { background: rgba(255, 255, 255, .14); color: #fff; }
 .site-entete--sombre.est-pose .bandeau,
 .site-entete--sombre.est-pose .nav {
-  background: rgba(255, 255, 255, .78);
+  background: rgba(10, 9, 17, .78);
   backdrop-filter: blur(18px) saturate(1.6); -webkit-backdrop-filter: blur(18px) saturate(1.6);
   transition: background-color .3s var(--ease), height .3s var(--ease), opacity .3s var(--ease);
 }
@@ -548,9 +556,9 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   transform: scaleX(0); transform-origin: left;
   transition: transform .28s var(--ease);
 }
-.nav__liens a:hover { color: var(--navy); }
+.nav__liens a:hover { color: var(--tx-1); }
 .nav__liens a:hover::after { transform: scaleX(1); }
-.nav__liens a[aria-current="page"] { color: var(--navy); font-weight: 700; }
+.nav__liens a[aria-current="page"] { color: var(--tx-1); font-weight: 700; }
 .nav__liens a[aria-current="page"]::after { transform: scaleX(1); }
 
 .nav__actions { display: flex; align-items: center; gap: 9px; flex: none; }
@@ -560,7 +568,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   color: var(--tx-2);
   transition: background-color .2s var(--ease), color .2s var(--ease);
 }
-.nav__ico:hover { background: var(--mist); color: var(--navy); }
+.nav__ico:hover { background: var(--mist); color: var(--tx-1); }
 .nav__ico .ic { width: 20px; height: 20px; }
 
 /* `overflow: visible` : la pastille de compte (span positionné hors de la
@@ -681,192 +689,148 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 }
 
 /* =========================================================================
-   HERO ÉDITORIAL — porté du site VP (Vêtement Palace, WebsiteVP/style.css,
-   règles `.hero*`/`.cta-pill`/`.cta-link` d'origine). Le client a demandé
-   de reprendre directement ce système plutôt que d'en réinventer un :
-   structure et mécanique intactes, palette et police adaptées à la charte
-   Dilitech ci-dessous.
-     — couleur : l'or (`--gold-light` #C9AD74, `--gold-dark` #7C6127) est
-       devenu le cyan de la marque (`--cyan-2`, `--cyan-ink`) ; l'encre
-       `--ink` est devenue `--navy-ink`.
-     — police : VP utilise Bodoni Moda (serif italique) en display ; la
-       charte Dilitech impose Montserrat partout, donc le titre garde ICI
-       la règle maison (gras marine → très maigre bleu clair) plutôt que
-       l'italique doré de VP — c'est le seul endroit où on s'écarte du
-       gabarit d'origine, pour ne pas trahir la charte.
+   HERO — composition reprise à la lettre depuis la référence STEP SNEAKERS
+   (Docs/hero, capture « Which one is your favorite… »), à la demande du
+   client après deux essais jugés insuffisants. Un CSS grid à deux colonnes
+   porte les cinq blocs de la référence exactement dans les mêmes cases —
+   titre, paragraphe, puces + CTA, trio icône/libellé, photo produit —
+   plutôt que la mécanique VP précédente (mot fantôme, libellé vertical,
+   pagination à points), absente de cette référence.
+   Couleurs et police ramenées à la charte Dilitech (Montserrat, bleus de
+   la marque) au lieu du bleu générique de STEP. Voir claudeprompt.md.
    ========================================================================= */
 
 .hero {
-  position: relative;
-  isolation: isolate;
-  /* VP place sa nav en `position: fixed` par-dessus le hero et compense
-     avec ce padding — la nav de Dilitech est `sticky` (dans le flux, pas
-     en overlay), le hero commence donc déjà sous elle : pas de padding à
-     ajouter ici, sous peine de pousser le contenu deux fois. */
-  min-height: calc(100vh - var(--nav-h) - var(--bandeau-h));
-  display: flex; flex-direction: column;
+  position: relative; isolation: isolate;
   overflow: hidden;
   color: #fff;
+  width: 100%;
+  /* `var(--nuit)` a été assombri jusqu'au noir quasi pur en travaillant ce
+     hero (voir sa définition) : il sert maintenant de fond ici comme sur
+     toutes les autres sections sombres du site, plutôt que de garder une
+     variante locale — c'est ce même dégradé qu'on réutilise pour harmoniser
+     le reste du site avec le hero. */
   background: var(--nuit);
+
+  /* Une hauteur ferme (pas seulement un plancher) donne au `1fr` de la
+     grille interne un espace réel à distribuer — sans elle, la ligne qui
+     porte la photo se dimensionnait sur le contenu et débordait largement
+     sous la fenêtre (mesuré : ~1050px pour une fenêtre de 900px). */
+  height: calc(100vh - var(--nav-h) - var(--bandeau-h));
+  min-height: 620px;
 }
 
-/* La photo occupe la partie droite du hero, pas toute sa surface : notre
-   matière (une vraie capture d'écran très colorée, sans zone neutre où
-   poser du texte lisible, contrairement à un portrait comme chez VP) ne
-   supporte pas un assombrissement uniforme sans perdre ce qui la rend
-   intéressante. Le texte vit donc sur le dégradé de marque (--nuit) à
-   gauche, la photo reste vive à droite, et un fondu (mask-image) les
-   raccorde sans coupure nette au milieu. */
-.hero__media {
-  position: absolute; top: 0; right: 0; bottom: 0; left: 42%; z-index: -3;
-  overflow: hidden;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 14%);
-  mask-image: linear-gradient(90deg, transparent 0%, #000 14%);
-}
-.hero__media img {
-  width: 100%; height: 100%; object-fit: cover; object-position: 68% 42%;
-  filter: brightness(.86) contrast(1.1) saturate(1.15);
-}
-.hero__overlay {
-  position: absolute; inset: 0; z-index: -2;
-  /* Juste assez pour que les barres du haut et du bas (méta, preuves,
-     réseaux) restent lisibles par-dessus la photo — pas un voile général. */
-  background:
-    linear-gradient(180deg, rgba(6, 5, 20, .8) 0%, transparent 16%, transparent 78%, rgba(6, 5, 20, .8) 100%);
-}
-@media (max-width: 900px) {
-  /* Plus de panneau plein pour porter le texte : la photo redevient
-     pleine largeur, donc l'assombrissement doit à lui seul garantir la
-     lisibilité sur toute la hauteur, pas seulement en haut/bas. */
-  .hero__media { left: 0; -webkit-mask-image: none; mask-image: none; }
-  .hero__media img { filter: brightness(.4) contrast(1.05) saturate(.9); }
-  .hero__overlay {
-    background:
-      linear-gradient(180deg, rgba(6, 5, 20, .78) 0%, rgba(6, 5, 20, .55) 30%, rgba(6, 5, 20, .72) 65%, rgba(6, 5, 20, .95) 100%);
-  }
-}
-/* Les mêmes halos en dérive qu'ailleurs sur le site (voir section 1) —
-   recolorent la scène en cyan plutôt que de recolorer la photo. */
-.halos--hero { z-index: -1; mix-blend-mode: screen; }
-.halos--hero .halo--1 { top: -12%; left: -8%; opacity: .7; }
-.halos--hero .halo--3 { top: auto; bottom: 4%; right: 10%; left: auto; opacity: .4; }
-
-/* Le mot fantôme en filigrane — signature VP reprise telle quelle. Le
-   demi-mot « TECH » du logo plutôt que le nom complet : plus court, et il
-   fait écho à la moitié maigre du wordmark. */
-.hero__ghost {
-  position: absolute; z-index: -1; left: 0; right: 0; top: 50%;
-  transform: translateY(-50%);
-  font-family: var(--font); font-weight: 800; text-transform: uppercase;
-  font-size: clamp(6rem, 22vw, 18rem); line-height: 1; letter-spacing: -.01em;
-  text-align: center; white-space: nowrap; pointer-events: none;
-  color: transparent; -webkit-text-stroke: 1px rgba(255, 255, 255, .12);
+/* Le fond (ci-dessus) occupe toute la largeur de la fenêtre ; le contenu,
+   lui, reste cadré à --wrap et centré — sur les écrans plus larges que
+   --wrap, mettre max-width directement sur .hero aurait aussi rogné son
+   propre fond, laissant deux bandes blanches (fond de page) de part et
+   d'autre au lieu du dégradé. */
+.hero__grid {
+  position: relative; z-index: 1; height: 100%;
+  display: grid;
+  grid-template-columns: minmax(280px, 1.05fr) minmax(300px, 1fr);
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "headline desc"
+    "specs    media"
+    "trio     media";
+  column-gap: clamp(24px, 4vw, 60px);
+  row-gap: 18px;
+  max-width: var(--wrap); margin: 0 auto;
+  padding: calc(var(--nav-h) + 30px) clamp(24px, 4vw, 50px) 26px;
 }
 
-/* Spotlight qui suit le curseur — activerSpotlightHero() dans js/core/ui.js,
-   même mécanique que VP (mousemove → --mx/--my en %), juste posée sur le
-   hero entier plutôt que sur un bouton. */
+.hero__frame {
+  position: absolute; z-index: 2; inset: 18px; border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, .14); pointer-events: none;
+}
+@media (max-width: 900px) { .hero__frame { display: none; } }
+
+.halos--hero { position: absolute; inset: 0; z-index: 0; mix-blend-mode: screen; }
+.halos--hero .halo--1 { top: -8%; left: auto; right: -6%; opacity: .5; }
+.halos--hero .halo--3 { top: auto; bottom: -10%; left: 4%; right: auto; opacity: .32; }
+
+/* Spotlight qui suit le curseur — activerSpotlightHero() dans js/core/ui.js
+   (mousemove → --mx/--my en %), posé sur le hero entier. */
 .hero__spotlight {
-  position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
   background: radial-gradient(560px circle at var(--mx, 50%) var(--my, 35%), var(--glow-cyan), transparent 62%);
   opacity: 0; transition: opacity .5s var(--ease);
 }
 .hero:hover .hero__spotlight { opacity: 1; }
 @media (pointer: coarse) { .hero__spotlight { display: none; } }
 
-.hero__frame { position: absolute; z-index: 1; inset: 18px; border: 1px solid rgba(255, 255, 255, .14); pointer-events: none; }
-.hero__side {
-  position: absolute; z-index: 1; left: 34px; top: 50%; transform: translateY(-50%) rotate(180deg);
-  writing-mode: vertical-rl; font-size: .64rem; font-weight: 600; letter-spacing: .32em; text-transform: uppercase;
-  color: rgba(255, 255, 255, .4);
-}
-@media (max-width: 900px) { .hero__frame, .hero__side { display: none; } }
-
-.hero__meta {
-  position: relative; z-index: 1; flex: 0 0 auto;
-  display: flex; align-items: center; justify-content: space-between;
-  max-width: var(--wrap); margin: 0 auto;
-  /* La nav flotte, transparente, par-dessus le hero (voir .site-entete--sombre) :
-     ce padding la dégage pour que l'amorce (« CATALOGUE 2026 ») ne se
-     superpose pas aux liens du menu. */
-  padding: calc(var(--nav-h) + 26px) clamp(24px, 4vw, 50px) 0; width: 100%;
-  font-size: .72rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase;
-  color: rgba(255, 255, 255, .55);
-}
-.hero__eyebrow-top { color: var(--cyan-2); }
-/* Le côté droit du bandeau (« Bamako, Mali ») et les icônes sociales du bas
-   passent au-dessus de la photo, pas du panneau sombre : leur clarté varie
-   avec ce qu'il y a dessous (des cartons clairs, ici), d'où cette ombre. */
-.hero__meta-contact, .hero__foot-social a { text-shadow: 0 1px 8px rgba(0, 0, 0, .5); }
-@media (max-width: 560px) { .hero__meta { display: none; } }
-
-.hero__inner {
-  position: relative; z-index: 1; flex: 1;
-  display: flex; align-items: center; justify-content: flex-start;
-  max-width: var(--wrap); margin: 0 auto; padding: 24px clamp(24px, 4vw, 50px); width: 100%;
-  text-align: left;
-}
-.hero__text { display: flex; flex-direction: column; align-items: flex-start; max-width: 420px; }
-@media (max-width: 900px) { .hero__inner { justify-content: center; text-align: center; }
-  .hero__text { align-items: center; max-width: 560px; } }
-
-.hero__eyebrow {
-  display: inline-flex; align-items: center; gap: 10px;
-  font-size: .7rem; font-weight: 700; letter-spacing: .3em; text-transform: uppercase;
-  color: var(--cyan-2);
-}
-
+/* --- colonne de gauche : titre, paragraphe, puces, trio ---------------- */
+.hero__headline { grid-area: headline; position: relative; z-index: 1; align-self: end; }
 .hero__title {
-  font-weight: 800;
-  font-size: clamp(2.1rem, 3.4vw, 3.15rem);
-  line-height: 1.05;
-  letter-spacing: -.04em;
+  font-weight: 700;
+  font-size: clamp(2.2rem, 3.6vw, 3.2rem);
+  line-height: 1.08;
+  letter-spacing: -.03em;
   color: #fff;
-  text-wrap: balance;
-  margin: 20px 0 22px;
 }
+/* Premier mot en accent — italique, gras, souligné cyan — comme « Enjoy »
+   dans la référence, plutôt que le dégradé gras → maigre de l'ancienne
+   version. */
 .hero__title em {
-  display: block;
-  font-style: normal; font-weight: 200;
-  color: var(--cyan-2);
-}
-.hero__sub {
-  font-size: .98rem; color: rgba(255, 255, 255, .68);
-  max-width: 46ch; margin: 0 0 36px; letter-spacing: .01em;
-}
-.hero__actions { display: flex; gap: 30px; flex-wrap: wrap; justify-content: flex-start; align-items: center; }
-@media (max-width: 900px) {
-  .hero__sub { margin: 0 auto 36px; }
-  .hero__actions { justify-content: center; flex-direction: column; gap: 20px; }
+  font-style: italic; font-weight: 800; color: var(--cyan-2);
+  text-decoration: underline; text-decoration-color: var(--cyan-2);
+  text-underline-offset: 6px; text-decoration-thickness: 2px;
 }
 
-/* --- pilule magnétique : l'appel principal --------------------------- */
+.hero__desc {
+  grid-area: desc; position: relative; z-index: 1;
+  justify-self: end; align-self: start; text-align: right;
+  max-width: 34ch;
+}
+.hero__desc p { font-size: .88rem; line-height: 1.6; color: rgba(255, 255, 255, .62); margin: 0 0 14px; }
+.hero__desc p:last-child { margin-bottom: 0; }
+
+.hero__specs { grid-area: specs; position: relative; z-index: 1; align-self: center; }
+/* Les puces « marques disponibles » ont été retirées (demande du client) :
+   cet espace vide garde la hauteur qu'elles occupaient, pour que le CTA ne
+   remonte pas combler le vide. */
+.hero__specs-vide { height: 130px; }
+@media (max-width: 900px) { .hero__specs-vide { height: 96px; } }
+.hero__specs-label {
+  font-size: .68rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
+  color: rgba(255, 255, 255, .55); margin: 0 0 14px;
+}
+/* Puces façon pointures de la référence, remplies avec de vraies marques
+   du catalogue (voir hero() dans accueil.js) plutôt que des tailles. */
+.hero__chips { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 28px; max-width: 360px; padding: 0; list-style: none; }
+.hero__chip {
+  padding: 9px 16px; border: 1px solid rgba(255, 255, 255, .22); border-radius: 10px;
+  background: rgba(255, 255, 255, .03);
+  font-size: .74rem; font-weight: 700; color: #fff;
+  transition: border-color .3s var(--ease);
+}
+.hero__chip--plus { color: var(--cyan-2); border-color: rgba(79, 195, 240, .4); }
+
+.hero__actions { display: flex; align-items: center; gap: 26px; flex-wrap: wrap; }
+
+/* --- bouton monochrome, coins nets ----------------------------------------
+   Le premier essai restait un pavé cyan plein — toujours le réflexe
+   « bouton-couleur-de-marque » des gabarits génériques. Ici, plus aucune
+   couleur : bordé, transparent, blanc sur noir, comme les cases du compteur
+   Toguna Motors (Docs/hero) — le cyan n'apparaît nulle part sur le bouton,
+   seul son inversion (fond blanc, texte noir) marque le survol. */
 .cta-pill {
-  position: relative; display: inline-flex; align-items: center; gap: 20px;
-  padding: 6px 6px 6px 28px; border: 1px solid rgba(255, 255, 255, .35); border-radius: 999px;
-  overflow: hidden; isolation: isolate; transition: border-color .4s var(--ease);
+  display: inline-flex; align-items: center; gap: 14px;
+  padding: 15px 26px; border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, .5);
+  background: transparent; color: #fff;
+  font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  transition: background .3s var(--ease), color .3s var(--ease), border-color .3s var(--ease);
 }
-.cta-pill::before {
-  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: 999px;
-  background: var(--cyan-2); transform: scaleX(0); transform-origin: left;
-  transition: transform .5s var(--ease-expo);
+.cta-pill:hover { background: #fff; color: #000; border-color: #fff; }
+.cta-pill__fleche {
+  display: grid; place-items: center; width: 15px; height: 15px; flex-shrink: 0;
 }
-.cta-pill:hover { border-color: var(--cyan-2); }
-.cta-pill:hover::before { transform: scaleX(1); }
-.cta-pill__label {
-  font-size: .74rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
-  color: #fff; transition: color .4s var(--ease); white-space: nowrap;
-}
-.cta-pill:hover .cta-pill__label { color: var(--navy-ink); }
-.cta-pill__orb {
-  width: 40px; height: 40px; border-radius: 50%; background: var(--cyan-2); color: var(--navy-ink);
-  display: grid; place-items: center; flex-shrink: 0;
-  transition: transform .5s var(--ease-expo), background .4s var(--ease);
-}
-.cta-pill__orb svg { width: 17px; height: 17px; }
-.cta-pill:hover .cta-pill__orb { background: var(--navy-ink); color: var(--cyan-2); transform: rotate(45deg); }
+.cta-pill__fleche svg { width: 100%; height: 100%; }
 
-/* --- lien souligné : l'appel secondaire ------------------------------- */
+/* --- lien souligné : l'appel secondaire (absent de la référence, gardé
+   car « demander un devis » reste un besoin réel du site) -------------- */
 .cta-link {
   position: relative; display: inline-flex; align-items: center; gap: 10px;
   font-size: .74rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
@@ -881,34 +845,73 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 .cta-link:hover { color: #fff; }
 .cta-link:hover::after { transform: scaleX(1); }
 
-/* --- pied du hero : chiffres + réseaux -------------------------------- */
-.hero__foot {
-  position: relative; z-index: 1; flex: 0 0 auto;
-  display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;
-  max-width: var(--wrap); margin: 0 auto; padding: 0 clamp(24px, 4vw, 50px) 34px; width: 100%;
+/* --- trio icône/libellé, en cases nettes ---------------------------------
+   Plus de trait de séparation ni d'icône nue flottante (le style « pack
+   d'icônes IA ») : chaque icône est posée dans une case bordée à coins
+   courts, sur le modèle des cases du compte à rebours Toguna Motors
+   (Docs/hero) — garantie et SAV sont des faits fixes déjà énoncés plus bas
+   sur la page, le réseau reste calculé (voir hero() dans accueil.js). */
+.hero__trio {
+  grid-area: trio; position: relative; z-index: 1; align-self: end;
+  display: flex; gap: 22px; padding: 0; margin: 0; list-style: none;
 }
-.hero__stats { display: flex; }
-.hero__stat { padding-right: 26px; margin-right: 26px; border-right: 1px solid rgba(255, 255, 255, .18); text-align: left; }
-.hero__stat:last-child { border-right: none; margin-right: 0; padding-right: 0; }
-.hero__stat b { font-size: 1.35rem; font-weight: 800; color: #fff; display: block; font-variant-numeric: tabular-nums; }
-.hero__stat > span { font-size: .64rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(255, 255, 255, .5); }
-.hero__foot-social { display: flex; gap: 16px; }
-.hero__foot-social a { color: rgba(255, 255, 255, .6); transition: color .3s var(--ease); }
-.hero__foot-social a:hover { color: var(--cyan-2); }
-.hero__foot-social .ic { width: 16px; height: 16px; }
-
-.hero__dots {
-  position: absolute; z-index: 1; right: 30px; top: 50%; transform: translateY(-50%);
-  display: flex; flex-direction: column; gap: 10px;
+.hero__trio li { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+.hero__trio-ic {
+  display: grid; place-items: center;
+  width: 44px; height: 44px; border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, .22);
+  background: transparent;
 }
-.hero__dots i { width: 5px; height: 5px; border-radius: 50%; background: rgba(255, 255, 255, .3); display: block; transition: all .3s var(--ease); }
-.hero__dots i.is-active { background: var(--cyan-2); width: 6px; height: 6px; }
-@media (max-width: 900px) { .hero__dots { display: none; } }
+.hero__trio-ic .ic { width: 20px; height: 20px; color: #fff; }
+.hero__trio span:last-child {
+  font-size: .64rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: rgba(255, 255, 255, .6); text-wrap: balance;
+}
 
-@media (max-width: 640px) {
-  .hero { min-height: 100svh; }
-  .hero__foot { justify-content: center; text-align: center; }
-  .hero__stats { justify-content: center; width: 100%; }
+/* --- photo produit, pleine colonne de droite ---------------------------
+   Photo de travail (source Pinterest, sans licence commerciale) — à
+   remplacer par une vraie photo Dilitech avant mise en ligne. Le
+   vignettage radial isole l'appareil de son décor (bureau, bokeh) pour se
+   rapprocher du produit détouré sur fond sombre de la référence. */
+.hero__media {
+  grid-area: media; position: relative; z-index: 1;
+  border-radius: 24px; overflow: hidden;
+  min-height: 320px;
+}
+.hero__media img {
+  width: 100%; height: 100%; object-fit: cover; object-position: 50% 32%;
+  filter: brightness(.94) contrast(1.08) saturate(1.05);
+}
+.hero__media-vignette {
+  position: absolute; inset: 0;
+  background: radial-gradient(120% 90% at 50% 40%, transparent 42%, rgba(6, 5, 20, .55) 78%, rgba(6, 5, 20, .92) 100%);
+}
+.hero__media-shadow {
+  position: absolute; left: 10%; right: 10%; bottom: -6%; height: 60px;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, .55), transparent 72%);
+  filter: blur(4px);
+}
+
+@media (max-width: 900px) {
+  /* La colonne unique s'empile sur sa hauteur naturelle : la hauteur ferme
+     du bureau (pensée pour la grille à deux colonnes) n'a plus lieu d'être
+     ici. */
+  .hero { height: auto; min-height: auto; }
+  .hero__grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    grid-template-areas: "headline" "media" "desc" "specs" "trio";
+    row-gap: 22px;
+    text-align: center;
+    padding-top: calc(var(--nav-h) + 34px);
+    padding-bottom: 40px;
+  }
+  .hero__desc { justify-self: center; text-align: center; max-width: 44ch; }
+  .hero__specs { align-self: auto; }
+  .hero__chips { justify-content: center; max-width: none; }
+  .hero__actions { justify-content: center; }
+  .hero__trio { justify-content: center; flex-wrap: wrap; row-gap: 16px; }
+  .hero__media { min-height: 320px; order: -1; }
 }
 
 /* Simple rangée de boutons — reste utilisée par les en-têtes « introuvable »
@@ -950,33 +953,6 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   text-transform: uppercase; color: var(--sur-sombre-3);
 }
 
-/* --- l'invite à défiler, en bas du hero --- */
-.scroll-cue {
-  position: absolute;
-  left: 50%; bottom: 28px;
-  transform: translateX(-50%);
-  z-index: 2;
-  display: grid; place-items: center;
-  width: 46px; height: 46px;
-  border-radius: 50%;
-  border: 1px solid var(--line-s);
-  color: var(--sur-sombre-2);
-  background: rgba(0, 0, 0, .22);
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  animation: cueBob 2.6s ease-in-out infinite;
-  transition: border-color .3s var(--ease), color .3s var(--ease), box-shadow .3s var(--ease);
-}
-.scroll-cue:hover {
-  border-color: var(--cyan-2); color: #fff;
-  box-shadow: 0 0 26px var(--glow-cyan-doux);
-}
-.scroll-cue .ic { width: 18px; height: 18px; }
-@keyframes cueBob {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50%      { transform: translateX(-50%) translateY(7px); }
-}
-@media (max-width: 640px) { .scroll-cue { display: none; } }
-
 
 /* =========================================================================
    9. MARQUEE DES MARQUES
@@ -1000,92 +976,198 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   white-space: nowrap;
   transition: color .2s var(--ease);
 }
-.marques__m:hover { color: var(--navy); }
+.marques__m:hover { color: var(--tx-1); }
 
 /* =========================================================================
-   10. CARTES DE CATÉGORIE
+   10. BENTO — L'UNIVERS DILITECH
+   -------------------------------------------------------------------------
+   Grille reprise À LA LETTRE depuis la référence (Docs/section/univers
+   (cartes catégories).jfif) : sept tuiles, mêmes proportions — voir le
+   commentaire dans index.html pour le détail. Contenu réel uniquement,
+   voir univers() dans accueil.js pour ce qui est calculé.
    ========================================================================= */
 
-.univers { display: grid; gap: 20px; }
-
-.univ {
+.bento {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: auto auto auto;
+  gap: 12px;
+}
+.bento__tile {
   position: relative;
-  display: grid; gap: 18px;
-  padding: clamp(24px, 3vw, 34px);
+  display: flex; flex-direction: column;
+  padding: clamp(16px, 2vw, 22px);
   border-radius: var(--r);
-  background: var(--paper);
+  background:
+    radial-gradient(240px 180px at 88% -12%, rgba(0, 159, 227, .16) 0%, transparent 62%),
+    linear-gradient(160deg, #141225 0%, #0c0a17 55%, #050308 100%);
   border: 1px solid var(--line-2);
   overflow: hidden;
-  transition: transform .3s var(--ease), box-shadow .3s var(--ease), border-color .3s var(--ease);
+  transition: transform .3s var(--ease), border-color .3s var(--ease), box-shadow .3s var(--ease);
 }
-.univ:hover {
-  transform: translateY(-5px);
-  border-color: rgba(48, 39, 132, .22);
-  box-shadow: 0 26px 50px -34px rgba(18, 19, 43, .5);
-}
-.univ__illus {
-  width: 96px; color: var(--navy);
-  transition: transform .4s var(--ease);
-}
-.univ__illus .il-a { color: var(--cyan); }
-.univ:hover .univ__illus { transform: translateX(5px) scale(1.04); }
-
-.univ__nom { font-size: 1.32rem; font-weight: 800; letter-spacing: -.02em; color: var(--navy); }
-.univ__txt { font-size: .93rem; color: var(--tx-2); }
-.univ__sous { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 2px; }
-.univ__sous a {
-  padding: 6px 12px; border-radius: 999px;
-  background: var(--mist); border: 1px solid transparent;
-  font-size: .78rem; font-weight: 600; color: var(--tx-2);
-  transition: all .18s var(--ease);
-}
-.univ__sous a:hover { background: var(--navy); color: #fff; }
-.univ__nb {
-  position: absolute; top: 22px; right: 24px;
-  font-size: .72rem; font-weight: 700; letter-spacing: .08em;
-  color: var(--tx-3);
+.bento__tile:hover {
+  transform: translateY(-4px);
+  border-color: rgba(79, 195, 240, .3);
+  box-shadow: 0 26px 50px -34px rgba(0, 0, 0, .6);
 }
 
-/* --- variantes sombres : la catégorie phare a une vraie photo, les deux
-   autres reprennent le dégradé de marque — plus aucune carte de cette
-   grille ne flotte sur du blanc plat. */
-.univ--sombre, .univ--photo {
-  background: var(--nuit); color: #fff; border-color: transparent;
-}
-.univ--sombre::before {
-  content: ""; position: absolute; inset: 0; z-index: 0;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, .06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, .06) 1px, transparent 1px);
-  background-size: 26px 26px;
-}
-.univ--sombre > *, .univ--photo > * { position: relative; z-index: 1; }
-.univ--sombre .univ__nom, .univ--photo .univ__nom { color: #fff; }
-.univ--sombre .univ__txt, .univ--photo .univ__txt { color: rgba(255, 255, 255, .72); }
-.univ--sombre .univ__nb, .univ--photo .univ__nb { color: rgba(255, 255, 255, .55); }
-.univ--sombre .univ__illus { color: #fff; filter: drop-shadow(0 8px 18px rgba(6, 5, 20, .4)); }
-/* Une vraie photo est déjà le dessin : le pictogramme ferait doublon. */
-.univ--photo .univ__illus { display: none; }
-.univ--sombre .univ__illus .il-a, .univ--photo .univ__illus .il-a { color: var(--cyan-2); }
-.univ--sombre .univ__sous a, .univ--photo .univ__sous a {
-  background: rgba(255, 255, 255, .12); color: #fff;
-}
-.univ--sombre .univ__sous a:hover, .univ--photo .univ__sous a:hover { background: var(--cyan); color: #04263A; }
-.univ--sombre:hover, .univ--photo:hover { border-color: rgba(255, 255, 255, .2); }
+.bento__tile--a { grid-column: 1 / span 1; grid-row: 1 / span 1; min-height: 150px; }
+.bento__tile--b { grid-column: 2 / span 1; grid-row: 1 / span 1; align-items: center; justify-content: center; }
+.bento__tile--c { grid-column: 3 / span 2; grid-row: 1 / span 1; justify-content: space-between; }
+.bento__tile--d { grid-column: 1 / span 2; grid-row: 2 / span 2; justify-content: space-between; }
+.bento__tile--e { grid-column: 3 / span 1; grid-row: 2 / span 1; justify-content: center; }
+.bento__tile--g { grid-column: 4 / span 1; grid-row: 2 / span 1; justify-content: center; }
+.bento__tile--f { grid-column: 3 / span 2; grid-row: 3 / span 1; }
 
-.univ--photo {
-  background: var(--navy-ink);
+/* --- tuile A : garantie, avec un petit « reçu » imbriqué — la carte dans
+   la carte de la référence (« +$2400 / Has been received at your bank »),
+   pas juste une icône et du texte à plat. --- */
+.bento__eyebrow {
+  font-size: .74rem; color: var(--tx-3); line-height: 1.4; max-width: 18ch;
 }
-.univ--photo__media {
-  position: absolute; inset: 0; z-index: 0;
+.bento__recu {
+  display: flex; align-items: center; gap: 12px;
+  margin-top: auto; padding: 12px; border-radius: 12px;
+  background: rgba(255, 255, 255, .035); border: 1px solid var(--line-2);
+  box-shadow: 0 14px 28px -18px rgba(0, 0, 0, .7);
 }
-.univ--photo__media img {
-  width: 100%; height: 100%; object-fit: cover; object-position: center 30%;
-  filter: brightness(.5) saturate(1.05);
+.bento__recu-ic {
+  display: grid; place-items: center; flex: none;
+  width: 34px; height: 34px; border-radius: 9px;
+  background: var(--navy); color: var(--cyan-2);
 }
-.univ--photo__media::after {
-  content: ""; position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(16, 11, 51, .2) 0%, rgba(16, 11, 51, .55) 55%, rgba(16, 11, 51, .92) 100%);
+.bento__recu-ic .ic { width: 15px; height: 15px; }
+.bento__recu-txt { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.bento__recu-titre { font-size: 1.05rem; font-weight: 800; color: var(--tx-1); letter-spacing: -.01em; }
+.bento__recu-sous { font-size: .7rem; color: var(--tx-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bento__mini { font-size: .72rem; color: var(--tx-3); margin-top: 4px; }
+.bento__mini--centre { text-align: center; margin-top: 12px; }
+.bento__fleche {
+  position: absolute; right: 16px; bottom: 16px;
+  display: grid; place-items: center;
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 1px solid var(--line-2); color: var(--tx-2);
+  transition: background .3s var(--ease), color .3s var(--ease), border-color .3s var(--ease);
+}
+.bento__fleche svg { width: 13px; height: 13px; }
+.bento__tile--a:hover .bento__fleche { background: var(--cyan-2); color: var(--navy-ink); border-color: var(--cyan-2); }
+.bento__tile--a { padding-bottom: 60px; }
+
+/* --- tuile B : marques, puces empilées en cartes (pas des ronds) --- */
+.bento__chips { display: flex; }
+.bento__chips span {
+  display: grid; place-items: center;
+  width: 42px; height: 42px; border-radius: 11px;
+  background: var(--mist-2); border: 2px solid var(--paper);
+  font-size: .62rem; font-weight: 800; color: var(--tx-1);
+  margin-left: -14px;
+  transform: rotate(var(--rot, 0deg));
+  box-shadow: 0 10px 20px -6px rgba(0, 0, 0, .55);
+}
+.bento__chips span:nth-child(1) { margin-left: 0; --rot: -9deg; z-index: 1; }
+.bento__chips span:nth-child(2) { --rot: 0deg; z-index: 2; }
+.bento__chips span:nth-child(3) { --rot: 9deg; z-index: 3; background: var(--navy); color: var(--cyan-2); }
+
+/* --- titres : gabarit commun, poussé beaucoup plus grand sur les tuiles
+   qui portent un vrai titre (C, E, F) — l'écart de taille avec les
+   libellés .bento__mini est ce qui donne le ton « soigné » de la
+   référence, pas des tailles toutes proches les unes des autres. --- */
+.bento__titre { font-size: .96rem; font-weight: 800; letter-spacing: -.02em; color: var(--tx-1); }
+.bento__titre em { font-style: normal; color: var(--cyan-2); }
+.bento__titre--grand { font-size: clamp(1.3rem, 1.6vw, 1.55rem); line-height: 1.15; letter-spacing: -.025em; }
+
+/* --- tuile C : réseau / carte, avec la pastille de ville sur le point
+   du siège — comme le pavé « Argentina » posé sur la carte de la
+   référence. --- */
+/* Hauteur ferme plutôt que `flex: 1` : un <svg> sans width/height HTML
+   (seulement du CSS) retombe sur son intrinsèque par défaut (300×150) pour
+   le calcul de taille du conteneur flex — ça gonflait toute la ligne de la
+   grille bento bien au-delà de ce qu'affichaient les autres tuiles. */
+.bento__carte { position: relative; height: 108px; margin: 10px 0; }
+.bento__carte-pill {
+  position: absolute; transform: translate(-50%, -160%);
+  padding: 5px 11px; border-radius: 999px;
+  background: rgba(16, 11, 51, .7); border: 1px solid rgba(255, 255, 255, .18);
+  backdrop-filter: blur(10px); font-size: .64rem; font-weight: 700; color: #fff;
+  white-space: nowrap;
+}
+.bento__legende { font-size: .78rem; color: var(--tx-3); }
+.bento__legende b { color: var(--tx-1); font-weight: 700; }
+
+/* --- tuile D : grand chiffre, lueur bleue dramatique (comme le « 88% »
+   de la référence) plutôt que le halo discret des autres tuiles. --- */
+.bento__tile--d {
+  background:
+    radial-gradient(560px 400px at 50% -14%, rgba(0, 159, 227, .6) 0%, rgba(0, 159, 227, .14) 45%, transparent 74%),
+    linear-gradient(180deg, #0a0714 0%, #050308 60%, #000000 100%);
+}
+.bento__phrase { font-size: .84rem; color: rgba(255, 255, 255, .72); max-width: 26ch; }
+.bento__nombre { font-size: clamp(4rem, 7vw, 5.6rem); font-weight: 800; color: #fff; line-height: .95; letter-spacing: -.04em; margin-top: auto; }
+.bento__d-bas { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; }
+.bento__nombre-mini {
+  font-size: .74rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  color: rgba(255, 255, 255, .55);
+}
+/* Petit rappel décoratif du toggle de la tuile E, posé ici comme la petite
+   carte à bascule sous le « 88% » de la référence — pas fonctionnel,
+   purement une signature visuelle qui revient dans le bloc. */
+.bento__toggle--sombre { background: rgba(255, 255, 255, .12); }
+.bento__toggle--sombre i { background: #fff; }
+
+/* --- tuile E : méthode / toggle --- */
+.bento__toggle {
+  display: inline-flex; align-items: center;
+  width: 38px; height: 22px; border-radius: 999px;
+  background: var(--cyan-2); padding: 3px; margin-bottom: 14px;
+}
+.bento__toggle i { width: 16px; height: 16px; border-radius: 50%; background: var(--navy-ink); margin-left: auto; display: block; }
+
+/* --- tuile G : villes, chiffre dans un badge élevé (comme le petit
+   panneau « 12 » de la référence) plutôt qu'un nombre nu. --- */
+.bento__badge-nb {
+  display: grid; place-items: center;
+  width: 52px; height: 52px; margin: 10px 0; border-radius: 13px;
+  background: linear-gradient(160deg, #1c1a33 0%, #0d0c18 100%);
+  border: 1px solid var(--line-2); box-shadow: 0 14px 26px -14px rgba(0, 0, 0, .75);
+  font-size: 1.3rem; font-weight: 800; color: var(--cyan-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- tuile F : trois familles + carte pleine couleur (comme la carte
+   « Audience Growth » bleue de la référence), plutôt qu'une répartition
+   chiffrée — pas de tendance réelle à afficher, un CTA franc à la place. */
+.bento__tile--f {
+  flex-direction: row; align-items: center; justify-content: space-between; gap: 16px;
+}
+.bento__asterisque { position: absolute; top: 16px; left: 18px; font-size: 1.1rem; color: var(--tx-3); }
+.bento__tile--f .bento__titre { padding-left: 26px; flex: 1 1 auto; }
+.bento__carte-cta {
+  position: relative; z-index: 1; flex: none;
+  display: grid; grid-template-columns: 1fr auto; align-items: center; column-gap: 14px; row-gap: 4px;
+  padding: 14px 18px; border-radius: 12px;
+  background: var(--cyan); color: #04263A;
+  transition: transform .3s var(--ease);
+}
+.bento__tile--f:hover .bento__carte-cta { transform: translateX(4px); }
+.bento__carte-cta-mini { grid-column: 1 / -1; font-size: .64rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; opacity: .75; }
+.bento__carte-cta-gros { font-size: 1.05rem; font-weight: 800; white-space: nowrap; }
+.bento__carte-cta svg { width: 15px; height: 15px; }
+
+@media (max-width: 900px) {
+  .bento { grid-template-columns: repeat(2, 1fr); }
+  .bento__tile--a { grid-column: 1; grid-row: 1; }
+  .bento__tile--b { grid-column: 2; grid-row: 1; }
+  .bento__tile--c { grid-column: 1 / span 2; grid-row: 2; }
+  .bento__tile--d { grid-column: 1 / span 2; grid-row: 3; }
+  .bento__tile--e { grid-column: 1; grid-row: 4; }
+  .bento__tile--g { grid-column: 2; grid-row: 4; }
+  .bento__tile--f { grid-column: 1 / span 2; grid-row: 5; flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 560px) {
+  .bento { grid-template-columns: 1fr; }
+  .bento__tile--a, .bento__tile--b, .bento__tile--c, .bento__tile--d,
+  .bento__tile--e, .bento__tile--g, .bento__tile--f { grid-column: 1; grid-row: auto; }
+  .bento__tile--f { flex-direction: column; align-items: flex-start; }
 }
 
 /* =========================================================================
@@ -1172,7 +1254,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   font-size: 1rem; font-weight: 700; line-height: 1.32; letter-spacing: -.015em;
   color: var(--tx-1);
 }
-.carte__nom a:hover { color: var(--navy); }
+.carte__nom a:hover { color: var(--tx-1); }
 
 .carte__resume {
   font-size: .84rem; line-height: 1.6; color: var(--tx-2);
@@ -1186,7 +1268,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 }
 .carte__prix { display: flex; flex-direction: column; line-height: 1.25; }
 .carte__barre { font-size: .75rem; color: var(--tx-3); text-decoration: line-through; }
-.carte__actuel { font-size: 1.08rem; font-weight: 800; color: var(--navy); letter-spacing: -.01em; }
+.carte__actuel { font-size: 1.08rem; font-weight: 800; color: var(--tx-1); letter-spacing: -.01em; }
 .carte__unite { font-size: .7rem; color: var(--tx-3); }
 
 .stock { display: inline-flex; align-items: center; gap: 6px; font-size: .74rem; font-weight: 600; }
@@ -1214,7 +1296,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   background: var(--mist); border-radius: var(--r);
 }
 .vide .ic { width: 38px; height: 38px; color: var(--tx-3); }
-.vide__titre { font-size: 1.14rem; font-weight: 800; color: var(--navy); }
+.vide__titre { font-size: 1.14rem; font-weight: 800; color: var(--tx-1); }
 .vide__txt { font-size: .92rem; color: var(--tx-2); max-width: 44ch; }
 
 /* =========================================================================
@@ -1234,7 +1316,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 .filtres__titre {
   display: flex; align-items: center; justify-content: space-between;
   font-size: .71rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase;
-  color: var(--navy);
+  color: var(--tx-1);
 }
 .filtres__liste { display: grid; gap: 3px; max-height: 268px; overflow-y: auto; margin-inline: -6px; padding-inline: 6px; }
 
@@ -1249,13 +1331,13 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 .opt input { accent-color: var(--navy); width: 16px; height: 16px; flex: none; cursor: pointer; }
 .opt__nom { flex: 1; }
 .opt__nb { font-size: .74rem; color: var(--tx-3); font-variant-numeric: tabular-nums; }
-.opt:has(input:checked) { color: var(--navy); font-weight: 600; }
+.opt:has(input:checked) { color: var(--tx-1); font-weight: 600; }
 
 /* Curseur de prix : deux poignées superposées sur une même piste. */
 .prix-plage { display: grid; gap: 12px; }
 .prix-plage__val {
   display: flex; justify-content: space-between;
-  font-size: .82rem; font-weight: 700; color: var(--navy);
+  font-size: .82rem; font-weight: 700; color: var(--tx-1);
   font-variant-numeric: tabular-nums;
 }
 .prix-plage__piste { position: relative; height: 26px; }
@@ -1318,13 +1400,13 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 .select-tri {
   padding: 12px 16px; padding-right: 38px;
   border: 1px solid var(--line); border-radius: 999px;
-  background: var(--paper) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23545A73' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 15px center;
+  background: var(--paper) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23B9BCDA' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 15px center;
   font-size: .86rem; font-weight: 600;
   appearance: none; cursor: pointer;
 }
 
 .compte-res { font-size: .86rem; color: var(--tx-2); margin-left: auto; }
-.compte-res b { color: var(--navy); font-weight: 800; }
+.compte-res b { color: var(--tx-1); font-weight: 800; }
 
 .btn-filtres { display: none; }
 
@@ -1334,7 +1416,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   display: inline-flex; align-items: center; gap: 7px;
   padding: 6px 8px 6px 13px; border-radius: 999px;
   background: rgba(48, 39, 132, .09);
-  font-size: .78rem; font-weight: 600; color: var(--navy);
+  font-size: .78rem; font-weight: 600; color: var(--tx-1);
 }
 .actif button { display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; opacity: .6; }
 .actif button:hover { opacity: 1; background: rgba(48, 39, 132, .18); }
@@ -1367,8 +1449,9 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 
 /* --- en-tête de page (bandeau sombre court) --- */
 .entete-page {
-  /* Même logique que .hero__meta : la nav flotte en transparence par-dessus
-     cette bande, il lui faut donc sa hauteur en plus du rythme habituel. */
+  /* Même logique que le padding du hero de l'accueil : la nav flotte en
+     transparence par-dessus cette bande, il lui faut donc sa hauteur en
+     plus du rythme habituel. */
   padding-block: calc(var(--nav-h) + clamp(30px, 4vw, 50px)) clamp(62px, 8vw, 104px);
   overflow: hidden;
 }
@@ -1387,12 +1470,45 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   pointer-events: none;
 }
 
+/* Mot fantôme en filigrane — repris à la lettre de la référence contact
+   (Docs/section/contact dili tech.jfif). Scopé à cette variante plutôt
+   qu'à .entete-page entier : les sept autres bandeaux de page restent sur
+   leur simple tache de lumière, plus légère.
+   Ancré près du haut (pas un pourcentage de la hauteur totale de la
+   section) : cartes et formulaire vivent maintenant dans la même bande que
+   le titre, donc la section est bien plus haute qu'à l'origine — un
+   centrage vertical global posait le mot fantôme au milieu du formulaire
+   plutôt que derrière le titre, comme sur la référence. */
+.entete-page__fantome {
+  position: absolute; z-index: -1; left: 0; right: 0;
+  top: clamp(84px, 13vw, 150px);
+  font-family: var(--font); font-weight: 800; text-transform: uppercase;
+  font-size: clamp(5rem, 15vw, 12rem); line-height: 1; letter-spacing: -.04em;
+  text-align: center; white-space: nowrap; pointer-events: none;
+  /* Aplat plein à faible opacité — pas un contour (-webkit-text-stroke) :
+     c'est ainsi que le code source v0 du client construit ce mot, sur un
+     vert qu'on ramène ici au marine de la charte. */
+  color: rgba(79, 66, 170, .16);
+}
+@media (max-width: 640px) { .entete-page__fantome { display: none; } }
+
+/* --- pastille + titre au-dessus des cartes/formulaire --- */
+.contact-tete { position: relative; z-index: 1; margin-bottom: clamp(32px, 4vw, 48px); }
+.contact-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 14px; margin-bottom: 16px; border-radius: 999px;
+  background: rgba(255, 255, 255, .06); border: 1px solid var(--line-s2);
+  font-size: .72rem; font-weight: 700; letter-spacing: .04em; color: #fff;
+}
+.contact-pill .ic { width: 13px; height: 13px; color: var(--cyan-2); }
+.contact__form-note { color: var(--tx-2); font-size: .92rem; margin-bottom: 22px; max-width: 52ch; }
+
 /* =========================================================================
    13. FICHE PRODUIT
    ========================================================================= */
 
 .fil { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; font-size: .8rem; color: var(--tx-3); margin-bottom: 22px; }
-.fil a:hover { color: var(--navy); }
+.fil a:hover { color: var(--tx-1); }
 .fil .ic { width: 13px; height: 13px; opacity: .5; }
 
 .fiche { display: grid; gap: clamp(26px, 4vw, 52px); align-items: start; }
@@ -1401,7 +1517,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   position: relative;
   display: grid; place-items: center;
   aspect-ratio: 4 / 3;
-  background: linear-gradient(168deg, var(--mist) 0%, #fff 100%);
+  background: linear-gradient(168deg, var(--mist) 0%, var(--paper) 100%);
   border: 1px solid var(--line-2); border-radius: var(--r);
   overflow: hidden;
 }
@@ -1411,13 +1527,13 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 .fiche__marque { font-size: .76rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--cyan-ink); }
 .fiche h1 {
   font-size: clamp(1.6rem, 3.4vw, 2.5rem); font-weight: 800;
-  letter-spacing: -.03em; line-height: 1.1; color: var(--navy);
+  letter-spacing: -.03em; line-height: 1.1; color: var(--tx-1);
   margin-top: 9px;
 }
 .fiche__resume { margin-top: 16px; font-size: 1.02rem; color: var(--tx-2); }
 
 .fiche__prix { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
-.fiche__prix .actuel { font-size: clamp(1.7rem, 3.4vw, 2.3rem); font-weight: 800; color: var(--navy); letter-spacing: -.03em; }
+.fiche__prix .actuel { font-size: clamp(1.7rem, 3.4vw, 2.3rem); font-weight: 800; color: var(--tx-1); letter-spacing: -.03em; }
 .fiche__prix .barre { font-size: 1.02rem; color: var(--tx-3); text-decoration: line-through; }
 .fiche__prix .gain { padding: 4px 11px; border-radius: 999px; background: rgba(214, 22, 90, .12); color: var(--promo); font-size: .78rem; font-weight: 800; }
 
@@ -1475,7 +1591,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   margin-top: 22px; font-size: .84rem; color: var(--tx-2);
 }
 .jeton--usage {
-  background: rgba(48, 39, 132, .09); color: var(--navy);
+  background: rgba(48, 39, 132, .09); color: var(--tx-1);
   font-size: .76rem; font-weight: 700; padding: 5px 11px; border-radius: 999px;
   transition: background-color .18s var(--ease), color .18s var(--ease);
 }
@@ -1505,7 +1621,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   width: 38px; height: 42px; color: var(--tx-2);
   transition: background-color .16s var(--ease), color .16s var(--ease);
 }
-.qte__b:hover { background: var(--mist); color: var(--navy); }
+.qte__b:hover { background: var(--mist); color: var(--tx-1); }
 .qte__b .ic { width: 15px; height: 15px; }
 .qte__n {
   width: 46px; height: 42px; text-align: center;
@@ -1548,7 +1664,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   flex: none;
 }
 .panneau__sur { font-size: .69rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--cyan-ink); }
-.panneau__titre { font-size: 1.42rem; font-weight: 800; letter-spacing: -.025em; color: var(--navy); }
+.panneau__titre { font-size: 1.42rem; font-weight: 800; letter-spacing: -.025em; color: var(--tx-1); }
 .panneau__x {
   display: grid; place-items: center; width: 38px; height: 38px;
   border-radius: 50%; background: var(--mist); color: var(--tx-2); flex: none;
@@ -1559,7 +1675,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 
 .panneau__vide { display: grid; justify-items: center; gap: 12px; text-align: center; padding-block: 44px; }
 .panneau__vide .ic { width: 42px; height: 42px; color: var(--tx-3); }
-.panneau__vide-titre { font-size: 1.1rem; font-weight: 800; color: var(--navy); }
+.panneau__vide-titre { font-size: 1.1rem; font-weight: 800; color: var(--tx-1); }
 .panneau__vide-txt { font-size: .88rem; color: var(--tx-2); max-width: 34ch; }
 
 .panneau__lignes { display: grid; gap: 4px; }
@@ -1571,17 +1687,17 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   display: grid; place-items: center;
   width: 58px; aspect-ratio: 1;
   background: var(--mist); border-radius: var(--r-s);
-  color: var(--navy);
+  color: var(--tx-1);
 }
 .pligne__illus svg { width: 78%; }
 .pligne__illus .il-a { color: var(--cyan); }
 .pligne__nom { font-size: .89rem; font-weight: 700; line-height: 1.35; }
-.pligne__nom:hover { color: var(--navy); }
+.pligne__nom:hover { color: var(--tx-1); }
 .pligne__ref { font-size: .74rem; color: var(--tx-3); margin: 3px 0 9px; }
 .pligne .qte__b { width: 30px; height: 32px; }
 .pligne .qte__n { width: 36px; height: 32px; font-size: .84rem; }
 .pligne__droite { display: grid; justify-items: end; gap: 8px; }
-.pligne__total { font-size: .89rem; font-weight: 800; color: var(--navy); white-space: nowrap; }
+.pligne__total { font-size: .89rem; font-weight: 800; color: var(--tx-1); white-space: nowrap; }
 .pligne__x { color: var(--tx-3); }
 .pligne__x:hover { color: var(--promo); }
 .pligne__x .ic { width: 17px; height: 17px; }
@@ -1594,7 +1710,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 .panneau__vider:hover { color: var(--promo); }
 
 .panneau__form { display: grid; gap: 13px; margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--line-2); }
-.panneau__form-titre { font-size: .95rem; font-weight: 800; color: var(--navy); }
+.panneau__form-titre { font-size: .95rem; font-weight: 800; color: var(--tx-1); }
 .panneau__form-aide { font-size: .8rem; color: var(--tx-3); margin-top: -8px; }
 
 .panneau__pied {
@@ -1606,7 +1722,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 }
 .panneau__total { display: flex; align-items: baseline; justify-content: space-between; }
 .panneau__total span { font-size: .84rem; font-weight: 600; color: var(--tx-2); }
-.panneau__total strong { font-size: 1.42rem; font-weight: 800; color: var(--navy); letter-spacing: -.02em; }
+.panneau__total strong { font-size: 1.42rem; font-weight: 800; color: var(--tx-1); letter-spacing: -.02em; }
 .panneau__mention { font-size: .74rem; color: var(--tx-3); margin-top: -4px; margin-bottom: 4px; }
 .panneau__alerte {
   display: flex; gap: 9px; align-items: flex-start;
@@ -1642,7 +1758,17 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 
 /* --- page contact --- */
 .contact { display: grid; gap: clamp(30px, 4vw, 52px); align-items: start; }
-.contact__form form { display: grid; gap: 15px; }
+/* Le formulaire vit dans sa propre carte — .contact-form dans le code
+   source v0 du client — plutôt que de poser ses champs à même le fond de
+   la section, comme les cartes de coordonnées à côté. */
+.contact__form form {
+  display: grid; gap: 15px;
+  padding: clamp(20px, 2.4vw, 28px);
+  background: rgba(30, 26, 58, .35);
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 14px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .3), 0 20px 44px -18px rgba(0, 0, 0, .5);
+}
 
 .champ--groupe { border: 0; }
 .champ--groupe legend {
@@ -1665,7 +1791,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   cursor: pointer;
   transition: all .18s var(--ease);
 }
-.puce span:hover { border-color: var(--navy); color: var(--navy); }
+.puce span:hover { border-color: var(--navy); color: var(--tx-1); }
 .puce input:checked + span { background: var(--navy); border-color: var(--navy); color: #fff; }
 .puce input:focus-visible + span { outline: 3px solid var(--cyan); outline-offset: 3px; }
 
@@ -1686,7 +1812,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 .rappel--vide .ic, .rappel__tete .ic { width: 19px; height: 19px; color: var(--cyan-ink); flex: none; }
 .rappel--vide a { color: var(--cyan-ink); font-weight: 700; text-decoration: underline; }
 .rappel__tete { display: flex; gap: 11px; align-items: center; font-size: .86rem; color: var(--tx-2); }
-.rappel__tete b { color: var(--navy); }
+.rappel__tete b { color: var(--tx-1); }
 .rappel__voir {
   margin-left: auto; font-size: .8rem; font-weight: 700; color: var(--cyan-ink);
   text-decoration: underline; white-space: nowrap;
@@ -1699,7 +1825,80 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   padding-top: 11px; border-top: 1px solid var(--line-2);
   font-size: .86rem; color: var(--tx-2);
 }
-.rappel__total b { font-size: 1.15rem; font-weight: 800; color: var(--navy); }
+.rappel__total b { font-size: 1.15rem; font-weight: 800; color: var(--tx-1); }
+
+/* --- cartes de coordonnées ----------------------------------------------
+   Portées du vrai code source v0 du client (Docs/contact/app/page.tsx +
+   globals.css) plutôt que d'une capture d'écran : dégradé diagonal plutôt
+   qu'un aplat, liseré intérieur, flèche pleine (pas juste bordée), la
+   carte glisse vers la droite au survol plutôt que de se soulever.
+   Couleurs du vert de leur maquette ramenées au marine/cyan de la charte ;
+   tailles remises à une échelle lisible (la maquette d'origine descend
+   jusqu'à du texte à 8px, une échelle de vignette, pas de production). --- */
+.contact-cartes { display: grid; gap: 10px; margin-bottom: 14px; }
+.contact-carte {
+  /* `min-width: 0` : sans lui, une grille (comme un flex) refuse par défaut
+     de rétrécir sous la taille intrinsèque du contenu — ici le libellé
+     d'adresse en une seule ligne, assez long pour pousser la carte hors du
+     viewport mobile et faire disparaître la flèche sur le bord. */
+  min-width: 0;
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 18px;
+  background: linear-gradient(105deg, rgba(36, 30, 74, .55) 0%, rgba(10, 9, 17, .75) 100%);
+  border: 1px solid rgba(255, 255, 255, .1); border-radius: 12px;
+  box-shadow: inset 0 1px rgba(255, 255, 255, .05);
+  transition: border-color .25s var(--ease), transform .25s var(--ease);
+}
+.contact-carte:hover { border-color: rgba(79, 195, 240, .45); transform: translateX(4px); }
+.contact-carte__ic {
+  display: grid; place-items: center; flex: none;
+  width: 40px; height: 40px; border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  color: var(--cyan-2);
+}
+.contact-carte__ic .ic { width: 18px; height: 18px; }
+.contact-carte__txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.contact-carte__label { font-size: .66rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--tx-3); }
+.contact-carte__valeur {
+  font-size: .93rem; font-weight: 700; color: var(--tx-1);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.contact-carte__fleche {
+  display: grid; place-items: center; flex: none;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255, 255, 255, .12); color: #fff;
+  transition: background .25s var(--ease), color .25s var(--ease);
+}
+.contact-carte__fleche .ic { width: 14px; height: 14px; transform: rotate(-45deg); }
+.contact-carte:hover .contact-carte__fleche { background: var(--cyan-2); color: var(--navy-ink); }
+
+/* --- bande « contact » du pied de page --------------------------------
+   Reprise à la lettre de la référence (Docs/section/contact dili tech.jfif) :
+   texte fantôme, pastille, titre, cartes — au-dessus des colonnes de liens
+   habituelles, sur toutes les pages. Les cartes elles-mêmes sont la règle
+   .contact-carte de base (celle de la page contact, en pleine taille), pas
+   une version compacte : c'est la fidélité au modèle qui prime ici, la
+   grille passe juste à 3 colonnes pour ne pas les étirer sur toute la
+   largeur du pied de page. */
+.pied-contact {
+  position: relative; isolation: isolate; overflow: hidden;
+  background:
+    radial-gradient(640px 420px at 12% -25%, rgba(0, 159, 227, .14) 0%, transparent 62%),
+    linear-gradient(180deg, #050308 0%, #020103 100%);
+  padding-block: clamp(48px, 6vw, 76px);
+}
+/* `.motif` n'a de positionnement que sous `.nuit` (sélecteur enfant direct,
+   voir plus haut) — cette bande n'a pas cette classe (son propre dégradé,
+   pas --nuit), donc la même règle est répétée ici pour le motif circuit. */
+.pied-contact > .motif { position: absolute; inset: 0; z-index: 0; opacity: .05; pointer-events: none; }
+.pied-contact__in { position: relative; z-index: 1; }
+.pied-contact .entete-page__fantome { top: 50%; transform: translateY(-46%); }
+.pied-contact .contact-pill { margin-bottom: 18px; }
+.pied-contact h2.titre--petit { margin-bottom: 28px; max-width: 22ch; }
+.pied-contact .contact-cartes { margin-bottom: 0; }
+@media (min-width: 780px) {
+  .pied-contact .contact-cartes { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+}
 
 /* --- blocs de coordonnées --- */
 .contact__infos { display: grid; gap: 14px; }
@@ -1720,15 +1919,15 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 .bloc-info__titre {
   display: flex; align-items: center; gap: 9px;
   font-size: .71rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase;
-  color: var(--navy);
+  color: var(--tx-1);
 }
 .bloc-info__titre .ic { width: 17px; height: 17px; color: var(--cyan-ink); }
 .bloc-info__gros { font-size: 1.05rem; font-weight: 700; color: var(--tx-1); }
-.bloc-info__gros a:hover { color: var(--navy); }
+.bloc-info__gros a:hover { color: var(--tx-1); }
 .bloc-info__txt { font-size: .87rem; color: var(--tx-2); }
 .bloc-info__liste { display: grid; gap: 8px; }
 .bloc-info__liste li { display: flex; align-items: center; gap: 9px; font-size: 1rem; font-weight: 700; }
-.bloc-info__liste a:hover { color: var(--navy); }
+.bloc-info__liste a:hover { color: var(--tx-1); }
 .bloc-info__horaires { display: grid; gap: 8px; width: 100%; }
 .bloc-info__horaires li { display: flex; justify-content: space-between; gap: 16px; font-size: .87rem; color: var(--tx-2); }
 .bloc-info__horaires b { color: var(--tx-1); }
@@ -1749,7 +1948,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 .faq__i summary {
   display: flex; align-items: center; gap: 16px;
   padding: 18px 22px;
-  font-size: .98rem; font-weight: 700; color: var(--navy);
+  font-size: .98rem; font-weight: 700; color: var(--tx-1);
   cursor: pointer; list-style: none;
 }
 .faq__i summary::-webkit-details-marker { display: none; }
@@ -1759,7 +1958,10 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 .faq__i p { padding: 0 22px 20px; font-size: .92rem; line-height: 1.7; color: var(--tx-2); }
 
 @media (min-width: 980px) {
-  .contact { grid-template-columns: 1.25fr .75fr; }
+  /* Coordonnées à gauche (plus étroites), formulaire à droite (plus large)
+     — l'ordre de la référence, .contact__infos passé avant .contact__form
+     dans le HTML. */
+  .contact { grid-template-columns: .8fr 1.2fr; }
 }
 
 /* =========================================================================
@@ -1811,7 +2013,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   font-size: .83rem; font-weight: 700; color: var(--tx-2);
   transition: background-color .2s var(--ease), color .2s var(--ease);
 }
-.onglet:hover { color: var(--navy); }
+.onglet:hover { color: var(--tx-1); }
 .onglet.est-actif { background: var(--navy); color: #fff; }
 
 /* --- services ---------------------------------------------------------
@@ -1854,7 +2056,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   box-shadow: 0 12px 24px -14px rgba(0, 159, 227, .55);
 }
 .serv__ic .ic { width: 26px; height: 26px; }
-.serv h3 { font-size: 1.15rem; font-weight: 800; letter-spacing: -.02em; color: var(--navy); }
+.serv h3 { font-size: 1.15rem; font-weight: 800; letter-spacing: -.02em; color: var(--tx-1); }
 .serv p { font-size: .89rem; color: var(--tx-2); }
 .serv ul { display: grid; gap: 6px; margin-top: 2px; }
 .serv li { position: relative; padding-left: 19px; font-size: .85rem; color: var(--tx-2); }
@@ -1934,7 +2136,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   background: rgba(0, 159, 227, .11); color: var(--cyan-ink);
 }
 .filiere__ic .ic { width: 21px; height: 21px; }
-.filiere h3 { font-size: 1rem; font-weight: 800; color: var(--navy); margin-bottom: 4px; }
+.filiere h3 { font-size: 1rem; font-weight: 800; color: var(--tx-1); margin-bottom: 4px; }
 .filiere p { font-size: .87rem; color: var(--tx-2); }
 
 @media (min-width: 700px) { .filieres { grid-template-columns: repeat(2, 1fr); } }
@@ -1982,12 +2184,12 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 .pdv__dr, .dispo__dr {
   display: grid; place-items: center; flex: none;
   width: 38px; height: 38px; border-radius: 11px;
-  background: var(--mist-2); color: var(--navy);
+  background: var(--mist-2); color: var(--tx-1);
   font-size: .74rem; font-weight: 800; letter-spacing: .06em;
 }
 .pdv--siege .pdv__dr, .dispo__l--siege .dispo__dr { background: var(--navy); color: #fff; }
 .dispo__dr { width: 32px; height: 32px; border-radius: 9px; font-size: .68rem; }
-.pdv__ville { font-size: 1.14rem; font-weight: 800; letter-spacing: -.02em; color: var(--navy); }
+.pdv__ville { font-size: 1.14rem; font-weight: 800; letter-spacing: -.02em; color: var(--tx-1); }
 .pdv__pays { font-size: .78rem; color: var(--tx-3); }
 .pdv__role {
   display: inline-block; padding: 4px 10px; border-radius: 999px;
@@ -1999,7 +2201,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 .pdv__note { font-size: .86rem; color: var(--tx-2); }
 .pdv__lien { margin-top: auto; padding-top: 6px; justify-self: start; }
 .pdv__refs { font-size: .88rem; color: var(--tx-2); }
-.pdv__refs b { font-size: 1.32rem; font-weight: 800; color: var(--navy); }
+.pdv__refs b { font-size: 1.32rem; font-weight: 800; color: var(--tx-1); }
 .pdv__univers { display: flex; flex-wrap: wrap; gap: 6px; }
 .pdv__univers span {
   padding: 4px 10px; border-radius: 999px;
@@ -2016,7 +2218,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   font-size: .93rem; color: var(--tx-2);
 }
 .siege__infos .ic, .siege__horaires .ic { width: 18px; height: 18px; color: var(--cyan-ink); flex: none; }
-.siege__infos a:hover { color: var(--navy); }
+.siege__infos a:hover { color: var(--tx-1); }
 .siege__horaires li b { margin-left: auto; font-weight: 700; color: var(--tx-1); }
 .siege__horaires .est-ferme { color: var(--tx-3); }
 .siege__horaires .est-ferme b { color: var(--tx-3); font-weight: 600; }
@@ -2029,7 +2231,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 .siege__stat b {
   display: block;
   font-size: 2.1rem; font-weight: 800; line-height: 1.05;
-  color: var(--navy); letter-spacing: -.03em;
+  color: var(--tx-1); letter-spacing: -.03em;
 }
 .siege__stat span {
   font-size: .77rem; font-weight: 700; letter-spacing: .1em;
@@ -2094,7 +2296,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 .art__corps { display: grid; gap: 9px; padding: 20px; flex: 1; align-content: start; }
 .art__meta { display: flex; align-items: center; gap: 9px; font-size: .73rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--cyan-ink); }
 .art__meta span { color: var(--tx-3); font-weight: 600; letter-spacing: normal; text-transform: none; }
-.art h3 { font-size: 1.12rem; font-weight: 800; letter-spacing: -.022em; line-height: 1.28; color: var(--navy); }
+.art h3 { font-size: 1.12rem; font-weight: 800; letter-spacing: -.022em; line-height: 1.28; color: var(--tx-1); }
 .art__chapo { font-size: .88rem; color: var(--tx-2); }
 .art .lien-fleche { margin-top: auto; padding-top: 12px; justify-self: start; }
 
@@ -2102,7 +2304,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 .papier { max-width: 720px; margin-inline: auto; }
 .papier h2 {
   font-size: clamp(1.28rem, 2.4vw, 1.62rem); font-weight: 800;
-  letter-spacing: -.025em; color: var(--navy);
+  letter-spacing: -.025em; color: var(--tx-1);
   margin-top: 46px; margin-bottom: 14px;
 }
 .papier p { margin-bottom: 18px; font-size: 1.02rem; line-height: 1.78; color: var(--tx-2); }
@@ -2165,8 +2367,8 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   font-size: .69rem; font-weight: 800; letter-spacing: .18em;
   text-transform: uppercase; color: var(--cyan-ink); flex: none;
 }
-.suite__titre { font-size: 1.05rem; font-weight: 700; color: var(--navy); flex: 1; }
-.suite__fl { color: var(--navy); flex: none; }
+.suite__titre { font-size: 1.05rem; font-weight: 700; color: var(--tx-1); flex: 1; }
+.suite__fl { color: var(--tx-1); flex: none; }
 .suite__fl .ic { width: 22px; height: 22px; }
 @media (max-width: 640px) { .suite { flex-wrap: wrap; gap: 8px; } }
 
@@ -2230,7 +2432,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 
 /* Déclinaison claire du même bloc, sur la page contact. Déclarée APRÈS la
    version sombre : à spécificité égale, c'est la dernière qui l'emporte. */
-.bloc-info__reseaux a { background: var(--mist); border-color: var(--line-2); color: var(--navy); }
+.bloc-info__reseaux a { background: var(--mist); border-color: var(--line-2); color: var(--tx-1); }
 .bloc-info__reseaux a:hover { background: var(--navy); border-color: var(--navy); color: #fff; }
 .pied__reseaux .ic { width: 18px; height: 18px; }
 
@@ -2275,10 +2477,14 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
   width: 54px; height: 54px; border-radius: 50%;
   background: var(--wa); color: #042A15;
   box-shadow: 0 12px 28px -10px rgba(37, 211, 102, .65);
-  transition: transform .25s var(--ease);
+  transition: transform .25s var(--ease), opacity .25s var(--ease), visibility .25s;
 }
 .bulle-wa:hover { transform: scale(1.08); }
 .bulle-wa .ic { width: 28px; height: 28px; }
+/* Masquée tant que le hero de l'accueil occupe l'écran (voir
+   masquerBulleWaSurHero() dans js/core/ui.js) : la bulle verte se pose
+   pile sur les cases du trio à cet endroit-là. */
+.bulle-wa--masquee { opacity: 0; visibility: hidden; transform: scale(.85); pointer-events: none; }
 
 .remonter {
   position: fixed; right: 18px; bottom: 18px; z-index: 700;
@@ -2347,7 +2553,6 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 
 @media (min-width: 860px) {
   .fiche { grid-template-columns: 1fr 1fr; }
-  .univers { grid-template-columns: repeat(3, 1fr); }
   .services { grid-template-columns: repeat(3, 1fr); }
   .articles { grid-template-columns: repeat(3, 1fr); }
   .args { grid-template-columns: repeat(4, 1fr); }
@@ -2362,7 +2567,7 @@ section { position: relative; padding-block: clamp(64px, 8.5vw, 122px); }
 /* --- passage en présentation mobile --- */
 @media (max-width: 980px) {
   .nav__liens { display: none; }
-  .nav__burger { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; color: var(--navy); }
+  .nav__burger { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; color: var(--tx-1); }
   .nav__burger:hover { background: var(--mist); }
   .nav__burger .ic { width: 22px; height: 22px; }
   .nav__in { justify-content: space-between; }

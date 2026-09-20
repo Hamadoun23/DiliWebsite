@@ -17,32 +17,23 @@ import { illustration } from '../data/illustrations.js';
 import { carteProduit } from '../components/carte-produit.js';
 import { $, $$, esc, rendre } from '../core/dom.js';
 import { icone } from '../core/icones.js';
-import { activerReveal, activerCompteurs, activerSpotlightHero } from '../core/ui.js';
+import { activerReveal, activerSpotlightHero, masquerBulleWaSurHero } from '../core/ui.js';
 
-/* --- hero : chiffres ---------------------------------------------------
-   Le visuel du hero est désormais une photo (voir index.html) : rien à
-   calculer côté JS pour lui. Seule la bande de preuves reste dynamique. */
+/* --- hero : trio ---------------------------------------------------------
+   Le hero (voir index.html) reprend la composition de la référence STEP
+   Sneakers. Les puces « marques disponibles » ont été retirées (demande du
+   client) — leur espace reste réservé en CSS (.hero__specs-vide). Le trio
+   du bas mélange deux faits fixes déjà énoncés plus bas sur la page
+   (garantie, SAV) avec le réseau, seul chiffre encore calculé ici. */
 
 function hero() {
   const s = cat.statistiques();
 
-  rendre(
-    '[data-preuves]',
-    [
-      { n: s.references, mot: 'références' },
-      { n: s.marques,    mot: 'marques' },
-      { n: s.villes,     mot: 'villes' },
-    ]
-      .map(
-        (p) => `<li class="hero__stat">
-                  <b data-compteur="${p.n}">0</b>
-                  <span>${esc(p.mot)}</span>
-                </li>`
-      )
-      .join('')
-  );
+  const villes = $('[data-hero-villes]');
+  if (villes) villes.textContent = `Réseau ${s.villes} villes`;
 
   activerSpotlightHero();
+  masquerBulleWaSurHero();
 }
 
 /* --- bandeau des marques ---------------------------------------------- */
@@ -56,43 +47,69 @@ function marques() {
   rendre('[data-marques]', une + une);
 }
 
-/* --- les trois univers ------------------------------------------------- */
+/* --- l'univers Dilitech (bento) -----------------------------------------
+   Grille reprise à la lettre depuis Docs/section/univers (cartes
+   catégories).jfif — voir index.html pour la structure des sept tuiles.
+   Tout le contenu vient du catalogue et du réseau, rien n'est inventé. */
 
-/* La catégorie phare (ordinateurs) porte une vraie photo — les deux autres
-   reprennent le dégradé de marque plutôt que de rester sur fond blanc plat :
-   voir claudeprompt.md, section « refonte hero + nav + cartes ». */
-const PHOTO_UNIVERS = {
-  ordinateurs: 'assets/img/produits/ordinateurs/portables-pro/hp-elitebook-840.jpg',
-};
+function bentoChips() {
+  const [premiere, seconde] = cat.MARQUES;
+  rendre(
+    '[data-bento-chips]',
+    [premiere, seconde]
+      .map((m) => `<span>${esc(m.slice(0, 2).toUpperCase())}</span>`)
+      .join('') + `<span>+${cat.MARQUES.length - 2}</span>`
+  );
+}
+
+/* Carte du réseau, réduite à des points reliés au siège — les coordonnées
+   (PARTENAIRES[].coords, en pourcentage) attendaient un usage depuis leur
+   création ; aucune n'est inventée ici. */
+function bentoCarte() {
+  const siege = PARTENAIRES.find((p) => p.role === 'siege');
+  const autres = PARTENAIRES.filter((p) => p.role !== 'siege');
+
+  const lignes = autres
+    .map(
+      (p) =>
+        `<line x1="${siege.coords.x}" y1="${siege.coords.y}" x2="${p.coords.x}" y2="${p.coords.y}"
+               stroke="rgba(79,195,240,.25)" stroke-width=".6"/>`
+    )
+    .join('');
+  const points = autres
+    .map((p) => `<circle cx="${p.coords.x}" cy="${p.coords.y}" r="2.2" fill="rgba(255,255,255,.55)"/>`)
+    .join('');
+
+  /* La pastille « Bamako » suit le point du siège (siege.coords, en %) —
+     même repère que le SVG, donc un simple left/top en pourcentage suffit
+     à la poser dessus, comme le pavé « Argentina » sur la carte de la
+     référence. Rendue ici plutôt qu'en HTML statique : `rendre()` remplace
+     tout le contenu de la tuile, un élément figé dans l'index.html serait
+     écrasé à chaque appel. */
+  rendre(
+    '[data-bento-carte]',
+    `<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%">
+      ${lignes}
+      ${points}
+      <circle cx="${siege.coords.x}" cy="${siege.coords.y}" r="4" style="fill:var(--cyan-2)"/>
+      <circle cx="${siege.coords.x}" cy="${siege.coords.y}" r="4" fill="none" style="stroke:var(--cyan-2)" stroke-width="1" opacity=".5">
+        <animate attributeName="r" values="4;9;4" dur="2.4s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values=".5;0;.5" dur="2.4s" repeatCount="indefinite"/>
+      </circle>
+    </svg>
+    <span class="bento__carte-pill" style="left:${siege.coords.x}%; top:${siege.coords.y}%">${esc(siege.ville)}</span>`
+  );
+}
 
 function univers() {
-  rendre(
-    '[data-univers]',
-    cat.CATEGORIES.map((c) => {
-      const n = cat.filtrer({ cat: c.code }).length;
-      const photo = PHOTO_UNIVERS[c.code];
-      return `
-        <article class="univ reveal${photo ? ' univ--photo' : ' univ--sombre'}">
-          ${
-            photo
-              ? `<span class="univ--photo__media" aria-hidden="true"><img src="${esc(photo)}" alt="" loading="lazy"></span>`
-              : ''
-          }
-          <p class="univ__nb">${n} réf.</p>
-          <span class="univ__illus">${illustration(c.illus)}</span>
-          <h3 class="univ__nom">${esc(c.nom)}</h3>
-          <p class="univ__txt">${esc(c.accroche)}</p>
-          <div class="univ__sous">
-            ${c.sous
-              .map(
-                (s) =>
-                  `<a href="catalogue.html?cat=${c.code}&sous=${s.code}">${esc(s.nom)}</a>`
-              )
-              .join('')}
-          </div>
-        </article>`;
-    }).join('')
-  );
+  const s = cat.statistiques();
+  const references = $('[data-bento-references]');
+  if (references) references.textContent = s.references;
+  const villes = $('[data-bento-villes]');
+  if (villes) villes.textContent = s.villes;
+
+  bentoChips();
+  bentoCarte();
 }
 
 /* --- sélection du moment (onglets) -------------------------------------- */
@@ -269,4 +286,3 @@ articles();
 noteCta();
 
 activerReveal();
-activerCompteurs();

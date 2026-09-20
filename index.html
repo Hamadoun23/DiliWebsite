@@ -26,45 +26,48 @@
 <main id="contenu">
 
   <!-- ===================================================================
-       HERO — composition éditoriale portée du site VP (Vêtement Palace,
-       WebsiteVP/index.html : mot fantôme en filigrane, spotlight qui suit
-       le curseur, cadre inset, libellé vertical, pagination à points,
-       pilule magnétique). Structure et mécanique JS reprises telles
-       quelles ; palette et typographie ramenées à la charte Dilitech
-       (Montserrat seul, bleus de la marque au lieu de l'or). Voir
-       claudeprompt.md pour le détail de ce qui a été gardé/changé.
-       Photo sous licence Unsplash (Martin Katler).
+       HERO — composition portée à la lettre depuis la référence STEP
+       SNEAKERS (Docs/hero/Which one is your favorite…jfif) : titre à
+       gauche (premier mot en accent souligné), paragraphe court aligné à
+       droite, rangée de puces + CTA au milieu, trio icône/libellé séparé
+       par des traits en bas, grande photo produit qui occupe toute la
+       colonne de droite. Structure en CSS grid plutôt qu'en panneau
+       photo + texte superposés (l'ancienne mécanique VP — mot fantôme,
+       pagination à points, libellé vertical — n'existe pas dans cette
+       référence, donc pas reprise ici). Voir claudeprompt.md.
+
+       « Marques disponibles » reprend cat.MARQUES (réel, calculé) au lieu
+       des pointures de STEP ; le trio reprend des faits déjà affichés
+       plus bas sur la page (garantie, SAV, réseau) plutôt que d'inventer
+       des chiffres.
+       Photo de travail (source Pinterest, sans licence commerciale) — à
+       remplacer par une vraie photo Dilitech avant mise en ligne.
        =================================================================== -->
   <header class="hero" id="hero">
-    <div class="hero__media">
-      <img src="assets/img/hero-laptop-large.jpg" alt="" fetchpriority="high">
-      <div class="hero__overlay"></div>
-      <div class="halos halos--hero" aria-hidden="true">
-        <span class="halo halo--1"></span>
-        <span class="halo halo--3"></span>
-      </div>
-      <div class="hero__spotlight"></div>
+    <div class="halos halos--hero" aria-hidden="true">
+      <span class="halo halo--1"></span>
+      <span class="halo halo--3"></span>
     </div>
-    <div class="hero__meta">
-      <span class="hero__eyebrow-top">Catalogue 2026</span>
-      <span class="hero__meta-contact">Bamako, Mali</span>
-    </div>
+    <div class="hero__spotlight"></div>
+    <div class="hero__frame" aria-hidden="true"></div>
 
-    <div class="hero__inner">
-      <div class="hero__text entre" style="--i:0">
-        <p class="hero__eyebrow">
-          <i class="surtitre__pouls" aria-hidden="true"></i>Ordinateurs · Réseau · SAV
-        </p>
-        <h1 class="hero__title">Le bon matériel,<em>pour le bon usage.</em></h1>
-        <p class="hero__sub">
-          Ordinateurs portables toutes marques, accessoires informatiques et
-          matériel réseau — avec le conseil qui va avec.
-        </p>
+    <div class="hero__grid">
+      <div class="hero__headline entre" style="--i:0">
+        <h1 class="hero__title"><em>Le bon</em> matériel,<br>pour le bon usage.</h1>
+      </div>
+
+      <div class="hero__desc entre" style="--i:1">
+        <p>Ordinateurs portables toutes marques, accessoires informatiques et matériel réseau, choisis selon votre usage réel.</p>
+        <p>Du conseil à la maintenance, la même équipe vous accompagne après la vente.</p>
+      </div>
+
+      <div class="hero__specs entre" style="--i:2">
+        <div class="hero__specs-vide" aria-hidden="true"></div>
         <div class="hero__actions">
           <a href="catalogue.html" class="cta-pill">
-            <span class="cta-pill__label">Voir le catalogue</span>
-            <span class="cta-pill__orb">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            Voir le catalogue
+            <span class="cta-pill__fleche" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </span>
           </a>
           <a href="contact.html" class="cta-link">
@@ -73,29 +76,28 @@
           </a>
         </div>
       </div>
-    </div>
 
-    <div class="hero__foot">
-      <ul class="hero__stats" data-preuves></ul>
-      <div class="hero__foot-social">
-        <a href="https://wa.me/22371927198" target="_blank" rel="noopener" aria-label="WhatsApp">
-          <span class="ic" data-ic="whatsapp"></span>
-        </a>
-        <a href="https://www.facebook.com/profile.php?id=100064903981504" target="_blank" rel="noopener" aria-label="Facebook">
-          <span class="ic" data-ic="facebook"></span>
-        </a>
-        <a href="https://www.linkedin.com/company/dilitech" target="_blank" rel="noopener" aria-label="LinkedIn">
-          <span class="ic" data-ic="linkedin"></span>
-        </a>
+      <ul class="hero__trio entre" style="--i:3">
+        <li>
+          <span class="hero__trio-ic"><span class="ic" data-ic="bouclier"></span></span>
+          <span>Garantie 12 mois</span>
+        </li>
+        <li>
+          <span class="hero__trio-ic"><span class="ic" data-ic="outil"></span></span>
+          <span>SAV assuré</span>
+        </li>
+        <li>
+          <span class="hero__trio-ic"><span class="ic" data-ic="reseau"></span></span>
+          <span data-hero-villes>Réseau</span>
+        </li>
+      </ul>
+
+      <div class="hero__media entre" style="--i:1">
+        <img src="assets/img/hero-tablet-desk.jpg" alt="" fetchpriority="high" width="735" height="983">
+        <div class="hero__media-vignette"></div>
+        <div class="hero__media-shadow" aria-hidden="true"></div>
       </div>
     </div>
-    <div class="hero__dots"><i class="is-active"></i><i></i><i></i></div>
-    <div class="hero__side" aria-hidden="true">Bamako — Mali</div>
-    <div class="hero__frame" aria-hidden="true"></div>
-
-    <a class="scroll-cue" href="#univers" aria-label="Découvrir le catalogue">
-      <span class="ic" data-ic="chevronBas"></span>
-    </a>
   </header>
 
   <!-- bandeau des marques distribuées -->
@@ -104,27 +106,90 @@
   </div>
 
   <!-- ===================================================================
-       LES TROIS UNIVERS DU CATALOGUE
+       L'UNIVERS DILITECH — grille bento reprise À LA LETTRE depuis
+       Docs/section/univers (cartes catégories).jfif : sept tuiles, mêmes
+       proportions (deux petites + une large en haut, une tuile carrée en
+       lueur bleue toute la hauteur en bas à gauche, deux petites puis une
+       large avec carte pleine couleur en bas à droite). Contenu réel
+       uniquement (cat.statistiques(), PARTENAIRES) — pas de métriques
+       inventées comme dans la référence (le « +80,5K » n'a pas d'équivalent
+       fiable ici, remplacé par un CTA plein cyan).
        =================================================================== -->
   <section id="univers">
     <div class="wrap">
       <header class="tete-duo">
         <div>
           <p class="surtitre">Le catalogue</p>
-          <h2 class="titre">Trois univers, <em>une seule logique.</em></h2>
+          <h2 class="titre">L'univers <em>Dilitech.</em></h2>
         </div>
         <a class="lien-fleche" href="catalogue.html">
           Tout le catalogue <span class="ic" data-ic="fleche"></span>
         </a>
       </header>
 
-      <p class="chapeau" style="margin-bottom:34px">
+      <p class="chapeau" style="margin-bottom:22px">
         Nous partons toujours de l'usage, jamais de la fiche technique. Dites-nous
         ce que la machine devra faire : nous vous orientons vers ce qui tient la
         charge, sans vous vendre ce qui ne servira pas.
       </p>
 
-      <div class="univers" data-univers></div>
+      <div class="bento">
+        <a href="services.html#sav" class="bento__tile bento__tile--a reveal">
+          <p class="bento__eyebrow">Sur chaque machine vendue.</p>
+          <div class="bento__recu">
+            <span class="bento__recu-ic"><span class="ic" data-ic="bouclier"></span></span>
+            <span class="bento__recu-txt">
+              <span class="bento__recu-titre">12 mois</span>
+              <span class="bento__recu-sous">Garantie sur le neuf.</span>
+            </span>
+          </div>
+          <span class="bento__fleche" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </span>
+        </a>
+
+        <a href="catalogue.html" class="bento__tile bento__tile--b reveal">
+          <span class="bento__chips" aria-hidden="true" data-bento-chips></span>
+          <p class="bento__mini bento__mini--centre">Marques distribuées</p>
+        </a>
+
+        <a href="reseau.html" class="bento__tile bento__tile--c reveal">
+          <p class="bento__titre bento__titre--grand">Un stock qui dépasse <em>Bamako.</em></p>
+          <div class="bento__carte" data-bento-carte aria-hidden="true"></div>
+          <p class="bento__legende">Point le plus actif après le siège : <b>Abidjan.</b></p>
+        </a>
+
+        <a href="catalogue.html" class="bento__tile bento__tile--d reveal">
+          <p class="bento__phrase">Choisies pour l'usage, jamais pour la fiche technique.</p>
+          <p class="bento__nombre" data-bento-references>0</p>
+          <div class="bento__d-bas">
+            <span class="bento__nombre-mini">références en ligne</span>
+            <span class="bento__toggle bento__toggle--sombre" aria-hidden="true"><i></i></span>
+          </div>
+        </a>
+
+        <a href="services.html" class="bento__tile bento__tile--e reveal">
+          <span class="bento__toggle" aria-hidden="true"><i></i></span>
+          <p class="bento__titre bento__titre--grand">Le conseil avant <em>le produit.</em></p>
+          <p class="bento__mini">Notre méthode</p>
+        </a>
+
+        <a href="reseau.html" class="bento__tile bento__tile--g reveal">
+          <p class="bento__mini">Réseau régional</p>
+          <span class="bento__badge-nb" data-bento-villes>0</span>
+          <p class="bento__mini">Villes desservies</p>
+        </a>
+
+        <a href="catalogue.html" class="bento__tile bento__tile--f reveal">
+          <span class="bento__asterisque" aria-hidden="true">＊</span>
+          <p class="bento__titre bento__titre--grand">Trois familles, <em>un seul arbitrage.</em></p>
+          <span class="bento__carte-cta">
+            <span class="bento__carte-cta-mini">Catalogue</span>
+            <span class="bento__carte-cta-gros">Explorer</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </span>
+        </a>
+      </div>
     </div>
   </section>
 
@@ -265,7 +330,7 @@
   <!-- ===================================================================
        APPEL À L'ACTION
        =================================================================== -->
-  <section class="nuit coupe-haut sur-nuit cta">
+  <section class="nuit coupe-haut sur-nuit cta" id="contact">
     <div class="motif circuit"></div>
     <div class="wrap cta__in">
       <p class="surtitre">Parlons de votre besoin</p>

@@ -40,7 +40,7 @@ export const HORAIRES = [
 
 export const RESEAUX = [
   { nom: 'Facebook',  url: 'https://www.facebook.com/profile.php?id=100064903981504', icone: 'facebook' },
-  { nom: 'Instagram', url: 'https://www.instagram.com/dilitech',   icone: 'instagram' },
+  { nom: 'TikTok',    url: 'https://www.tiktok.com/@dilitech?is_from_webapp=1&sender_device=pc', icone: 'tiktok' },
   { nom: 'LinkedIn',  url: 'https://www.linkedin.com/company/dilitech', icone: 'linkedin' },
   { nom: 'WhatsApp',  url: `https://wa.me/${WHATSAPP}`,            icone: 'whatsapp' },
 ];

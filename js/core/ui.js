@@ -233,21 +233,6 @@ export function activerChromeDePage() {
   );
 }
 
-/* --- lueur qui suit le curseur -------------------------------------------
-   Réservée aux boutons `.btn--lueur` (un ou deux par page, les appels
-   principaux) : une délégation unique sur `document`, jamais un écouteur
-   par bouton — le coût reste nul même si la page en affiche plusieurs. */
-export function activerLueurBoutons(racine = document) {
-  if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-  racine.addEventListener('pointermove', (e) => {
-    const b = e.target.closest?.('.btn--lueur');
-    if (!b) return;
-    const r = b.getBoundingClientRect();
-    b.style.setProperty('--mx', `${((e.clientX - r.left) / r.width) * 100}%`);
-    b.style.setProperty('--my', `${((e.clientY - r.top) / r.height) * 100}%`);
-  });
-}
-
 /**
  * Spotlight qui suit le curseur dans le hero de l'accueil — technique
  * portée telle quelle du site VP (`initHeroSpotlight` dans
@@ -263,6 +248,59 @@ export function activerSpotlightHero(id = '#hero') {
     hero.style.setProperty('--mx', `${((e.clientX - r.left) / r.width) * 100}%`);
     hero.style.setProperty('--my', `${((e.clientY - r.top) / r.height) * 100}%`);
   });
+}
+
+/**
+ * La même lueur, généralisée à toutes les sections du site (voir la règle
+ * `section::before` en CSS) : une délégation unique sur `document`, pas un
+ * écouteur par section — le coût reste nul même si la page en compte dix.
+ */
+export function activerLueurSections(racine = document) {
+  if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  racine.addEventListener('pointermove', (e) => {
+    const s = e.target.closest?.('section');
+    if (!s) return;
+    const r = s.getBoundingClientRect();
+    s.style.setProperty('--mx', `${((e.clientX - r.left) / r.width) * 100}%`);
+    s.style.setProperty('--my', `${((e.clientY - r.top) / r.height) * 100}%`);
+  });
+}
+
+/**
+ * Les liens de nav Services/Réseau/Conseils/Contact pointent tous vers
+ * `index.html#ancre` (voir LIENS dans chrome.js), pour fonctionner depuis
+ * n'importe quelle page. Sur l'accueil lui-même, ce préfixe forcerait un
+ * rechargement complet pour rejoindre une section déjà affichée : on
+ * intercepte ces clics pour n'y faire qu'un défilement doux à la place.
+ */
+export function activerAncresAccueil() {
+  const surAccueil = /(^|\/)index\.html$/.test(location.pathname) || /\/$/.test(location.pathname);
+  if (!surAccueil) return;
+
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest?.('a[href^="index.html#"]');
+    if (!a) return;
+    const cible = $(`#${a.href.split('#')[1]}`);
+    if (!cible) return;
+    e.preventDefault();
+    cible.scrollIntoView({ behavior: animationsReduites() ? 'auto' : 'smooth', block: 'start' });
+    history.pushState(null, '', `#${a.href.split('#')[1]}`);
+  });
+}
+
+/**
+ * Masque la bulle WhatsApp tant que le hero occupe l'écran : posée sur les
+ * cases du trio (garantie/SAV/réseau), elle les couvre sinon en permanence.
+ */
+export function masquerBulleWaSurHero(id = '#hero') {
+  const hero = $(id);
+  const bulle = $('[data-wa]');
+  if (!hero || !bulle) return;
+  const obs = new IntersectionObserver(
+    ([e]) => bulle.classList.toggle('bulle-wa--masquee', e.isIntersecting),
+    { threshold: 0.15 }
+  );
+  obs.observe(hero);
 }
 
 /* --- images différées ---------------------------------------------------- */

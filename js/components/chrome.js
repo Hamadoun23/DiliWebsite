@@ -37,13 +37,25 @@ export const logo = (classe = '') => `
     <span class="marque__mot"><b>DILI</b><i>TECH</i></span>
   </span>`;
 
+/* Services/Réseau/Conseils/Contact pointent vers les sections de l'accueil
+   (#services, #reseau, #conseils, #contact) plutôt que vers leurs pages
+   dédiées : la nav tient sur une seule page, Catalogue mis à part — lui
+   seul garde un vrai besoin de page séparée (filtres, recherche). Les
+   pages dédiées (services.html, reseau.html, conseils.html, contact.html)
+   restent en ligne pour qui a le lien direct ou pour le référencement,
+   simplement retirées du menu principal.
+   Le préfixe `index.html` (plutôt qu'un simple `#services`) est ce qui
+   permet à ces liens de fonctionner depuis n'importe quelle page — la nav
+   est partagée par les neuf pages du site, pas seulement l'accueil ;
+   activerAncresAccueil() dans ui.js transforme ensuite le clic en défilement
+   doux quand on est déjà sur l'accueil, pour éviter un rechargement complet. */
 const LIENS = [
-  { cle: 'accueil',   href: 'index.html',     libelle: 'Accueil' },
-  { cle: 'catalogue', href: 'catalogue.html', libelle: 'Catalogue' },
-  { cle: 'services',  href: 'services.html',  libelle: 'Services' },
-  { cle: 'reseau',    href: 'reseau.html',    libelle: 'Réseau' },
-  { cle: 'conseils',  href: 'conseils.html',  libelle: 'Conseils' },
-  { cle: 'contact',   href: 'contact.html',   libelle: 'Contact' },
+  { cle: 'accueil',   href: 'index.html',              libelle: 'Accueil' },
+  { cle: 'catalogue', href: 'catalogue.html',          libelle: 'Catalogue' },
+  { cle: 'services',  href: 'index.html#services',     libelle: 'Services' },
+  { cle: 'reseau',    href: 'index.html#reseau',       libelle: 'Réseau' },
+  { cle: 'conseils',  href: 'index.html#conseils',     libelle: 'Conseils' },
+  { cle: 'contact',   href: 'index.html#contact',      libelle: 'Contact' },
 ];
 
 const telPrincipal = CONTACT.telephones.find((t) => t.principal) ?? CONTACT.telephones[0];
@@ -202,6 +214,48 @@ class SitePied extends HTMLElement {
     const annee = new Date().getFullYear();
 
     this.innerHTML = `
+      <!-- Bande « contact » reprise à la lettre de la référence (Docs/section/
+           contact dili tech.jfif) : texte fantôme, pastille, titre, cartes en
+           taille réelle — pas la version compacte d'une colonne de pied de
+           page. Posée sur toutes les pages, au-dessus des colonnes de liens
+           habituelles plutôt qu'à leur place : un footer garde sa fonction de
+           plan du site, ce bandeau lui ajoute la vitrine de contact. -->
+      <div class="pied-contact">
+        <div class="motif circuit"></div>
+        <p class="entete-page__fantome" aria-hidden="true">Contact</p>
+        <div class="wrap pied-contact__in">
+          <span class="contact-pill">${icone('devis')} Nous joindre</span>
+          <h2 class="titre titre--petit">Une question ? <em>Écrivez-nous.</em></h2>
+          <div class="contact-cartes">
+            <a class="contact-carte" href="tel:${esc(telPrincipal.tel)}">
+              <span class="contact-carte__ic">${icone('telephone')}</span>
+              <span class="contact-carte__txt">
+                <span class="contact-carte__label">Téléphone</span>
+                <span class="contact-carte__valeur">${esc(telPrincipal.label)}</span>
+              </span>
+              <span class="contact-carte__fleche">${icone('fleche')}</span>
+            </a>
+            <a class="contact-carte" href="mailto:${esc(CONTACT.email)}">
+              <span class="contact-carte__ic">${icone('mail')}</span>
+              <span class="contact-carte__txt">
+                <span class="contact-carte__label">E-mail</span>
+                <span class="contact-carte__valeur">${esc(CONTACT.email)}</span>
+              </span>
+              <span class="contact-carte__fleche">${icone('fleche')}</span>
+            </a>
+            <a class="contact-carte" target="_blank" rel="noopener"
+               href="https://www.google.com/maps/search/${encodeURIComponent(CONTACT.mapsQuery)}">
+              <span class="contact-carte__ic">${icone('broche')}</span>
+              <span class="contact-carte__txt">
+                <span class="contact-carte__label">Adresse</span>
+                <span class="contact-carte__valeur">${esc(CONTACT.adresse)}, ${esc(CONTACT.ville)}</span>
+              </span>
+              <span class="contact-carte__fleche">${icone('fleche')}</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
       <div class="wrap pied__haut">
         <div class="pied__marque">
           <a href="index.html" aria-label="${esc(SITE.nomComplet)} — accueil">${logo('marque--pied')}</a>
@@ -235,25 +289,8 @@ class SitePied extends HTMLElement {
           </ul>
         </div>
 
-        <div class="pied__col pied__col--contact">
-          <p class="pied__titre">Nous joindre</p>
-          <ul>
-            ${CONTACT.telephones
-              .map((t) => `<li><a href="tel:${esc(t.tel)}">${icone('telephone')}${esc(t.label)}</a></li>`)
-              .join('')}
-            <li><a href="mailto:${esc(CONTACT.email)}">${icone('mail')}${esc(CONTACT.email)}</a></li>
-            <li>
-              <a href="https://www.google.com/maps/search/${encodeURIComponent(CONTACT.mapsQuery)}"
-                 target="_blank" rel="noopener">
-                ${icone('broche')}
-                <span class="pied__adresse">
-                  ${esc(CONTACT.adresse)}
-                  <span>${esc(CONTACT.ville)}, ${esc(CONTACT.pays)}</span>
-                </span>
-              </a>
-            </li>
-          </ul>
-          <p class="pied__titre pied__titre--2">Horaires</p>
+        <div class="pied__col">
+          <p class="pied__titre">Horaires</p>
           <ul class="pied__horaires">
             ${HORAIRES.map(
               (h) => `<li${h.ouvert ? '' : ' class="est-ferme"'}>

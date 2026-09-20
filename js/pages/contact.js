@@ -19,6 +19,8 @@ import { $, $$, esc, rendre } from '../core/dom.js';
 import { icone } from '../core/icones.js';
 import { toast } from '../core/ui.js';
 
+const telPrincipal = CONTACT.telephones.find((t) => t.principal) ?? CONTACT.telephones[0];
+
 /* =========================================================================
    1. SUJETS DE LA DEMANDE
    ========================================================================= */
@@ -49,46 +51,48 @@ rendre(
    2. COORDONNÉES
    ========================================================================= */
 
+/* Les trois cartes du haut reprennent à la lettre la référence (Docs/section/
+   contact dili tech.jfif) : icône, libellé + valeur, flèche cliquable — au
+   lieu des blocs éditoriaux verticaux d'origine. Horaires, réseaux et photo
+   d'équipe restent en dessous, dans le format existant : de l'info réelle
+   que la référence n'a pas, pas une raison de la supprimer. */
 rendre(
   '[data-infos]',
-  `<figure class="bloc-info bloc-info--photo">
+  `<div class="contact-cartes">
+     <a class="contact-carte" href="mailto:${esc(CONTACT.email)}">
+       <span class="contact-carte__ic">${icone('mail')}</span>
+       <span class="contact-carte__txt">
+         <span class="contact-carte__label">Nous écrire</span>
+         <span class="contact-carte__valeur">${esc(CONTACT.email)}</span>
+       </span>
+       <span class="contact-carte__fleche">${icone('fleche')}</span>
+     </a>
+
+     <a class="contact-carte" href="tel:${esc(telPrincipal.tel)}">
+       <span class="contact-carte__ic">${icone('telephone')}</span>
+       <span class="contact-carte__txt">
+         <span class="contact-carte__label">Nous appeler</span>
+         <span class="contact-carte__valeur">${esc(telPrincipal.label)}</span>
+       </span>
+       <span class="contact-carte__fleche">${icone('fleche')}</span>
+     </a>
+
+     <a class="contact-carte" target="_blank" rel="noopener"
+        href="https://www.google.com/maps/search/${encodeURIComponent(CONTACT.mapsQuery)}">
+       <span class="contact-carte__ic">${icone('broche')}</span>
+       <span class="contact-carte__txt">
+         <span class="contact-carte__label">Notre showroom</span>
+         <span class="contact-carte__valeur">${esc(SIEGE.quartier)}, ${esc(CONTACT.ville)}</span>
+       </span>
+       <span class="contact-carte__fleche">${icone('fleche')}</span>
+     </a>
+   </div>
+
+   <figure class="bloc-info bloc-info--photo">
      <img src="assets/img/equipe/portrait-vendredi.jpg"
           alt="Un membre de l'équipe Dilitech au showroom de Torokorobougou" loading="lazy">
      <figcaption>Toute l'équipe Dilitech est joignable directement — pas de standard, pas de filtrage.</figcaption>
    </figure>
-
-   <div class="bloc-info">
-     <p class="bloc-info__titre">${icone('broche')} Showroom & atelier</p>
-     <p class="bloc-info__gros">${esc(SIEGE.quartier)}</p>
-     <p class="bloc-info__txt">${esc(CONTACT.ville)}, ${esc(CONTACT.pays)}</p>
-     <a class="lien-fleche" target="_blank" rel="noopener"
-        href="https://www.google.com/maps/search/${encodeURIComponent(CONTACT.mapsQuery)}">
-       Ouvrir dans Maps ${icone('fleche')}
-     </a>
-   </div>
-
-   <div class="bloc-info">
-     <p class="bloc-info__titre">${icone('telephone')} Téléphone & WhatsApp</p>
-     <ul class="bloc-info__liste">
-       ${CONTACT.telephones
-         .map(
-           (t) => `<li>
-             <a href="tel:${esc(t.tel)}">${esc(t.label)}</a>
-             ${t.principal ? '<span class="jeton">Principal</span>' : ''}
-           </li>`
-         )
-         .join('')}
-     </ul>
-     <a class="btn btn--wa" href="https://wa.me/${esc(CONTACT.telephones[0].whatsapp)}"
-        target="_blank" rel="noopener">${icone('whatsapp')} Écrire sur WhatsApp</a>
-   </div>
-
-   <div class="bloc-info">
-     <p class="bloc-info__titre">${icone('mail')} E-mail</p>
-     <p class="bloc-info__gros">
-       <a href="mailto:${esc(CONTACT.email)}">${esc(CONTACT.email)}</a>
-     </p>
-   </div>
 
    <div class="bloc-info">
      <p class="bloc-info__titre">${icone('horloge')} Horaires d'ouverture</p>

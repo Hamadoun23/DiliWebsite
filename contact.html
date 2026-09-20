@@ -20,32 +20,41 @@
 
 <main id="contenu">
 
-  <section class="entete-page nuit grain coupe-bas sur-nuit">
+  <!-- ===================================================================
+       Reprise à la lettre de Docs/section/contact dili tech.jfif : une
+       seule bande sombre (pastille + titre + sous-titre, puis cartes et
+       formulaire directement en dessous, texte fantôme « CONTACT » en
+       filigrane derrière tout le bloc) plutôt que deux sections séparées.
+       Couleurs de la charte Dilitech à la place du vert de la référence.
+       =================================================================== -->
+  <section class="entete-page entete-page--fantome nuit grain coupe-bas sur-nuit">
     <div class="motif circuit"></div>
+    <p class="entete-page__fantome" aria-hidden="true">Contact</p>
     <div class="wrap">
-      <p class="surtitre">Contact & devis</p>
-      <h1 class="titre titre--geant">Dites-nous ce que vous voulez faire. <em>Nous vous dirons avec quoi.</em></h1>
-      <p class="chapeau">
-        Une réponse humaine, par un technicien ou un commercial, sous 24 heures
-        ouvrées. Aucun paiement en ligne : nous établissons un devis, et la
-        vente se finalise avec vous.
-      </p>
-    </div>
-  </section>
-
-  <section class="sec--serre">
-    <div class="wrap contact">
-
-      <!-- ============ FORMULAIRE ============ -->
-      <div class="contact__form">
-        <h2 class="titre titre--petit">Demander <em>un devis.</em></h2>
-        <p class="chapeau" style="margin-bottom:26px">
-          Plus vous décrivez l'usage, plus la réponse sera juste. Si vous avez
-          déjà composé une sélection dans le catalogue, elle est jointe
-          automatiquement.
+      <div class="contact-tete">
+        <span class="contact-pill"><span class="ic" data-ic="devis"></span> Contact & devis</span>
+        <h1 class="titre titre--geant">Dites-nous ce que vous voulez faire. <em>Nous vous dirons avec quoi.</em></h1>
+        <p class="chapeau">
+          Une réponse humaine, par un technicien ou un commercial, sous 24 heures
+          ouvrées. Aucun paiement en ligne : nous établissons un devis, et la
+          vente se finalise avec vous.
         </p>
+      </div>
 
-        <form novalidate data-form-devis>
+      <div class="contact">
+
+        <!-- ============ COORDONNÉES ============ -->
+        <aside class="contact__infos" data-infos></aside>
+
+        <!-- ============ FORMULAIRE ============ -->
+        <div class="contact__form">
+          <p class="contact__form-note">
+            Plus vous décrivez l'usage, plus la réponse sera juste. Si vous avez
+            déjà composé une sélection dans le catalogue, elle est jointe
+            automatiquement.
+          </p>
+
+          <form novalidate data-form-devis>
           <div class="champ-duo">
             <label class="champ">
               <span>Nom et prénom <b aria-hidden="true">*</b></span>
@@ -100,12 +109,10 @@
               <span class="ic" data-ic="mail"></span> Envoyer par e-mail
             </button>
           </div>
-        </form>
+          </form>
+        </div>
+
       </div>
-
-      <!-- ============ COORDONNÉES ============ -->
-      <aside class="contact__infos" data-infos></aside>
-
     </div>
   </section>
 
