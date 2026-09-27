@@ -13,7 +13,12 @@
 
 import '../components/chrome.js';
 import '../components/panneau-devis.js';
+import '../components/panneau-produit.js';
+import '../components/panneau-article.js';
+import '../components/concierge.js';
 import { ouvrirPanneau } from '../components/panneau-devis.js';
+import { voirProduit } from '../components/panneau-produit.js';
+import { lireArticle } from '../components/panneau-article.js';
 
 import * as devis from '../core/devis.js';
 import { parId } from '../core/catalogue.js';
@@ -26,6 +31,7 @@ import {
   activerChromeDePage,
   activerLueurSections,
   activerAncresAccueil,
+  activerScrollspy,
   surveillerImages,
   toast,
 } from '../core/ui.js';
@@ -37,6 +43,22 @@ document.addEventListener('click', (e) => {
   if (e.target.closest('.js-ouvrir-devis')) {
     e.preventDefault();
     ouvrirPanneau();
+    return;
+  }
+
+  /* Voir la fiche d'un produit — panneau superposé, plus de produit.html */
+  const voir = e.target.closest('.js-voir-produit');
+  if (voir) {
+    e.preventDefault();
+    voirProduit(voir.dataset.id);
+    return;
+  }
+
+  /* Lire un article de conseil — panneau superposé, plus d'article.html */
+  const lire = e.target.closest('.js-lire-article');
+  if (lire) {
+    e.preventDefault();
+    lireArticle(lire.dataset.slug);
     return;
   }
 
@@ -113,15 +135,25 @@ function brancherBulleWhatsApp() {
 /* --- démarrage ---------------------------------------------------------- */
 
 function demarrer() {
-  /* Le panneau de devis est injecté ici : inutile de le répéter dans les six
-     pages HTML, et il doit exister avant tout clic. */
+  /* Les panneaux superposés (devis, fiche produit, article) sont injectés
+     ici : inutile de les répéter dans index.html et catalogue.html, et ils
+     doivent exister avant tout clic — ou avant la lecture de l'URL au
+     chargement (lien direct vers ?produit=/?article=). */
   if (!$('panneau-devis')) document.body.append(document.createElement('panneau-devis'));
+  if (!$('panneau-produit')) document.body.append(document.createElement('panneau-produit'));
+  if (!$('panneau-article')) document.body.append(document.createElement('panneau-article'));
+  /* Le concierge (questions d'usage au fil de la visite) : pas sur la 404,
+     qui n'a ni sélection ni catalogue à adapter. */
+  if (!$('dilitech-concierge') && ($('#hero') || $('[data-grille]'))) {
+    document.body.append(document.createElement('dilitech-concierge'));
+  }
 
   remplirIcones();
   brancherBulleWhatsApp();
   activerChromeDePage();
   activerLueurSections();
   activerAncresAccueil();
+  activerScrollspy();
   activerReveal();
   activerCompteurs();
   surveillerImages();

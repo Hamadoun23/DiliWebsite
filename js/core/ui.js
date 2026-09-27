@@ -9,7 +9,7 @@
    les animations, tout se contente d'apparaître.
    ========================================================================= */
 
-import { $, $$, animationsReduites, parFrame } from './dom.js';
+import { $, $$, animationsReduites, parFrame, allerA } from './dom.js';
 import { icone } from './icones.js';
 
 /* --- apparition au défilement ----------------------------------------- */
@@ -219,10 +219,27 @@ export function activerChromeDePage() {
   const entete = $('.site-entete');
   const remonte = $('.remonter');
 
+  /* Barre qui s'efface pendant qu'on descend, et revient dès qu'on remonte
+     ou qu'on s'arrête de défiler (demande du client). Jamais cachée en haut
+     de page ni pendant que le menu mobile est ouvert. */
+  let yPrec = scrollY;
+  let arret = null;
   const surDefilement = parFrame(() => {
     const y = scrollY;
     entete?.classList.toggle('est-pose', y > 12);
     remonte?.classList.toggle('est-visible', y > 900);
+
+    const descend = y > yPrec + 4;
+    const monte = y < yPrec - 4;
+    if (y < 120 || monte || entete?.classList.contains('menu-ouvert')) {
+      entete?.classList.remove('est-cachee');
+    } else if (descend) {
+      entete?.classList.add('est-cachee');
+    }
+    if (descend || monte) yPrec = y;
+
+    clearTimeout(arret);
+    arret = setTimeout(() => entete?.classList.remove('est-cachee'), 350);
   });
 
   addEventListener('scroll', surDefilement, { passive: true });
@@ -266,6 +283,24 @@ export function activerLueurSections(racine = document) {
   });
 }
 
+/* Les cinq ancres de nav de l'accueil, dans l'ordre du document — partagées
+   par activerAncresAccueil() (clic → repère immédiat) et activerScrollspy()
+   (défilement organique → repère recalculé). « contact » pointe vers le
+   pied de page (voir id="contact" dans chrome.js), plus vers une section de
+   #contenu : c'est ce qui rend son repère au clic (ci-dessous) nécessaire,
+   un simple calcul de seuil au défilement ne l'attrape pas toujours (une
+   section plus courte que l'écran, en toute fin de document, ne peut pas
+   toujours être amenée sous l'en-tête fixe par le défilement). */
+const ANCRES_NAV = ['hero', 'services', 'reseau', 'conseils', 'contact'];
+
+/** Bascule `aria-current="page"` sur les liens de nav de l'ancre donnée. */
+function marquerNavActif(id) {
+  const liens = $$('.site-entete a[href^="index.html"]');
+  for (const l of liens) l.removeAttribute('aria-current');
+  const sel = id === 'hero' ? 'a[href="index.html"]' : `a[href="index.html#${id}"]`;
+  $$(sel).forEach((l) => l.setAttribute('aria-current', 'page'));
+}
+
 /**
  * Les liens de nav Services/Réseau/Conseils/Contact pointent tous vers
  * `index.html#ancre` (voir LIENS dans chrome.js), pour fonctionner depuis
@@ -280,12 +315,75 @@ export function activerAncresAccueil() {
   document.addEventListener('click', (e) => {
     const a = e.target.closest?.('a[href^="index.html#"]');
     if (!a) return;
-    const cible = $(`#${a.href.split('#')[1]}`);
+    const ancre = a.href.split('#')[1];
+    const cible = $(`#${ancre}`);
     if (!cible) return;
     e.preventDefault();
-    cible.scrollIntoView({ behavior: animationsReduites() ? 'auto' : 'smooth', block: 'start' });
-    history.pushState(null, '', `#${a.href.split('#')[1]}`);
+    allerA(cible);
+    history.pushState(null, '', `#${ancre}`);
+    /* Repère posé tout de suite plutôt qu'attendu du défilement : une cible
+       courte en fin de document (le pied de page, pour « contact ») ne
+       franchit pas toujours le seuil du scrollspy si le défilement ne peut
+       pas l'amener jusque-là. On sait déjà où l'utilisateur va — et on le
+       repose une fois l'animation de défilement terminée, pour gagner la
+       course contre le scrollspy qui aura recalculé entre-temps (et pu se
+       tromper sur cette même cible courte) à chaque événement de scroll. */
+    if (ANCRES_NAV.includes(ancre)) {
+      marquerNavActif(ancre);
+      /* Le scrollspy continue de recalculer à chaque scroll de l'animation
+         (déclenchée par allerA ci-dessus) et peut se tromper entre-temps sur
+         une cible courte en fin de document — plusieurs reposes plutôt
+         qu'une seule, la durée d'un défilement natif fluide n'étant pas
+         garantie (elle dépend de la distance et du navigateur). */
+      for (const delai of [300, 800, 1500, 2500]) {
+        setTimeout(() => marquerNavActif(ancre), delai);
+      }
+    }
   });
+}
+
+/**
+ * Repère de section actif dans la nav — l'accueil n'a plus qu'une page pour
+ * six anciennes, la nav doit donc dire où l'on est pendant le défilement
+ * plutôt que de rester bloquée sur « Accueil ». Bascule `aria-current` sur
+ * les liens `index.html#…` (déjà stylés pour cet attribut, voir style.css) ;
+ * ne fait rien sur les pages qui n'ont pas ces ancres (catalogue.html).
+ */
+export function activerScrollspy() {
+  /* Accueil seulement : #contact vit dans le pied de page, donc existe aussi
+     sur catalogue.html — sans ce garde-fou, « Contact » y serait marqué actif
+     en permanence à côté de « Catalogue ». */
+  if (!$('#hero')) return;
+  const cibles = ANCRES_NAV.map((id) => ({ id, section: $(`#${id}`) })).filter((c) => c.section);
+  if (!cibles.length) return;
+
+  /* Une ligne de seuil, pas un ratio d'intersection : les sections fondues
+     (services, réseau…) n'ont plus du tout la même hauteur, un ratio
+     favoriserait toujours la plus petite. La bonne section est la dernière
+     dont le haut a franchi le seuil, sous l'en-tête fixe. */
+  let derniere = null;
+  const surDefilement = parFrame(() => {
+    const seuil =
+      (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-h')) || 76) + 40;
+    let courante = cibles[0].id;
+    for (const c of cibles) {
+      if (c.section.getBoundingClientRect().top <= seuil) courante = c.id;
+    }
+    /* Contact vit désormais dans le pied de page (voir chrome.js) : plus
+       court qu'un plein écran, son haut ne franchit parfois jamais le seuil
+       — on ne peut pas défiler plus loin que le bas du document pour l'y
+       amener. Tout en bas de page, c'est donc forcément la dernière cible
+       qui est « active », quel que soit le calcul ci-dessus. */
+    const enBas = scrollY + innerHeight >= document.documentElement.scrollHeight - 150;
+    if (enBas) courante = cibles.at(-1).id;
+
+    if (courante !== derniere) {
+      derniere = courante;
+      marquerNavActif(courante);
+    }
+  });
+  addEventListener('scroll', surDefilement, { passive: true });
+  surDefilement();
 }
 
 /**

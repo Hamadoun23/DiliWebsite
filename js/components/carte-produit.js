@@ -30,11 +30,17 @@ export function carteProduit(p, { compact = false } = {}) {
   const stock = niveauStock(p);
   const tag = p.tag ? TAGS[p.tag] : null;
   const remise = p.prixBarre ? Math.round((1 - p.prix / p.prixBarre) * 100) : 0;
-  const lien = `produit.html?id=${encodeURIComponent(p.id)}`;
+  /* Plus de produit.html : la fiche s'ouvre en panneau superposé sur la page
+     courante (voir js/components/panneau-produit.js). L'href reste un vrai
+     lien — `?produit=` sur la page en cours — pour le clic-droit / nouvel
+     onglet et comme repli si le script n'a pas chargé ; la délégation
+     globale de commun.js intercepte le clic normal pour ouvrir le panneau
+     sans recharger. */
+  const lien = `?produit=${encodeURIComponent(p.id)}`;
 
   return `
   <article class="carte reveal${compact ? ' carte--compact' : ''}" data-produit="${esc(p.id)}">
-    <a class="carte__visuel" href="${lien}"
+    <a class="carte__visuel js-voir-produit" href="${lien}" data-id="${esc(p.id)}"
        aria-label="Voir la fiche de ${esc(p.nom)}">
       <span class="carte__illus">${illustration(p.illus)}</span>
       ${
@@ -52,7 +58,7 @@ export function carteProduit(p, { compact = false } = {}) {
         ${p.etat === 'reconditionne' ? `<span class="jeton jeton--recond">${esc(ETATS.reconditionne.nom)}</span>` : ''}
       </p>
 
-      <h3 class="carte__nom"><a href="${lien}">${esc(p.nom)}</a></h3>
+      <h3 class="carte__nom"><a href="${lien}" class="js-voir-produit" data-id="${esc(p.id)}">${esc(p.nom)}</a></h3>
 
       ${compact ? '' : `<p class="carte__resume">${esc(p.resume)}</p>`}
 

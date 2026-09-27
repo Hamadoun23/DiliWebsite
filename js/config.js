@@ -57,3 +57,11 @@ export const DEVIS = {
 const nf = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
 export const prix = (v) => (v == null ? 'Sur devis' : `${nf.format(v)} FCFA`);
 export const nombre = (v) => nf.format(v);
+
+/* Logiciel de gestion DiliApp (phase 2). Les demandes de devis du site y sont
+   transmises en plus de WhatsApp. En local : le backend tourne sur le port
+   8210 (voir gestion/start-back.bat). À remplacer par l'URL publique au
+   déploiement ; une chaîne vide désactive la transmission. */
+export const API = {
+  url: 'http://127.0.0.1:8210/api',
+};

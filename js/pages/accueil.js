@@ -11,10 +11,13 @@
 import './commun.js';
 
 import * as cat from '../core/catalogue.js';
-import { PARTENAIRES } from '../data/partenaires.js';
-import { ARTICLES, dateLisible } from '../data/articles.js';
+import * as profil from '../core/profil.js';
+import { PARTENAIRES, SIEGE } from '../data/partenaires.js';
+import { ARTICLES } from '../data/articles.js';
+import { carteConseil } from '../components/carte-conseil.js';
 import { illustration } from '../data/illustrations.js';
 import { carteProduit } from '../components/carte-produit.js';
+import { CONTACT, HORAIRES } from '../config.js';
 import { $, $$, esc, rendre } from '../core/dom.js';
 import { icone } from '../core/icones.js';
 import { activerReveal, activerSpotlightHero, masquerBulleWaSurHero } from '../core/ui.js';
@@ -114,26 +117,31 @@ function univers() {
 
 /* --- sélection du moment (onglets) -------------------------------------- */
 
+/* « Pour vous » n'existe que si le visiteur a dit quelque chose de son usage
+   (puces ci-dessous ou concierge) ; il passe alors en premier. */
 const VUES = {
-  best:    { nom: 'Notre choix', liste: () => cat.recommandes() },
-  promo:   { nom: 'Promotions',  liste: () => cat.promotions() },
-  nouveau: { nom: 'Nouveautés',  liste: () => cat.nouveautes() },
+  pourvous: { nom: 'Pour vous',   liste: () => profil.pourVous(8) },
+  best:     { nom: 'Notre choix', liste: () => cat.recommandes() },
+  promo:    { nom: 'Promotions',  liste: () => cat.promotions() },
+  nouveau:  { nom: 'Nouveautés',  liste: () => cat.nouveautes() },
 };
 
 function selection() {
   const barre = $('[data-onglets]');
   const zone = $('[data-selection]');
+  const puces = $('[data-usage-puces]');
+  const resume = $('[data-usage-resume]');
   if (!barre || !zone) return;
 
-  barre.innerHTML = Object.entries(VUES)
-    .map(
-      ([cle, v], i) =>
-        `<button type="button" role="tab" class="onglet${i === 0 ? ' est-actif' : ''}"
-                 data-vue="${cle}" aria-selected="${i === 0}">${esc(v.nom)}</button>`
-    )
-    .join('');
+  let active = 'best';
 
   const afficher = (cle) => {
+    active = cle;
+    for (const b of $$('.onglet', barre)) {
+      const actif = b.dataset.vue === cle;
+      b.classList.toggle('est-actif', actif);
+      b.setAttribute('aria-selected', String(actif));
+    }
     const liste = VUES[cle].liste().slice(0, 8);
     zone.innerHTML = `<div class="grille-produits">${liste
       .map((p) => carteProduit(p))
@@ -143,135 +151,248 @@ function selection() {
     activerReveal(zone);
   };
 
+  /* Tout ce qui dépend des réponses : onglets, titre, puces, résumé. Rappelé
+     à chaque réponse, d'où qu'elle vienne (puces, concierge, autre onglet). */
+  const refleter = () => {
+    const connu = !profil.estVide();
+    const cles = Object.keys(VUES).filter((k) => k !== 'pourvous' || connu);
+    barre.innerHTML = cles
+      .map(
+        (cle) => `<button type="button" role="tab" class="onglet${cle === 'pourvous' ? ' onglet--vous' : ''}"
+                          data-vue="${cle}" aria-selected="false">${esc(VUES[cle].nom)}</button>`
+      )
+      .join('');
+
+    $('[data-selection-surtitre]').textContent = connu ? 'D’après vos réponses' : 'En ce moment';
+    const prenom = profil.prenom();
+    $('[data-selection-titre]').innerHTML = connu
+      ? `Sélectionné <em>pour vous${prenom ? `, ${esc(prenom)}` : ''}.</em>`
+      : 'Notre sélection <em>du moment.</em>';
+
+    const choisis = new Set(profil.etat().usages);
+    if (puces) {
+      puces.innerHTML = cat.USAGES.map(
+        (u) => `<button type="button" class="puce-usage" data-usage="${esc(u.code)}"
+                        aria-pressed="${choisis.has(u.code)}" title="${esc(u.desc)}">${esc(u.nom)}</button>`
+      ).join('');
+    }
+    if (resume) {
+      resume.hidden = !connu;
+      resume.innerHTML = connu
+        ? `${icone('check')}<span>Pensé pour <b>${esc(profil.resume())}</b>.</span>
+           <button type="button" class="usage-choix__modifier" data-usage-effacer>Tout effacer</button>`
+        : '';
+    }
+
+    afficher(connu ? 'pourvous' : active === 'pourvous' ? 'best' : active);
+  };
+
   barre.addEventListener('click', (e) => {
     const b = e.target.closest('[data-vue]');
-    if (!b) return;
-    for (const autre of $$('.onglet', barre)) {
-      const actif = autre === b;
-      autre.classList.toggle('est-actif', actif);
-      autre.setAttribute('aria-selected', String(actif));
-    }
-    afficher(b.dataset.vue);
+    if (b) afficher(b.dataset.vue);
+  });
+  puces?.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-usage]');
+    if (b) profil.basculerUsage(b.dataset.usage);
+  });
+  resume?.addEventListener('click', (e) => {
+    if (e.target.closest('[data-usage-effacer]')) profil.effacerReponses();
   });
 
-  afficher('best');
+  /* Le magasin prévient aussi quand le concierge note ses propres compteurs
+     (visites, question reportée…) : on ne refait la section que si les
+     RÉPONSES ont changé, sinon l'onglet choisi à la main sauterait. */
+  let signature = null;
+  profil.abonner((e) => {
+    const s = JSON.stringify([e.prenom, e.usages, e.lieu, e.postes, e.priorites, e.etat]);
+    if (s === signature) return;
+    signature = s;
+    refleter();
+  });
 }
 
-/* --- services ----------------------------------------------------------- */
+/* --- services : illustrations des blocs (portée de services.js) --------- */
 
-const SERVICES = [
+function servicesIllustrations() {
+  for (const n of $$('[data-illus]')) {
+    n.innerHTML = illustration(n.dataset.illus);
+  }
+}
+
+/* --- filières de formation (portée de services.js) ----------------------- */
+
+const FILIERES = [
   {
-    ic: 'portable', ancre: 'vente', titre: 'Vente & conseil',
-    txt: "Ordinateurs portables et fixes, toutes marques, neufs ou reconditionnés garantis, plus tous les accessoires du poste de travail.",
+    ic: 'clavierIc', nom: 'Informatique bureautique',
+    txt: "Word, Excel, PowerPoint et les usages du poste de travail. Le socle qui manque le plus souvent en entreprise.",
   },
   {
-    ic: 'outil', ancre: 'maintenance', titre: 'Maintenance PC',
-    txt: "Diagnostic, nettoyage, remplacement de batterie ou de disque, réinstallation système, récupération de données. Devis avant intervention.",
+    ic: 'etoile', nom: 'Analyse de données',
+    txt: "Tableurs avancés, tableaux croisés, tableaux de bord et restitution avec Power BI.",
   },
   {
-    ic: 'bouclier', ancre: 'sav', titre: 'Service après-vente',
-    txt: "Suivi des garanties, prise en charge des retours, prêt de matériel selon disponibilité. Le SAV est assuré par l'équipe qui a vendu.",
+    ic: 'devis', nom: 'Programmation',
+    txt: "Bases de l'algorithmique et développement d'applications, pour débuter ou se reconvertir.",
   },
   {
-    ic: 'reseau', ancre: 'reseau', titre: 'Installation réseau',
-    txt: "Relevé de couverture, câblage Cat 6, baies brassées, bornes Wi-Fi, vidéosurveillance. Du plan d'implantation à la mise en service.",
+    ic: 'bouclier', nom: 'Cybersécurité',
+    txt: "Hygiène numérique, protection des postes et des données, réaction en cas d'incident.",
   },
   {
-    ic: 'diplome', ancre: 'formation', titre: 'Formations professionnelles',
-    txt: "Bureautique, analyse de données, programmation, gestion de projet, finance, droit et cybersécurité. Sessions en présentiel à Bamako.",
+    ic: 'boite', nom: 'Gestion de projet',
+    txt: "Cadrage, planification, suivi et pilotage budgétaire d'un projet, méthodes classiques et agiles.",
   },
   {
-    ic: 'boite', ancre: 'parc', titre: 'Équipement de parc',
-    txt: "Chiffrage poste par poste, matériel homogène, livraison et installation sur site, coordination avec nos partenaires régionaux.",
+    ic: 'etincelle', nom: 'Finance',
+    txt: "Lecture des états financiers, gestion budgétaire et analyse de la rentabilité.",
+  },
+  {
+    ic: 'diplome', nom: 'Droit',
+    txt: "Notions juridiques appliquées à la vie de l'entreprise et aux relations contractuelles.",
   },
 ];
 
-function services() {
+function filieres() {
   rendre(
-    '[data-services]',
-    SERVICES.map(
-      (s) => `
-      <article class="serv reveal">
-        <span class="serv__ic">${icone(s.ic)}</span>
-        <h3>${esc(s.titre)}</h3>
-        <p>${esc(s.txt)}</p>
-        <a class="lien-fleche" href="services.html#${s.ancre}">En savoir plus ${icone('fleche')}</a>
+    '[data-filieres]',
+    FILIERES.map(
+      (f) => `
+      <article class="filiere reveal">
+        <span class="filiere__ic">${icone(f.ic)}</span>
+        <div>
+          <h3>${esc(f.nom)}</h3>
+          <p>${esc(f.txt)}</p>
+        </div>
       </article>`
     ).join('')
   );
 }
 
-/* --- aperçu du réseau ---------------------------------------------------- */
+/* --- réseau : le siège + les partenaires (portée de reseau.js) ----------- */
 
-function reseau() {
-  /* Le siège d'abord, puis les deux partenaires les mieux dotés : l'accueil
-     donne un aperçu, la page dédiée donne la liste complète. */
-  const stockPar = (code) =>
-    cat.tous().reduce((n, p) => n + (p.dispo[code] ?? 0), 0);
+const referencesDe = (code) => cat.tous().filter((p) => (p.dispo[code] ?? 0) > 0).length;
 
-  const liste = [
-    PARTENAIRES[0],
-    ...PARTENAIRES.slice(1).sort((a, b) => stockPar(b.code) - stockPar(a.code)).slice(0, 2),
-  ];
+function universDe(code) {
+  return cat.CATEGORIES.map((c) => ({
+    nom: c.nom,
+    n: cat.tous().filter((p) => p.cat === c.code && (p.dispo[code] ?? 0) > 0).length,
+  })).filter((x) => x.n > 0);
+}
 
+function preuvesReseau() {
   rendre(
-    '[data-reseau-apercu]',
-    liste
+    '[data-preuves]',
+    [
+      { n: PARTENAIRES.length, mot: 'points de vente' },
+      { n: new Set(PARTENAIRES.map((p) => p.pays)).size, mot: 'pays' },
+      { n: cat.statistiques().references, mot: 'références' },
+    ]
       .map(
-        (p) => `
-      <article class="pdv reveal${p.role === 'siege' ? ' pdv--siege' : ''}">
-        <div class="pdv__tete">
-          <span class="pdv__dr" aria-hidden="true">${esc(p.iso)}</span>
-          <div>
-            <p class="pdv__ville">${esc(p.ville)}</p>
-            <p class="pdv__pays">${esc(p.pays)}</p>
+        (p) => `<li class="heros__preuve">
+                  <b data-compteur="${p.n}">0</b><span>${esc(p.mot)}</span>
+                </li>`
+      )
+      .join('')
+  );
+}
+
+function siege() {
+  rendre(
+    '[data-siege]',
+    `<div class="siege reveal">
+       <div class="siege__txt">
+         <p class="surtitre">Siège & showroom</p>
+         <h3 class="titre">${esc(SIEGE.ville)}, <em>${esc(SIEGE.quartier)}.</em></h3>
+         <p class="chapeau">${esc(SIEGE.note)}</p>
+
+         <ul class="siege__infos">
+           <li>${icone('broche')}<span>${esc(SIEGE.quartier)} — ${esc(CONTACT.ville)}, ${esc(CONTACT.pays)}</span></li>
+           ${CONTACT.telephones
+             .map((t) => `<li>${icone('telephone')}<a href="tel:${esc(t.tel)}">${esc(t.label)}</a></li>`)
+             .join('')}
+           <li>${icone('mail')}<a href="mailto:${esc(CONTACT.email)}">${esc(CONTACT.email)}</a></li>
+         </ul>
+
+         <ul class="siege__horaires">
+           ${HORAIRES.map(
+             (h) => `<li${h.ouvert ? '' : ' class="est-ferme"'}>
+                       ${icone('horloge')}<span>${esc(h.jours)}</span><b>${esc(h.h)}</b>
+                     </li>`
+           ).join('')}
+         </ul>
+
+         <div class="cta__actions" style="justify-content:flex-start">
+           <a class="btn btn--plein"
+              href="https://www.google.com/maps/search/${encodeURIComponent(CONTACT.mapsQuery)}"
+              target="_blank" rel="noopener">Ouvrir dans Maps</a>
+           <a class="btn btn--ligne" href="index.html#contact">Nous écrire</a>
+         </div>
+       </div>
+
+       <div class="siege__stats">
+         ${universDe(SIEGE.code)
+           .map(
+             (u) => `<div class="siege__stat">
+                       <b>${u.n}</b><span>${esc(u.nom)}</span>
+                     </div>`
+           )
+           .join('')}
+         <div class="siege__stat siege__stat--large">
+           <b>${referencesDe(SIEGE.code)}</b><span>références tenues au siège</span>
+         </div>
+       </div>
+     </div>
+
+     <div class="siege-photos reveal">
+       <p class="siege-photos__legende">Le stock, en vrai — Torokorobougou</p>
+       <div class="siege-photos__grille">
+         <img src="assets/img/atelier/atelier-1.jpg" alt="Étagères de portables en stock à l'entrepôt Dilitech" loading="lazy">
+         <img src="assets/img/atelier/atelier-2.jpg" alt="Vitrine de la boutique Dilitech avec plusieurs modèles exposés" loading="lazy">
+         <img src="assets/img/atelier/atelier-3.jpg" alt="Cartons de portables neufs réceptionnés à l'entrepôt Dilitech" loading="lazy">
+       </div>
+     </div>`
+  );
+}
+
+function partenaires() {
+  rendre(
+    '[data-partenaires]',
+    PARTENAIRES.filter((p) => p.role !== 'siege')
+      .map((p) => {
+        const refs = referencesDe(p.code);
+        const univers = universDe(p.code);
+        return `
+        <article class="pdv reveal">
+          <div class="pdv__tete">
+            <span class="pdv__dr" aria-hidden="true">${esc(p.iso)}</span>
+            <div>
+              <p class="pdv__ville">${esc(p.ville)}</p>
+              <p class="pdv__pays">${esc(p.pays)}${p.quartier ? ` · ${esc(p.quartier)}` : ''}</p>
+            </div>
           </div>
-        </div>
-        <p class="pdv__role">${esc(p.libelleRole)}</p>
-        <p class="pdv__note">${esc(p.note)}</p>
-        <a class="lien-fleche pdv__lien" href="catalogue.html?partenaire=${p.code}">
-          Voir ce qui est disponible ${icone('fleche')}
-        </a>
-      </article>`
-      )
-      .join('')
-  );
-}
+          <p class="pdv__role">${esc(p.libelleRole)}</p>
+          <p class="pdv__note">${esc(p.note)}</p>
 
-/* --- derniers articles ---------------------------------------------------- */
+          <p class="pdv__refs">
+            <b>${refs}</b> référence${refs > 1 ? 's' : ''} disponible${refs > 1 ? 's' : ''}
+          </p>
+          <div class="pdv__univers">
+            ${univers.map((u) => `<span>${esc(u.nom)} · ${u.n}</span>`).join('')}
+          </div>
 
-function articles() {
-  rendre(
-    '[data-articles]',
-    ARTICLES.slice(0, 3)
-      .map(
-        (a) => `
-      <article class="art reveal">
-        <a class="art__visuel" href="article.html?a=${encodeURIComponent(a.slug)}" aria-hidden="true" tabindex="-1">
-          ${illustration(a.illus)}
-        </a>
-        <div class="art__corps">
-          <p class="art__meta">${esc(a.categorie)} <span>· ${esc(dateLisible(a.date))}</span></p>
-          <h3><a href="article.html?a=${encodeURIComponent(a.slug)}">${esc(a.titre)}</a></h3>
-          <p class="art__chapo">${esc(a.chapo)}</p>
-          <a class="lien-fleche" href="article.html?a=${encodeURIComponent(a.slug)}">
-            Lire — ${a.lecture} min ${icone('fleche')}
+          <a class="lien-fleche pdv__lien" href="catalogue.html?partenaire=${p.code}">
+            Filtrer le catalogue sur ${esc(p.ville)} ${icone('fleche')}
           </a>
-        </div>
-      </article>`
-      )
+        </article>`;
+      })
       .join('')
   );
 }
 
-/* --- note de bas d'appel à l'action --------------------------------------- */
+/* --- conseils : aperçu de 3, la page complète est conseils.html --------- */
 
-function noteCta() {
-  const s = cat.statistiques();
-  rendre(
-    '[data-cta-note]',
-    `${s.references} références en ligne · ${s.marques} marques · réponse sous 24 h ouvrées`
-  );
+function apercuConseils() {
+  rendre('[data-articles]', ARTICLES.slice(0, 3).map((a) => carteConseil(a, { lien: 'page' })).join(''));
 }
 
 /* --- montage ------------------------------------------------------------- */
@@ -280,9 +401,11 @@ hero();
 marques();
 univers();
 selection();
-services();
-reseau();
-articles();
-noteCta();
+servicesIllustrations();
+filieres();
+preuvesReseau();
+siege();
+partenaires();
+apercuConseils();
 
 activerReveal();

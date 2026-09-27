@@ -568,6 +568,521 @@ les sections de l'accueil sous le hero (univers, services, aperçu réseau,
 articles) n'ont pas été retouchées ; les autres pages n'ont eu que le
 bénéfice de la nav flottante, pas une refonte de leurs propres sections.
 
+## Vie locale : Dilitech sponsor d'un challenge digital (septembre 2026)
+
+Le client a fourni 11 photos (`Docs/images/`) d'un événement organisé par un
+autre acteur bamakois, **2D Digitals** (formation informatique/graphisme/
+marketing digital) : Dilitech y était **sponsor officiel du « Challenge
+Digital — Mini-Business Concept »**, un concours d'entrepreneuriat digital
+pour jeunes, et a fourni le matériel remis aux lauréats (ordinateurs,
+tablette Lenovo, casquettes et t-shirts Dilitech). Une des photos montre
+l'attestation de reconnaissance remise à Dilitech pour ce sponsoring — le
+texte exact de l'attestation est repris en citation.
+
+Nouvelle section **« Vie locale »**, sur `reseau.html` à l'origine (fondue
+dans `index.html#reseau` depuis, voir plus bas) : texte + une carte-citation
+(photo de la remise de l'attestation + le texte de l'attestation + qui l'a
+remise) à côté d'une galerie de 3 photos de l'événement (mêmes codes visuels
+que `.siege-photos` déjà existante : légende, grille, lift au survol).
+
+Photos traitées avec la même recette que les passes précédentes (Pillow :
+`autocontrast` + `UnsharpMask` léger ; deux des quatre photos utilisées sont
+recadrées de portrait 3:4 vers paysage 4:3, crop vérifié par capture avant
+export plutôt que deviné). Posées dans `assets/img/engagement/`. Les 11
+photos d'origine, renommées, déplacées (pas copiées) dans
+`assets/originaux/evenements/` — même principe que les passes précédentes
+sur les photos produits, `Docs/images/` ne contient donc plus rien.
+
+## Fusion en page unique (septembre 2026)
+
+Après avoir vu le résultat des sections « aperçu » de l'accueil (3 services
+sur 6, 3 partenaires sur 7, 3 articles sur 6, un CTA à la place du
+formulaire), le client a tranché sans détour : *« j'ai pas aimé, je veux
+voir tout sur une seule page, je veux un site single page comme pour toguna
+motors, il y'aura juste une page à part sur le catalogue »*, puis, en
+message de suivi : *« si tu peux même supprimer les autres pages en html,
+garde juste l'index.html et le catalogue.html »*.
+
+**Ce qui a été fait** — voir « Pages » et « Architecture JS » plus haut pour
+l'état final :
+- Le contenu **complet** de `services.html`, `reseau.html`, `conseils.html`
+  et `contact.html` a été fondu dans les sections `#services`/`#reseau`/
+  `#conseils`/`#contact` de `index.html` (plus des aperçus), puis ces quatre
+  fichiers ont été supprimés. Leur logique JS a été portée dans
+  `accueil.js` (même balisage, mêmes classes CSS — aucune réécriture de
+  fond, un déplacement).
+- **Fiche produit et lecture d'article** (`produit.html`, `article.html`)
+  sont devenues des **panneaux superposés** (`<panneau-produit>`,
+  `<panneau-article>`, `js/components/`) plutôt que des pages : question
+  posée explicitement au client avant de s'y engager (impact réel sur
+  l'architecture), tranchée pour le panneau plutôt que garder les deux
+  pages. Mécanique copiée sur `<panneau-devis>` (déjà sur le site) : voile,
+  piège à focus, verrouillage du défilement — seule la largeur change
+  (`.panneau--large`, 920px). L'état vit dans l'URL (`?produit=DT-…`,
+  `?article=slug`, via la nouvelle `definirParametre()` de `core/dom.js`) :
+  un lien reste partageable, recharger la page rouvre le bon panneau, et le
+  bouton « précédent » du navigateur referme le panneau au lieu de quitter
+  le site — jamais de rechargement complet.
+- Collision d'ids évitée : la section « Installation réseau » des services
+  (`id="reseau"` dans l'ancien `services.html`) est devenue
+  `id="service-reseau"` — `#reseau` est maintenant pris par la section
+  réseau/partenaires de niveau page.
+- **Rythme des ancres sombres revu à la baisse** : chaque ancienne page
+  ouvrait sur sa propre bande `.nuit` pleine page et se refermait souvent
+  sur son propre CTA `.nuit` — mis bout à bout sur une seule page, ça aurait
+  fait une dizaine de bandes sombres à la suite. Les bannières d'ouverture
+  sont devenues de simples en-têtes `tete-sec`/`tete-duo` (même traitement
+  que les autres sections de l'accueil), et les CTA redondants (fin de
+  `conseils.html`, « devenir partenaire » de `reseau.html`) ont été retirés
+  ou réduits à un lien inline — seules les bandes `.nuit` qui portent un
+  vrai contenu (les étapes de « Équipement de parc », les étapes de
+  « Comment ça se passe », la bande d'ouverture de Contact) sont restées.
+- **Repère de section actif dans la nav** (`activerScrollspy()`,
+  `core/ui.js`) : la page ne rechargeant plus entre « Accueil » et
+  « Services », la nav doit dire où l'on est pendant le défilement. Basé
+  sur une ligne de seuil sous l'en-tête fixe (dernière section dont le haut
+  l'a franchie), **pas** sur `IntersectionObserver`/ratio d'intersection —
+  premier essai, écarté : les sections fondues ont des hauteurs très
+  différentes (un `#services` court, un `#reseau` très long), et un ratio
+  d'intersection favorise toujours mécaniquement la section la plus courte.
+- `activerAncresAccueil()` (défilement doux vers une ancre `index.html#…`)
+  utilise maintenant `allerA()` (`core/dom.js`, tenait déjà compte de
+  `--nav-h`) au lieu d'un `scrollIntoView` brut qui plaçait la cible sous
+  l'en-tête fixe.
+- `sitemap.xml` réduit à `/` et `/catalogue.html`. `404.html` **gardé**
+  malgré la formulation « garde juste l'index.html et le catalogue.html » —
+  ce n'est jamais un lien de nav, seulement une page technique servie par
+  l'hébergeur ; à signaler au client plutôt qu'à supprimer sans le dire.
+
+Vérifié par Playwright : les deux pages × 3 largeurs (390/768/1440), zéro
+erreur console, zéro débordement horizontal ; ouverture/fermeture des deux
+panneaux (Échap, clic sur le voile, bouton « précédent »), rechargement sur
+`?produit=`/`?article=` rouvre le bon panneau, recherche du catalogue
+toujours fonctionnelle.
+
+### Retrait de la grande section Contact — redondante avec le pied de page
+
+Juste après cette fusion, retour du client sur une capture de la section
+Contact : *« retire la section contact et devis, pas besoin »*. Le site a
+déjà, sur **toutes** les pages, une bande de contact dans `<site-pied>`
+(`pied-contact` — coordonnées, formulaire court, WhatsApp) : la grande
+section `#contact` de l'accueil (bande sombre + formulaire riche à sujets +
+FAQ) faisait double emploi.
+
+- Les deux sections (Contact/devis complet + FAQ) sont retirées d'`index.html`.
+- **`id="contact"` déplacé sur `.pied-contact`** (`chrome.js`, `<site-pied>`)
+  : tous les liens `index.html#contact` déjà semés dans le site (nav, hero,
+  CTA « Demander un diagnostic »/« Nous confier un chiffrage »/etc., le lien
+  « Une question sur ce produit ? » du panneau produit) continuent de
+  fonctionner sans être touchés un par un — ils amènent maintenant au pied
+  de page, présent sur les deux pages.
+- `accueil.js` perd tout ce qui ne servait qu'à cette section : formulaire
+  de devis, rappel de sélection, sujets, horaires/ouverture affichés en
+  carte, FAQ — environ 280 lignes, avec leurs imports (`devis`, `toast`,
+  `RESEAUX`, `prix`) devenus inutiles ici (le tiroir `<panneau-devis>` et le
+  petit formulaire du pied de page couvrent déjà ce besoin).
+- **Piège rencontré et corrigé** : un commentaire dans `chrome.js` citait
+  littéralement `` `index.html#contact` `` entre apostrophes inverses — à
+  l'intérieur d'un template literal JS (`this.innerHTML = \`…\``), ça
+  ferme la chaîne en plein milieu et casse tout le composant
+  (`SyntaxError: Unexpected identifier 'index'`, plus aucune nav ni pied de
+  page sur le site). Corrigé avec des guillemets français « » dans les
+  commentaires JS à partir de maintenant.
+- **Le scrollspy (`activerScrollspy()`) ne suffisait plus pour « Contact »** :
+  le pied de page est plus court qu'un écran et se trouve tout en bas d'un
+  document désormais très long — le calcul « dernière section dont le haut a
+  franchi le seuil » ne l'attrape pas toujours (il ne peut pas être amené
+  sous la nav par le défilement, il n'y a plus de place en dessous). Deux
+  filets ajoutés dans `core/ui.js` :
+  1. un repli « en bas de page → dernière ancre » (`enBas`, avec une marge
+     large de 150px : la hauteur totale du document bouge encore un peu au
+     moment du calcul, à cause des images `loading="lazy"` pas encore
+     chargées plus bas) ;
+  2. `activerAncresAccueil()` (clic sur un lien de nav) pose désormais le
+     repère **tout de suite**, avec plusieurs reposes échelonnées (300 à
+     2500 ms) le temps que l'animation de défilement native se termine —
+     elle n'a pas de durée garantie, et le scrollspy recalculait entre-temps
+     et pouvait se tromper. Le code des deux fonctions partage maintenant
+     `marquerNavActif()` plutôt que deux logiques séparées.
+
+## Photos de la boutique (septembre 2026)
+
+Six nouvelles photos du dépôt/showroom de Torokorobougou (`Docs/images/`).
+Les trois vignettes de « Le stock, en vrai » (`assets/img/atelier/
+atelier-1..3.jpg`) ont été **remplacées sur place** — mêmes noms de fichier,
+donc aucun HTML/JS à toucher, et les `alt` existants décrivaient déjà le bon
+sujet : étagères de portables (1), vitrine vitrée avec éclairage LED bleu
+(2 — la plus belle du lot, candidate évidente si le hero doit un jour
+changer de photo), cartons réceptionnés (3). Recette habituelle : recadrage
+paysage qui coupe le plafond, `autocontrast` + `UnsharpMask`. Originaux
+renommés et déplacés dans `assets/originaux/boutique/`.
+
+## Bascule jour / nuit (septembre 2026)
+
+Demande : *« le fond bleu est top en nuit, mets-y un fond blanc pour le
+jour »*, sur le modèle de `EventMotors/Catalogue` (Toguna). Même mécanique
+que Toguna : `data-theme="light"` sur `<html>`, choix mémorisé dans
+`localStorage` (clé `dilitech-theme`), script inline bloquant en tête des
+trois pages pour éviter le flash sombre au chargement, bouton soleil/lune
+dans la nav (et dans le menu mobile, où les icônes de nav sont masquées).
+Le mode nuit reste le défaut ; `prefers-color-scheme` n'est pas lu.
+
+**Parti pris : en mode jour, TOUT passe au clair** — hero, bandes d'accent
+(`.nuit`), tuiles bento, visuels produits, pied de page, menu mobile. Un
+premier jet gardait ces zones sombres en jour (comme les panneaux marine de
+Toguna) ; le client l'a refusé : *« en mode jour, il faut que tout change
+vers le blanc, tout le hero doit aller en blanc, pareil pour les autres
+sections »*. Seuls le marine et le cyan de marque (boutons, pastilles,
+étiquettes) restent identiques.
+
+Comment c'est câblé dans `style.css` :
+- **`--fond`** : fond générique de `body` et `section` (vaut `var(--nuit)`
+  en nuit, donc le mode nuit est pixel pour pixel l'ancien site).
+- **Bloc `:root[data-theme="light"]`** : bascule aussi les jetons « sur fond
+  sombre » — `--nuit` (devient un blanc à peine teinté avec des halos très
+  légers, pour que le hero et les bandes restent distincts des sections
+  unies), `--sur-sombre*` (texte blanc → encre), `--cyan-2` (devient la
+  valeur de `--cyan-ink`, 5:1 sur blanc). Tous les composants pensés pour le
+  sombre suivent donc sans règle à part.
+- **Nouveau jeton `--sur-rgb`** (`255, 255, 255` la nuit, encre marine le
+  jour) : les ~40 `rgba(255, 255, 255, .x)` codés en dur (traits, voiles de
+  verre, bordures du hero…) sont devenus `rgba(var(--sur-rgb), .x)`. Les
+  `#fff` posés sur des fonds qui basculent sont devenus `var(--sur-sombre)`.
+  Restent en `#fff` volontairement : le texte sur fond marine/cyan/vert
+  plein (boutons, étiquettes, pastilles, toasts) — ces fonds ne changent pas.
+- Les fonds sombres écrits en dégradés littéraux (tuiles bento, badge
+  « villes », cartes de contact, formulaires du pied de page, voiles du
+  hero…) ont leur pendant clair **regroupé dans un seul bloc**, juste sous
+  le bloc de jetons, pour voir d'un coup d'œil tout ce que le mode jour
+  réécrit. ⚠ Tout nouveau composant avec un fond sombre en dur doit y avoir
+  son équivalent clair (ou, mieux, utiliser `var(--nuit)`/`--paper`/
+  `--sur-rgb` dès le départ).
+
+Corrigés en chemin, révélés par le mode jour :
+- `.heros__preuves` (bande de chiffres de `#reseau`) avait ses chiffres en
+  `#fff` en dur — conçue pour l'ancienne bande sombre de `reseau.html`.
+  Passée sur `--tx-1`/`--tx-3`, carte pleine en jour.
+- Onglet actif des conseils (`.cat-filtres .onglet.est-actif`) : bug de
+  spécificité existant — `.cat-filtres .onglet { background: var(--paper) }`
+  écrasait le fond marine de `.onglet.est-actif`, seul le texte blanc
+  restait. Invisible en nuit (blanc sur papier sombre), blanc sur blanc en
+  jour.
+- **Scrollspy** limité à l'accueil (`if (!$('#hero')) return;`) : depuis que
+  `id="contact"` est sur le pied de page, il existe aussi sur
+  `catalogue.html`, où « Contact » restait marqué actif à côté de
+  « Catalogue ».
+
+Vérifié par Playwright : bascule + mémorisation + thème déjà posé au
+premier rendu de la page suivante ; deux thèmes × trois pages × trois
+largeurs sans erreur console ni débordement ; captures section par section
+en jour, et comparaison du mode nuit avant/après.
+
+## Nav allégée (septembre 2026)
+
+Demande du client : *« je veux pas voir trop de liens »*.
+- **Bandeau d'activité retiré** (la fine barre au-dessus de la nav : activité,
+  téléphone, adresse) — markup dans `chrome.js`, règles `.bandeau*` et
+  variable `--bandeau-h` supprimées du CSS. Téléphone et adresse restent
+  dans le pied de page et le menu mobile.
+- **Loupe retirée** de la nav (elle menait à `catalogue.html#recherche`). La
+  barre de recherche **du catalogue lui-même** est conservée.
+- **Liens « Réseau » et « Conseils » retirés** de `LIENS` (nav + menu
+  mobile). Les sections `#reseau` et `#conseils` restent sur l'accueil,
+  intactes ; le scrollspy continue de les suivre (aucun lien n'est marqué
+  actif pendant qu'on les traverse, plutôt qu'un faux « Services »).
+  Nav finale : Accueil · Catalogue · Services · Contact.
+
+## Le « concierge » : écoute client au fil de la visite (septembre 2026)
+
+Vision du patron : écoute client, bon usage du matériel, accompagnement —
+le site ne doit pas seulement vendre, il doit faire préciser l'usage. Le
+client a demandé des petits pop-ups doux et graduels (« un accueil digne
+d'un hôtel 5 étoiles ») et une sélection qui garde les réponses en mémoire.
+Choix explicites du client : **questions uniquement sur l'usage** (pas de
+budget, pas de prénom, pas de ville) ; **ordre des sections inchangé**.
+
+**Ce que vit le visiteur**
+- 1re visite, ~4 s après le premier défilement : carte d'accueil
+  (« Bienvenue chez Dilitech… ») avec « Commencer maintenant » (pose Q1
+  tout de suite) ou « Je regarde d'abord ». Visites suivantes, s'il a déjà
+  répondu : « Bon retour parmi nous — votre sélection vous attend ».
+- 3 questions, une à la fois, armées par l'arrivée sur une section :
+  Q1 usages (multi, les 7 `USAGES` du catalogue) sur `#univers` ou la grille
+  du catalogue ; Q2 lieu (bureau / terrain / cours) sur `#pourquoi` ; Q3
+  nombre de postes sur `#services`. Toujours dans l'ordre (pas « où » avant
+  « quoi »).
+- **Les questions reviennent à chaque chargement de page** (demande du
+  client, 2e passe : « faire réapparaître les pop-ups » tout en gardant la
+  mémoire). Déjà répondue ? Elle revient pré-cochée (« Votre dernière
+  réponse est cochée : confirmez, ou changez-la » → « C'est toujours ça »).
+  Les compteurs (questions déjà montrées, plafond, délai) vivent en mémoire
+  de la PAGE, pas de la session : une actualisation repart à zéro.
+  « Plus tard » = pas d'autre carte spontanée pour cette question sur cette
+  page ; « Ne plus me demander » (persisté) coupe toutes les cartes
+  spontanées. L'accueil « Bienvenue » : une fois dans la vie du visiteur ;
+  « Bon retour » : une fois par session d'onglet (`sessionStorage`
+  `dt-bon-retour`), avec « Mon besoin a changé ».
+- **À la demande** : tout `.js-ouvrir-conseiller` ouvre le QUESTIONNAIRE
+  GUIDÉ (« Question 1 sur 3 » → « Suivant » → … → merci), sans délai, même
+  après « Ne plus me demander ». Aujourd'hui : les deux interrupteurs de
+  l'univers Dilitech (voir plus bas).
+- ⚠ **Pas de bouton flottant façon « chat / assistant »** : essayé, refusé
+  par le client (« non pas de chat, je voulais que les pop-ups
+  réapparaissent »).
+- Règles de politesse (`concierge.js`, en tête) : 25 s entre la fermeture
+  d'une carte et la suivante, 3 questions spontanées max par page, rien
+  tant que le visiteur n'a pas défilé, rien pendant qu'un panneau/menu est
+  ouvert (`body.defilement-bloque`). Non modal, Échap ferme.
+- **Interrupteurs de l'univers Dilitech** (tuiles D « 55 références » et E
+  « Le conseil avant le produit ») : autrefois décoratifs, ce sont
+  maintenant de vrais boutons qui rouvrent les questions. Éteints (gris,
+  bouton à gauche) tant que le visiteur n'a rien dit de son usage, allumés
+  (cyan) ensuite — état posé par le concierge sur tout `[data-etat-profil]`
+  (`data-actif`, et `aria-checked` sur `role="switch"`). La tuile E est
+  devenue un `<button>` entier, avec « Dites-nous votre usage → » remplacé
+  par « Pensé pour : … » (`[data-profil-mini]`). La tuile D reste un lien
+  vers le catalogue par un **lien étiré** (`.bento__etire`, position
+  absolue sur toute la tuile) — l'interrupteur est posé au-dessus
+  (`z-index: 2`), parce qu'un bouton ne peut pas vivre dans un `<a>`.
+- Section `#selection` : puces « Pour quel usage ? » (même mémoire que les
+  cartes) ; dès qu'un usage est connu, titre « Sélectionné pour vous »,
+  onglet « Pour vous » (point cyan) en premier et actif, phrase « Pensé
+  pour … » + « Tout effacer ».
+- Devis : bloc « Besoin exprimé sur le site » dans le message WhatsApp
+  (`devis.messageTexte()` → `profil.lignesBesoin()`).
+- Catalogue : bandeau « Vous nous avez dit : … — N'afficher que ce qui vous
+  convient » quand un usage est connu ET qu'aucun filtre n'est posé
+  (jamais appliqué d'office).
+
+**Où ça vit**
+- `js/core/profil.js` — mémoire (`creerStore`, clé `dt-profil`, synchro
+  entre onglets), les `QUESTIONS`, `scoreProduit()` / `pourVous()`,
+  `resume()`, `lignesBesoin()`. Compteur de visites par session d'onglet.
+- `js/components/concierge.js` — `<dilitech-concierge>`, injecté par
+  `demarrer()` (commun.js) sur l'accueil et le catalogue, pas sur la 404.
+  Déclencheurs (IntersectionObserver) « arment » ; un ordonnanceur (1,5 s)
+  montre. Méthode publique `ouvrirQuestionnaire()`.
+- Ajouter une question : l'entrée dans `QUESTIONS` + `CODES`/`valider`
+  (profil.js), sa place dans `ORDRE` et `DECLENCHEURS` (concierge.js), son
+  poids dans `scoreProduit()` et sa ligne dans `lignesBesoin()`.
+
+**Classement « Pour vous »** : +3 par usage en commun (un produit sans aucun
+usage commun est exclu), puis bonus de départage — terrain : +2 si
+`mobilite`, −4 si matériel sédentaire (écran, poste fixe, impression,
+réseau câblé) ; cours : +2 `etudes` ; plusieurs postes : +2 `entreprise` ;
++1 pour les ordinateurs (qui parle d'usage cherche d'abord une machine). À
+score égal, l'ordre éditorial du catalogue.
+
+**Piège rencontré** : le repli `setTimeout(cacher, 400)` de fermeture masque
+souvent la carte avant la fin de sa transition — `transitionend` ne part
+jamais, l'écouteur `{ once }` reste accroché et refermait la carte
+SUIVANTE dès son ouverture. Garde ajoutée (`cacher` ne masque que si aucune
+carte n'a été rouverte). Même mécanique dans les trois panneaux, mais leur
+transition (0,34 s) finit avant les 400 ms : pas touché.
+
+Vérifié par Playwright : parcours complet d'une 1re visite (accueil → Q1 →
+merci → onglet « Pour vous » → Q2 après le délai → Q3 → « Plus tard »),
+2e visite (« Bon retour »), message de devis, bandeau du catalogue,
+« Ne plus me demander », puces sans concierge ; deux thèmes × trois pages ×
+trois largeurs sans erreur ni débordement.
+
+### 3e passe du concierge : six questions en deux passages, Précédent / Suivant
+
+Retour du client : la question 2 « va vite » (un clic sur un choix unique
+passait directement à la suivante), et il veut **six questions, en deux
+passages**, avec le **prénom** en partie 1 (champ texte). Il avait écarté le
+prénom au premier tour ; il l'a demandé ici explicitement.
+
+- **Partie 1 « Faisons connaissance »** (armée sur `#univers`, ou la grille
+  du catalogue) : prénom (champ, facultatif, 40 car. max), usages (multi),
+  lieu. **Partie 2 « Pour affiner nos conseils »** (armée sur `#services`,
+  ou `#contact` = le pied de page sur le catalogue) : nombre de postes,
+  priorités (multi, **2 au plus** : autonomie, légèreté, puissance,
+  solidité, juste prix), neuf / reconditionné / peu importe. Les deux
+  dernières questions sont un choix de ma part (le client a demandé « 6
+  questions » sans les préciser) — orientées besoin, toujours pas de budget.
+  Définitions : `QUESTIONS` et `PARTIES` dans `profil.js`.
+- Chaque passage = un parcours à étapes : barre de progression, « Faisons
+  connaissance · Question 2 sur 3 », **« ← Précédent » / « Suivant → »**,
+  « C'est noté » à la dernière. Un clic sur un choix le coche seulement ;
+  c'est « Suivant » qui enregistre et avance (un choix non coché = question
+  passée, sans effacer l'ancienne réponse). Entrée dans le champ prénom =
+  « Suivant ». « Enchanté, Awa. » juste après le prénom ; « Merci Awa,
+  c'est noté » à la fin ; « Bon retour parmi nous, Awa » ; titre de la
+  sélection « Sélectionné pour vous, Awa ». Le prénom part aussi dans le
+  bloc « Besoin exprimé » du devis.
+- Les interrupteurs de l'univers (et « Mon besoin a changé ») ouvrent les
+  **six** d'affilée (« Votre besoin · Question 1 sur 6 »).
+- Choix coché : teinte cyan + « ✓ », plus le fond marine plein — il se
+  confondait avec le bouton « Suivant / C'est toujours ça » (capture du
+  client). Même style pour les puces d'usage de la sélection.
+- `estVide()` = **aucun usage connu** (avant : aucune des réponses) — sans
+  usage, « Pour vous » n'aurait aucun produit à montrer ; prénom, lieu,
+  priorités… ne font que départager.
+- Classement : priorités et état ajoutés à `scoreProduit()` (autonomie /
+  légèreté → mobilité ; puissance → création, gaming ; solidité → pro,
+  entreprise ; juste prix → reconditionné ou ≤ 400 000 FCFA ; reconditionné
+  demandé → +3 aux reconditionnés).
+
+### 4e passe : la question « métier »
+
+Retour du client : *« au niveau des besoins il manque un truc : est-ce pour
+un dev, un graphiste, un monteur vidéo, un architecte… ? »*. Ajout de
+**« Quel est votre métier ? »** en partie 1, juste après le prénom (partie 1
+= prénom, métier, usages, lieu ; partie 2 inchangée ; 7 questions au total).
+
+- `METIERS` dans `profil.js` : 10 métiers + « Autre ». Chacun porte des
+  `usages` (**pré-cochés** à la question suivante quand l'usage n'est pas
+  encore connu, avec « D'après votre métier, nous avons pré-coché ce qui
+  vous ressemble — ajustez librement ») et des sous-catégories `sous` qui
+  lui servent vraiment (monteur vidéo → portables création, stockage,
+  stations, audio ; graphiste → écrans…), **+2** dans `scoreProduit()`.
+- « Autre » n'est pas une puce : c'est le champ libre sous la liste
+  (« Autre métier ? Précisez-le ici », 60 car.) → `metier: 'autre'` +
+  `metierLibre`. Taper dans le champ décoche les puces ; choisir une puce
+  vide le champ.
+- Le métier entre dans le résumé (« Pensé pour : monteur vidéo et
+  création ») et dans le bloc « Besoin exprimé » du devis.
+- La carte ne dépasse jamais l'écran (`max-height` + défilement interne) :
+  la question métier a beaucoup de puces. Sur mobile, elle tient entre la
+  nav et les boutons flottants.
+
+## Photos partout à la place des dessins de PC (septembre 2026)
+
+Demande du client : *« les parties où on voit les PC, assure d'utiliser toutes
+les images de PC au lieu de faire des illustrations »*. Il restait 11
+ordinateurs sur 19 en dessin (HP 250, IdeaPad, Acer, Vivobook, Asus TUF,
+Legion, Precision, et les 4 postes fixes). **Les 19 ont désormais une photo.**
+
+Règle suivie (script de recadrage 4:3 : autocontrast + UnsharpMask, comme
+les passes précédentes) :
+- **Même marque quand c'est possible** : HP 250 → HP fermé de la vitrine ;
+  IdeaPad → Lenovo au démarrage ; Legion → Lenovo écran couleur ;
+  Precision → Dell fermé.
+- **Aucune photo d'Acer, d'Asus ni de poste fixe** dans le lot du client :
+  recadrages des rayons et des cartons de la boutique **où aucune marque ne
+  se lit** (le premier recadrage « Asus TUF » laissait voir un logo Dell et
+  un ThinkPad : refait).
+- Ces 11 produits portent `photoBoutique: true` dans `produits.js` → la
+  fiche produit affiche « Photo prise dans notre boutique de
+  Torokorobougou. La photo du modèle exact vous est envoyée sur demande. »
+  (même principe que la note « Illustration de la famille » d'avant).
+- Écartées volontairement : `bento-windows-laptop.jpg`, `bento-macbook.jpg`,
+  `hero-macbook-mystic.jpg` (origine inconnue, pas de licence documentée) —
+  pas de photo d'origine douteuse sur une fiche produit.
+- Articles de conseil qui parlent d'ordinateurs : champ `img` dans
+  `articles.js` (choisir un portable, équiper un bureau, neuf ou
+  reconditionné, sécuriser son poste) → photo dans la carte et en tête de
+  la lecture. Onduleurs et Wi-Fi gardent leur dessin (pas de photo).
+- Bloc « Vente & conseil » : photo de la vitrine LED (`vente-vitrine.jpg`)
+  au lieu du dessin de portable. Lignes du tiroir « Ma sélection » : la
+  photo du produit quand elle existe.
+- Fichiers : `assets/img/produits/ordinateurs/{portables-etudes,
+  portables-creation,bureau}/`, `assets/img/conseils/`.
+
+**Reste en dessin** (aucune photo fournie) : accessoires, matériel réseau,
+blocs Maintenance (onduleur) et Installation réseau (baie). **À demander au
+client** : de vraies photos des postes fixes (aujourd'hui des photos de
+cartons/rayons) et du hero — `hero-tablet-desk.jpg` est toujours la photo
+de travail Pinterest **sans licence commerciale**, à remplacer avant la
+mise en ligne.
+
+## Mode jour seul (septembre 2026)
+
+Décision du client : *« on va rester uniquement sur le mode jour, en fond
+blanc, désactive le mode nuit/jour »*. Le site est **figé en mode jour** :
+`<html lang="fr" data-theme="light">` en dur dans les trois pages. Retirés :
+les boutons soleil/lune (nav + menu mobile), le script anti-flash et
+`activerBasculeTheme()`. Un ancien choix « nuit » resté dans le
+`localStorage` des visiteurs est simplement ignoré.
+
+**Le CSS des deux thèmes est conservé** (jetons de `:root` = nuit, bloc
+`:root[data-theme="light"]` = jour) : pour réactiver la bascule un jour,
+remettre les boutons et la fonction (voir l'historique « Bascule jour /
+nuit » plus haut). Toutes les notes de ce fichier qui parlent du « mode
+nuit » décrivent donc un état non visible aujourd'hui.
+
+## Page Conseils (septembre 2026)
+
+Demande : recréer les conseils autour du ton réel de l'entreprise sur les
+réseaux — les idées reçues (« un i7 est plus fort qu'un i5 »), l'ironie
+(« vous voulez un carton coûte que coûte… vous allez manger le carton ? »),
+le prix (« même prix que les autres : chez qui achèteriez-vous ? — pour le
+SAV et la qualité — voilà la vraie différence »). Structure choisie par le
+client : **3 conseils sur l'accueil qui mènent à une vraie page
+`conseils.html`**, comme le catalogue (le site a donc de nouveau trois pages
++ la 404 ; « Conseils » est revenu dans la nav, lien vers la page).
+
+- `js/data/articles.js` : `RUBRIQUES` (Idées reçues, Le vrai prix, Bien
+  choisir, Entretien & sécurité, Entreprise & réseau), champ `rubrique`
+  (remplace `categorie`, recalculé pour le code existant), `citation`
+  (phrase-choc affichée en grand), nouveau bloc `dialogue` (bulles
+  Client / Dilitech dans la lecture). 3 nouveaux posts rédigés dans le ton
+  du patron à partir de ses exemples — **à relire par le client**.
+- `js/components/carte-conseil.js` : carte « publication » (avatar, date,
+  rubrique, citation, chapo), partagée accueil / page. Accueil : lien vers
+  `conseils.html?article=slug` ; page : lecture en panneau sur place.
+- `conseils.html` + `js/pages/conseils.js` : filtres par rubrique (URL
+  `?rubrique=`), le plus récent « à la une » en pleine largeur, liens
+  Facebook / TikTok (« ces conseils, nous les publions d'abord ici »).
+- Photos : `assets/img/conseils/` (sticker Intel Core i7, carton ThinkPad,
+  vitrine pour le prix).
+
+### Conseils = aussi le blog des publications Facebook
+
+Le client : *« la page conseil sert aussi de blog d'articles, regarde la
+page Facebook et recense toi-même »*. Relevé fait avec Playwright sur la
+page publique (sans connexion, Facebook ne laisse charger que les
+publications les plus récentes — **9 accessibles**). 7 reprises sur le
+site, texte exact dans un bloc `publication` + un court développement de
+notre part ; 2 écartées car hors sujet informatique (un post sur un
+consultant en communication, une citation sur la richesse). Textes bruts,
+dates relatives et visuels d'origine : `assets/originaux/facebook/`.
+
+- Nouvelles rubriques : **Franc-parler** (phrases du patron), **En
+  boutique** (machines du moment — ThinkPad X1 Yoga Gen 7 à 380 000),
+  **Auprès de vous** (clients, réussites : le post du diplôme).
+- Champs ajoutés : `source` (lien vers la publication ; carte « Facebook »,
+  lecture « Voir la publication sur Facebook »), `format: 'texte'`
+  (publication sans image → phrase en grand sur fond sombre, comme le post),
+  `cadrage` (object-position des photos portrait).
+- Piège : dans `.post__visuel` (grille centrée), une image en
+  `height: 100%` ne remplissait pas la case et montrait le haut de la photo
+  (le plafond au lieu du visage) : les photos sont maintenant en
+  `position: absolute; inset: 0`.
+- **À signaler au client** : la page Facebook affiche l'e-mail
+  `Cisseboubacar605@gmail.com`, le LinkedIn `linkedin.com/company/dilitech`
+  et un site `dilitech.odoo.com` ; le site utilise toujours
+  `contact@dilitech.ml` (jamais confirmé). Pour ajouter d'autres
+  publications : copier le texte dans une entrée d'`ARTICLES` avec
+  `source`, et l'image dans `assets/img/conseils/`.
+
+## Fiche produit refaite + galerie (septembre 2026)
+
+Demande : *« un meilleur design, et plusieurs images d'un ordi »*. Panneau
+élargi à 1080px ; nouvelle mise en page `.pf` (panneau-produit.js,
+`#rendre`) :
+- **Galerie** à gauche (reste en place au défilement) : grande photo 4:3,
+  flèches, compteur « 2 / 6 », vignettes, flèches du clavier, glisser au
+  doigt. Photos : `galerieDe(p)` dans **`js/data/galeries.js`** = photo
+  principale, puis les autres vues de la même marque prises en boutique
+  (`assets/img/produits/galerie/`), puis la vitrine et les rayons. 3 à 6
+  photos par ordinateur. `MEME_PHOTO` évite de montrer deux fois la même
+  photo d'origine ; **les postes fixes n'héritent pas des vues de portables**
+  de leur marque (trompeur). Note sous la galerie : « Photos prises dans
+  notre boutique, sur la gamme de ce modèle — demandez la photo de votre
+  machine exacte ». Le jour où le client fournit les photos d'un modèle :
+  champ `galerie: [...]` sur le produit, elle passe devant tout.
+- À droite : marque · référence · état, nom, résumé, **« Correspond à ce
+  que vous nous avez dit »** (si le concierge connaît l'usage, via
+  `profil.scoreProduit`), 4 caractéristiques clés en tuiles, bloc prix /
+  stock / quantité / ajout, **bouton WhatsApp pré-rempli** avec le produit,
+  garanties, usages recommandés.
+- En bas : caractéristiques complètes et disponibilité en deux cartes,
+  puis « à comparer ».
+- Piège : enfants de grille sans `min-width: 0` → la bande de vignettes
+  élargissait la colonne au-delà de l'écran sur mobile.
+
 ## Stack
 
 - **100 % statique** : HTML / CSS / **modules ES natifs**. Aucun framework,
@@ -581,24 +1096,32 @@ bénéfice de la nav flottante, pas une refonte de leurs propres sections.
 - Vérification visuelle : Playwright, appelé depuis le dossier temporaire —
   aucune dépendance ajoutée au projet.
 
-## Pages
+## Pages — deux, depuis septembre 2026
+
+Le site tenait sur 9 pages jusqu'à une demande explicite du client :
+*« je veux voir tout sur une seule page, un site single page comme pour
+Toguna Motors, il y'aura juste une page à part pour le catalogue »*, puis
+*« si tu peux même supprimer les autres pages HTML, garde juste l'index.html
+et le catalogue.html »*. Voir « Fusion en page unique » plus bas pour
+l'historique complet de cette passe.
 
 | Fichier | Contenu |
 |---|---|
-| `index.html` | hero, marques, 3 univers, sélection du moment, « le conseil avant le produit », services, réseau, conseils, appel |
-| `catalogue.html` | filtres, recherche, tri, grille par tranches |
-| `produit.html?id=` | fiche : specs, prix, **disponibilité par partenaire**, similaires |
-| `services.html` | 6 métiers, filières de formation, équipement de parc |
-| `reseau.html` | le siège, les 6 partenaires, comment ça se passe |
-| `conseils.html` | liste filtrable par thème |
-| `article.html?a=` | lecture d'un article + produits recommandés |
-| `contact.html` | formulaire de devis, coordonnées, questions fréquentes |
-| `404.html` | page d'erreur |
+| `index.html` | hero, marques, univers, sélection du moment, « le conseil avant le produit », **services complets** (6 métiers, filières, parc), **réseau complet** (siège, 6 partenaires, vie locale, comment ça se passe), **conseils complets** (filtrable, 6 articles) — le contact tient dans le pied de page (`<site-pied>`, présent sur les deux pages), pas de grande section dédiée |
+| `catalogue.html` | filtres, recherche, tri, grille par tranches — seule page restée à part (filtres + recherche en justifient une) |
+| `404.html` | page d'erreur — gardée pour l'hébergeur, jamais un lien de nav |
+
+**Fiche produit et lecture d'un article ne sont plus des pages** —
+`produit.html` et `article.html` ont été supprimées. Elles s'ouvrent en
+**panneau superposé** (`<panneau-produit>`, `<panneau-article>`, même
+mécanique que `<panneau-devis>`) par-dessus la page courante, avec l'état
+dans l'URL (`?produit=DT-…`, `?article=slug`) pour rester partageables —
+voir « Panneaux superposés » plus bas.
 
 **Il n'y a AUCUN script de génération de pages.** La navigation et le pied de
 page sont des **éléments personnalisés** — `<site-entete page="…">` et
 `<site-pied>` — définis dans `js/components/chrome.js`. Modifier ce fichier
-met les neuf pages à jour. (C'est la différence avec Farafinatignɛ, qui
+met les deux pages à jour. (C'est la différence avec Farafinatignɛ, qui
 regénérait ses pages avec `tools/build-pages.py`.)
 
 ## Architecture JS
@@ -612,21 +1135,32 @@ js/
     articles.js           6 conseils, corps en blocs typés (jamais de HTML brut)
     illustrations.js      22 dessins d'appareils
   core/
-    dom.js                $, $$, esc, html``, debounce, parFrame
+    dom.js                $, $$, esc, html``, debounce, parFrame, definirParametre
     store.js              magasin réactif : Proxy + localStorage + BroadcastChannel
     catalogue.js          ★ COUCHE D'ACCÈS — filtres, tri, disponibilité, stats
     devis.js              sélection, quantités, message WhatsApp
-    ui.js                 apparition au défilement, notifications, piège à focus
+    ui.js                 apparition au défilement, notifications, piège à focus,
+                           scrollspy de nav (activerScrollspy)
     icones.js             jeu d'icônes
   components/
-    chrome.js             <site-entete> et <site-pied>
-    carte-produit.js      la carte, une seule pour tout le site
-    panneau-devis.js      <panneau-devis>, le tiroir de sélection
+    chrome.js              <site-entete> et <site-pied>
+    carte-produit.js       la carte, une seule pour tout le site
+    panneau-devis.js       <panneau-devis>, le tiroir de sélection
+    panneau-produit.js     <panneau-produit>, fiche produit en panneau (ex-produit.html)
+    panneau-article.js     <panneau-article>, lecture d'un article en panneau (ex-article.html)
   pages/
-    commun.js             ★ chargé par toutes les pages, délégation globale
-    accueil.js catalogue.js produit.js services.js reseau.js conseils.js
-    article.js contact.js
+    commun.js              ★ chargé par les deux pages, délégation globale,
+                            injecte les trois panneaux
+    accueil.js              TOUT index.html : hero, univers, sélection, services,
+                            réseau (siège+partenaires+vie locale), conseils
+    catalogue.js            catalogue.html
 ```
+
+Les anciens `services.js`, `reseau.js`, `conseils.js`, `contact.js`,
+`produit.js` et `article.js` ont été **fusionnés dans `accueil.js`** (le
+rendu) et dans `panneau-produit.js`/`panneau-article.js` (les deux fiches).
+Rien n'a été réécrit dans la logique elle-même, seulement déplacé — même
+balisage, mêmes classes CSS, mêmes fonctions de `core/catalogue.js`.
 
 ### Les deux fichiers à comprendre avant de toucher au reste
 
@@ -656,9 +1190,13 @@ recherche, tranches) **sans jamais rebrancher d'écouteurs ni en laisser fuir**.
 - **Les références `DT-PC-001`… sont générées** en fin de `produits.js`, dans
   l'ordre du tableau : **insérer un produit au milieu décale toutes les
   suivantes** — ajouter en fin de bloc de sous-catégorie.
-- Les modules de page qui appellent des `const` fléchées définies plus bas
-  doivent **placer leur aiguillage en fin de fichier** (zone morte
-  temporelle). C'est le cas de `produit.js`, et c'est commenté sur place.
+- **Les panneaux superposés** (`panneau-devis.js`, `panneau-produit.js`,
+  `panneau-article.js`) partagent tous la même mécanique : voile, piège à
+  focus (`piegerFocus`), verrouillage du défilement, classe `.est-ouvert`
+  pour la transition. `panneau-produit`/`panneau-article` ajoutent en plus
+  `definirParametre()` (`core/dom.js`) pour que `?produit=`/`?article=`
+  vivent dans l'URL — un lien vers une fiche reste donc partageable, et le
+  bouton « précédent » referme le panneau au lieu de quitter le site.
 
 ## Le parcours de devis
 
@@ -667,8 +1205,8 @@ C'est le seul tunnel du site. **Aucun paiement en ligne** — hors périmètre V
 1. Le visiteur ajoute des produits depuis n'importe où (`.js-ajouter`)
 2. La sélection vit dans `localStorage` et **se synchronise entre les onglets**
    (BroadcastChannel)
-3. Le tiroir `<panneau-devis>` ou le formulaire de `contact.html` — **le même
-   moteur** — collecte nom et téléphone (**obligatoires**)
+3. Le tiroir `<panneau-devis>` ou le formulaire de `index.html#contact` —
+   **le même moteur** — collecte nom et téléphone (**obligatoires**)
 4. Un récapitulatif texte part sur **WhatsApp**, avec les références `DT-…`
    pour que la saisie côté Dilitech soit sans ambiguïté. Repli par e-mail.
 

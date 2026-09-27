@@ -18,6 +18,7 @@
 import './commun.js';
 
 import * as cat from '../core/catalogue.js';
+import * as profil from '../core/profil.js';
 import { PARTENAIRES } from '../data/partenaires.js';
 import { grilleProduits, carteProduit } from '../components/carte-produit.js';
 import { prix as fmtPrix, nombre } from '../config.js';
@@ -335,6 +336,35 @@ function jetonsActifs() {
   }
 }
 
+/* --- suggestion tirée de ce que le visiteur a dit de son usage ---------
+   Jamais appliquée d'office : seulement proposée, et seulement quand aucun
+   filtre n'est posé (sinon on contredirait un choix qu'il vient de faire). */
+
+function aucunFiltre() {
+  return !etat.q && !etat.cat && !etat.sous && !etat.marques.length && !etat.usages.length &&
+    !etat.etat && !etat.partenaire && !etat.promo &&
+    etat.prixMin <= BORNES.min && etat.prixMax >= BORNES.max;
+}
+
+function suggestionUsage() {
+  const zone = $('[data-suggestion]');
+  if (!zone) return;
+  const usages = profil.etat().usages;
+  if (!usages.length || !aucunFiltre()) {
+    zone.innerHTML = '';
+    return;
+  }
+  const noms = usages.map((u) => cat.USAGES.find((x) => x.code === u)?.nom ?? u).join(', ');
+  zone.innerHTML = `
+    <div class="suggestion-usage">
+      ${icone('etincelle')}
+      <span>Vous nous avez dit : <b>${esc(noms)}</b>.</span>
+      <button type="button" class="suggestion-usage__btn" data-appliquer-usage>
+        N’afficher que ce qui vous convient ${icone('fleche')}
+      </button>
+    </div>`;
+}
+
 /* =========================================================================
    4. GRILLE ET CHARGEMENT PAR TRANCHES
    ========================================================================= */
@@ -396,6 +426,7 @@ function rafraichir({ garderPrix = false } = {}) {
   filtrePartenaires();
   if (!garderPrix) filtrePrix();
   jetonsActifs();
+  suggestionUsage();
   rendreResultats();
   majTitre();
 }
@@ -501,6 +532,17 @@ function brancher() {
     ecrireUrl(etat);
     rendreResultats();
   });
+
+  /* --- suggestion d'usage (réponses données au concierge) --- */
+  $('[data-suggestion]')?.addEventListener('click', (e) => {
+    if (!e.target.closest('[data-appliquer-usage]')) return;
+    etat.usages = [...profil.etat().usages];
+    ecrireUrl(etat);
+    rafraichir({ garderPrix: true });
+  });
+  /* Une réponse donnée pendant qu'on est sur le catalogue fait apparaître la
+     suggestion tout de suite. */
+  profil.abonner(suggestionUsage, { immediat: false });
 
   /* --- retrait d'un jeton --- */
   $('[data-actifs]').addEventListener('click', (e) => {

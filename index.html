@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -70,7 +70,7 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </span>
           </a>
-          <a href="contact.html" class="cta-link">
+          <a href="index.html#contact" class="cta-link">
             <span class="cta-link__dot"></span>
             Demander un devis
           </a>
@@ -134,7 +134,7 @@
       </p>
 
       <div class="bento">
-        <a href="services.html#sav" class="bento__tile bento__tile--a reveal">
+        <a href="index.html#sav" class="bento__tile bento__tile--a reveal">
           <p class="bento__eyebrow">Sur chaque machine vendue.</p>
           <div class="bento__recu">
             <span class="bento__recu-ic"><span class="ic" data-ic="bouclier"></span></span>
@@ -153,28 +153,38 @@
           <p class="bento__mini bento__mini--centre">Marques distribuées</p>
         </a>
 
-        <a href="reseau.html" class="bento__tile bento__tile--c reveal">
+        <a href="index.html#reseau" class="bento__tile bento__tile--c reveal">
           <p class="bento__titre bento__titre--grand">Un stock qui dépasse <em>Bamako.</em></p>
           <div class="bento__carte" data-bento-carte aria-hidden="true"></div>
           <p class="bento__legende">Point le plus actif après le siège : <b>Abidjan.</b></p>
         </a>
 
-        <a href="catalogue.html" class="bento__tile bento__tile--d reveal">
+        <!-- Tuile-lien vers le catalogue ; l'interrupteur « pour mon usage »
+             est un vrai bouton posé AU-DESSUS du lien étiré (un bouton ne peut
+             pas vivre dans un <a>). Il rouvre les questions du concierge. -->
+        <div class="bento__tile bento__tile--d reveal">
+          <a class="bento__etire" href="catalogue.html" aria-label="Voir tout le catalogue"></a>
           <p class="bento__phrase">Choisies pour l'usage, jamais pour la fiche technique.</p>
           <p class="bento__nombre" data-bento-references>0</p>
           <div class="bento__d-bas">
             <span class="bento__nombre-mini">références en ligne</span>
-            <span class="bento__toggle bento__toggle--sombre" aria-hidden="true"><i></i></span>
+            <span class="bento__bascule-usage">
+              <span class="bento__bascule-mot">Adapté à mon usage</span>
+              <button type="button" class="bento__toggle js-ouvrir-conseiller" role="switch"
+                      aria-checked="false" aria-label="Adapter la sélection à mon usage" data-etat-profil><i></i></button>
+            </span>
           </div>
-        </a>
+        </div>
 
-        <a href="services.html" class="bento__tile bento__tile--e reveal">
-          <span class="bento__toggle" aria-hidden="true"><i></i></span>
-          <p class="bento__titre bento__titre--grand">Le conseil avant <em>le produit.</em></p>
-          <p class="bento__mini">Notre méthode</p>
-        </a>
+        <!-- « Le conseil avant le produit » : la tuile entière invite à dire son
+             usage — interrupteur éteint tant qu'on ne sait rien, allumé ensuite. -->
+        <button type="button" class="bento__tile bento__tile--e reveal js-ouvrir-conseiller">
+          <span class="bento__toggle" data-etat-profil aria-hidden="true"><i></i></span>
+          <span class="bento__titre bento__titre--grand">Le conseil avant <em>le produit.</em></span>
+          <span class="bento__mini" data-profil-mini="Dites-nous votre usage →">Dites-nous votre usage →</span>
+        </button>
 
-        <a href="reseau.html" class="bento__tile bento__tile--g reveal">
+        <a href="index.html#reseau" class="bento__tile bento__tile--g reveal">
           <p class="bento__mini">Réseau régional</p>
           <span class="bento__badge-nb" data-bento-villes>0</span>
           <p class="bento__mini">Villes desservies</p>
@@ -194,17 +204,29 @@
   </section>
 
   <!-- ===================================================================
-       SÉLECTION DU MOMENT
+       SÉLECTION — « du moment » tant qu'on ne sait rien du visiteur,
+       « pour vous » dès qu'il a dit son usage (puces ci-dessous ou cartes du
+       concierge ; même mémoire, js/core/profil.js). Titres et onglets posés
+       par selection() dans accueil.js.
        =================================================================== -->
   <section class="sec--brume" id="selection">
     <div class="wrap">
       <header class="tete-duo">
         <div>
-          <p class="surtitre">En ce moment</p>
-          <h2 class="titre">Notre sélection <em>du moment.</em></h2>
+          <p class="surtitre" data-selection-surtitre>En ce moment</p>
+          <h2 class="titre" data-selection-titre>Notre sélection <em>du moment.</em></h2>
         </div>
         <div class="onglets" role="tablist" aria-label="Filtrer la sélection" data-onglets></div>
       </header>
+
+      <div class="usage-choix">
+        <p class="usage-choix__q">
+          Pour quel usage&nbsp;?
+          <span>Dites-le nous, la sélection s’adapte — et nous nous en souviendrons.</span>
+        </p>
+        <div class="usage-choix__puces" role="group" aria-label="Votre usage" data-usage-puces></div>
+        <p class="usage-choix__resume" data-usage-resume hidden></p>
+      </div>
 
       <div data-selection aria-live="polite"></div>
     </div>
@@ -271,82 +293,332 @@
   </section>
 
   <!-- ===================================================================
-       SERVICES
+       SERVICES — contenu complet, repris de l'ancien services.html
        =================================================================== -->
   <section id="services">
     <div class="wrap">
-      <header class="tete-duo">
-        <div>
-          <p class="surtitre">Nos métiers</p>
-          <h2 class="titre">Au-delà de <em>la vente.</em></h2>
-        </div>
-        <a class="lien-fleche" href="services.html">
-          Voir le détail <span class="ic" data-ic="fleche"></span>
-        </a>
+      <header class="tete-sec">
+        <p class="surtitre">Nos métiers</p>
+        <h2 class="titre">Au-delà de <em>la vente.</em></h2>
+        <p class="chapeau">
+          Un matériel livré n'est pas un problème résolu. Dilitech accompagne
+          l'équipement de bout en bout : le conseil avant l'achat, l'installation,
+          la maintenance, et le service après-vente assuré par la même équipe.
+        </p>
+      </header>
+    </div>
+  </section>
+
+  <section id="vente">
+    <div class="wrap bloc-serv">
+      <div class="bloc-serv__txt">
+        <p class="surtitre">01 — Vente & conseil</p>
+        <h3 class="titre">La bonne machine, <em>pas la plus chère.</em></h3>
+        <p class="chapeau">
+          Nous distribuons toutes les grandes marques d'ordinateurs portables et
+          fixes, neufs ou reconditionnés en atelier, ainsi que l'ensemble des
+          accessoires du poste de travail. Mais notre travail commence avant :
+          comprendre ce que la machine devra encaisser.
+        </p>
+        <ul class="liste-p">
+          <li>Ordinateurs portables et postes fixes, toutes marques</li>
+          <li>Reconditionnés testés, batterie et disque remplacés, garantie 6 mois</li>
+          <li>Écrans, périphériques, stockage, onduleurs, sacoches, impression</li>
+          <li>Postes assemblés dans notre atelier, configurés selon le budget</li>
+          <li>Devis chiffré, avec les alternatives que nous aurions choisies</li>
+        </ul>
+        <a class="btn btn--plein" href="catalogue.html">Parcourir le catalogue</a>
+      </div>
+      <div class="bloc-serv__vis bloc-serv__vis--photo reveal" aria-hidden="true">
+        <img src="assets/img/vente-vitrine.jpg" alt="" loading="lazy" decoding="async">
+      </div>
+    </div>
+  </section>
+
+  <section class="sec--brume" id="maintenance">
+    <div class="wrap bloc-serv bloc-serv--inv">
+      <div class="bloc-serv__txt reveal">
+        <p class="surtitre">02 — Maintenance PC</p>
+        <h3 class="titre">Un atelier, <em>pas seulement un comptoir.</em></h3>
+        <p class="chapeau">
+          La plupart des machines que l'on croit bonnes à remplacer ne le sont
+          pas. Un diagnostic honnête coûte moins cher qu'un achat inutile — et
+          quand le remplacement s'impose, nous le disons aussi.
+        </p>
+        <ul class="liste-p">
+          <li>Diagnostic complet et devis établi <b>avant</b> toute intervention</li>
+          <li>Nettoyage, dépoussiérage, remplacement de la pâte thermique</li>
+          <li>Remplacement de batterie, de disque, ajout de mémoire</li>
+          <li>Réinstallation système et transfert des données</li>
+          <li>Récupération de données sur disque défaillant</li>
+          <li>Désinfection et remise en état après compromission</li>
+        </ul>
+        <a class="btn btn--plein" href="index.html#contact">Demander un diagnostic</a>
+      </div>
+      <div class="bloc-serv__vis reveal" data-illus="onduleur" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <section id="sav">
+    <div class="wrap bloc-serv">
+      <div class="bloc-serv__txt reveal">
+        <p class="surtitre">03 — Service après-vente</p>
+        <h3 class="titre">La garantie <em>est écrite.</em></h3>
+        <p class="chapeau">
+          Douze mois sur le matériel neuf, six mois sur nos reconditionnés, avec
+          le rapport de test remis à la livraison. Le suivi est assuré par
+          l'équipe qui a vendu : personne ne vous renverra vers un autre service.
+        </p>
+        <ul class="liste-p">
+          <li>Suivi des garanties constructeur et garantie atelier Dilitech</li>
+          <li>Prise en charge des retours et des échanges</li>
+          <li>Prêt de matériel selon disponibilité pendant l'immobilisation</li>
+          <li>Historique d'intervention conservé par machine</li>
+        </ul>
+      </div>
+      <div class="bloc-serv__vis bloc-serv__vis--photo reveal" aria-hidden="true">
+        <img src="assets/img/agent-sav.jpg" alt="" loading="lazy" decoding="async">
+      </div>
+    </div>
+  </section>
+
+  <section class="sec--brume" id="service-reseau">
+    <div class="wrap bloc-serv bloc-serv--inv">
+      <div class="bloc-serv__txt reveal">
+        <p class="surtitre">04 — Installation réseau</p>
+        <h3 class="titre">Du plan d'implantation <em>à la mise en service.</em></h3>
+        <p class="chapeau">
+          Un réseau qui coupe fait perdre plus de temps qu'un ordinateur lent.
+          Nous relevons la couverture réelle avant de proposer du matériel —
+          c'est la seule façon de ne pas vendre une borne qui ne changera rien.
+        </p>
+        <ul class="liste-p">
+          <li>Relevé de couverture Wi-Fi sur site et plan d'implantation</li>
+          <li>Câblage Cat 6 serti sur mesure, repéré et étiqueté</li>
+          <li>Baies brassées, panneaux, bandeaux de prises, onduleur de baie</li>
+          <li>Routeurs, switchs administrables, bornes Wi-Fi pilotées</li>
+          <li>Vidéosurveillance IP : caméras, enregistreur, accès à distance</li>
+          <li>Documentation du réseau remise à la livraison</li>
+        </ul>
+        <a class="btn btn--plein" href="catalogue.html?cat=reseau">Voir le matériel réseau</a>
+      </div>
+      <div class="bloc-serv__vis reveal" data-illus="baie" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <section id="formation">
+    <div class="wrap">
+      <header class="tete-sec tete-sec--centre">
+        <p class="surtitre">05 — Formations professionnelles</p>
+        <h3 class="titre">Le matériel ne suffit pas, <em>il faut savoir s'en servir.</em></h3>
+        <p class="chapeau">
+          Dilitech ouvre des sessions de formation professionnelle à Bamako.
+          Inscriptions ouvertes — contactez-nous pour le calendrier et les
+          conditions de la filière qui vous intéresse.
+        </p>
       </header>
 
-      <div class="services" data-services></div>
+      <div class="filieres" data-filieres></div>
+
+      <div class="cta__actions" style="margin-top:34px">
+        <a class="btn btn--plein" href="index.html#contact">Demander le calendrier</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="nuit coupe-duo sur-nuit" id="parc">
+    <div class="motif circuit"></div>
+    <div class="wrap">
+      <header class="tete-sec tete-sec--centre">
+        <p class="surtitre">06 — Équipement de parc</p>
+        <h3 class="titre">Équiper dix postes, <em>ou cent.</em></h3>
+        <p class="chapeau">
+          Pour les entreprises, les administrations, les ONG et les écoles :
+          un chiffrage poste par poste, du matériel homogène, et une mise en
+          service coordonnée avec nos partenaires régionaux.
+        </p>
+      </header>
+
+      <div class="etapes">
+        <article class="etape reveal">
+          <p class="etape__n">1</p>
+          <h3>Recensement</h3>
+          <p>Nombre de postes, usages par service, existant à conserver, contraintes de budget et de délai.</p>
+        </article>
+        <article class="etape reveal">
+          <p class="etape__n">2</p>
+          <h3>Chiffrage</h3>
+          <p>Un devis ligne à ligne, avec les postes, le réseau, l'énergie et les licences — rien d'oublié en cours de route.</p>
+        </article>
+        <article class="etape reveal">
+          <p class="etape__n">3</p>
+          <h3>Livraison & installation</h3>
+          <p>Préparation des machines en atelier, image système commune, installation et câblage sur site.</p>
+        </article>
+        <article class="etape reveal">
+          <p class="etape__n">4</p>
+          <h3>Suivi</h3>
+          <p>Garanties centralisées, interventions de maintenance, et interlocuteur unique chez Dilitech.</p>
+        </article>
+      </div>
+
+      <div class="cta__actions" style="margin-top:38px">
+        <a class="btn btn--cyan btn--lueur" href="index.html#contact">Nous confier un chiffrage</a>
+      </div>
     </div>
   </section>
 
   <!-- ===================================================================
-       LE RÉSEAU
+       LE RÉSEAU — contenu complet, repris de l'ancien reseau.html
        =================================================================== -->
   <section class="sec--brume" id="reseau">
     <div class="wrap">
-      <header class="tete-duo">
-        <div>
-          <p class="surtitre">Notre réseau</p>
-          <h2 class="titre">Bamako, <em>et six capitales.</em></h2>
-        </div>
-        <a class="lien-fleche" href="reseau.html">
-          Tout le réseau <span class="ic" data-ic="fleche"></span>
-        </a>
+      <header class="tete-sec">
+        <p class="surtitre">Notre réseau</p>
+        <h2 class="titre">Bamako, <em>et six capitales.</em></h2>
+        <p class="chapeau">
+          Le stock ne dort pas dans un seul entrepôt. Dilitech s'appuie sur un
+          réseau de partenaires revendeurs en Afrique de l'Ouest et centrale :
+          ce que nous n'avons pas ici, un partenaire l'a souvent déjà.
+        </p>
+      </header>
+      <ul class="heros__preuves" data-preuves></ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap" data-siege></div>
+  </section>
+
+  <section class="sec--brume">
+    <div class="wrap">
+      <header class="tete-sec">
+        <p class="surtitre">Partenaires revendeurs</p>
+        <h3 class="titre">Six points d'appui <em>dans la région.</em></h3>
+        <p class="chapeau">
+          Chaque partenaire tient son propre stock et sert sa zone. Les
+          quantités affichées sur les fiches produits sont consolidées sur
+          l'ensemble du réseau — vous savez d'où vient la machine avant de
+          commander.
+        </p>
+      </header>
+      <div class="reseau" data-partenaires></div>
+    </div>
+  </section>
+
+  <!-- ============ VIE LOCALE / ENGAGEMENT ============ -->
+  <section>
+    <div class="wrap">
+      <header class="tete-sec tete-sec--centre">
+        <p class="surtitre">Vie locale</p>
+        <h3 class="titre">Présents <em>auprès de vous, de nos clients.</em></h3>
+        <p class="chapeau">
+          Dilitech ne se limite pas à la boutique de Torokorobougou. L'entreprise
+          fournit régulièrement du matériel informatique — ordinateurs, tablettes,
+          accessoires — à des initiatives locales, et s'associe à des événements
+          qui font grandir de jeunes talents du numérique à Bamako.
+        </p>
       </header>
 
-      <div class="reseau" data-reseau-apercu></div>
+      <div class="engagement">
+        <div class="engagement__texte reveal">
+          <p>
+            Une présence qui va au-delà de la vente : sur le terrain, aux côtés
+            des porteurs de projets et des jeunes entrepreneurs qui font vivre
+            l'écosystème numérique malien.
+          </p>
+          <a class="lien-fleche" href="index.html#contact">
+            Parler d'un partenariat <span class="ic" data-ic="fleche"></span>
+          </a>
+        </div>
+
+        <div class="engagement__citation reveal">
+          <img src="assets/img/engagement/engagement-attestation.jpg"
+               alt="Un représentant Dilitech, casquette Dilitech, reçoit l'attestation de reconnaissance de 2D Digitals des mains d'une partenaire.">
+          <p class="engagement__label">Sponsor officiel — Challenge Digital « Mini-Business Concept »</p>
+          <blockquote>
+            <p>« En reconnaissance de son engagement remarquable et de son soutien
+              déterminant en tant que Sponsor officiel du Challenge Digital
+              « Mini-Business Concept », contribuant activement à la promotion
+              de l'innovation et de l'entrepreneuriat digital. »</p>
+          </blockquote>
+          <p class="engagement__signature">Attestation de reconnaissance — 2D Digitals, Bamako</p>
+        </div>
+      </div>
+
+      <div class="engagement-photos reveal">
+        <p class="engagement-photos__legende">Sur le terrain, avec nos partenaires</p>
+        <div class="engagement-photos__grille">
+          <img src="assets/img/engagement/engagement-vedette.jpg"
+               alt="Trois jeunes lauréates du Challenge Digital tenant leurs cadeaux, attestations et un ordinateur portable offert par Dilitech." loading="lazy">
+          <img src="assets/img/engagement/engagement-evenement.jpg"
+               alt="Table de remise de prix lors de l'événement, avec paniers cadeaux et carton d'ordinateur portable, devant la bannière 2D Digitals." loading="lazy">
+          <img src="assets/img/engagement/engagement-remise.jpg"
+               alt="Un représentant Dilitech, casquette Dilitech, remet un ordinateur portable et un panier cadeau à une jeune lauréate." loading="lazy">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ COMMENT ÇA MARCHE ============ -->
+  <section class="nuit coupe-duo sur-nuit">
+    <div class="motif circuit"></div>
+    <div class="wrap">
+      <header class="tete-sec tete-sec--centre">
+        <p class="surtitre">Comment ça se passe</p>
+        <h3 class="titre">De la demande <em>à la livraison.</em></h3>
+      </header>
+
+      <div class="etapes">
+        <article class="etape reveal">
+          <p class="etape__n">1</p>
+          <h3>Vous composez</h3>
+          <p>Ajoutez les produits à votre sélection depuis le catalogue, ou décrivez-nous simplement votre besoin.</p>
+        </article>
+        <article class="etape reveal">
+          <p class="etape__n">2</p>
+          <h3>Nous vérifions</h3>
+          <p>Nous confirmons la disponibilité réelle sur le réseau, le prix ferme et le délai depuis le point de vente le plus proche.</p>
+        </article>
+        <article class="etape reveal">
+          <p class="etape__n">3</p>
+          <h3>Vous recevez le devis</h3>
+          <p>Un devis chiffré, avec — si nous pensons que c'est mieux pour vous — une alternative argumentée.</p>
+        </article>
+        <article class="etape reveal">
+          <p class="etape__n">4</p>
+          <h3>Retrait ou acheminement</h3>
+          <p>Retrait au showroom de Torokorobougou, livraison sur Bamako, ou acheminement par le réseau vers votre ville.</p>
+        </article>
+      </div>
+
+      <p class="cta__note" style="text-align:center;margin-top:30px">
+        Aucun paiement en ligne : la commande se finalise avec un commercial,
+        par WhatsApp ou au showroom. Vous êtes revendeur et voulez nous
+        rejoindre ? <a href="index.html#contact">Écrivez-nous.</a>
+      </p>
     </div>
   </section>
 
   <!-- ===================================================================
-       CONSEILS
+       CONSEILS — contenu complet, repris de l'ancien conseils.html
        =================================================================== -->
   <section id="conseils">
     <div class="wrap">
       <header class="tete-duo">
         <div>
-          <p class="surtitre">Conseils d'achat</p>
+          <p class="surtitre">Conseils &amp; franc-parler</p>
           <h2 class="titre">Ce qu'on aimerait <em>vous dire en boutique.</em></h2>
         </div>
         <a class="lien-fleche" href="conseils.html">
-          Tous les articles <span class="ic" data-ic="fleche"></span>
+          Tous nos conseils <span class="ic" data-ic="fleche"></span>
         </a>
       </header>
-
-      <div class="articles" data-articles></div>
+      <!-- Les 3 plus récents ; chaque carte ouvre conseils.html, lecture ouverte. -->
+      <div class="posts posts--apercu" data-articles></div>
     </div>
   </section>
 
-  <!-- ===================================================================
-       APPEL À L'ACTION
-       =================================================================== -->
-  <section class="nuit coupe-haut sur-nuit cta" id="contact">
-    <div class="motif circuit"></div>
-    <div class="wrap cta__in">
-      <p class="surtitre">Parlons de votre besoin</p>
-      <h2 class="titre">Dites-nous ce que vous voulez faire. <em>Nous vous dirons avec quoi.</em></h2>
-      <p class="chapeau">
-        Constituez votre sélection depuis le catalogue, ou décrivez-nous
-        simplement votre besoin : nous revenons vers vous avec un devis chiffré
-        et les alternatives que nous aurions choisies à votre place.
-      </p>
-      <div class="cta__actions">
-        <a class="btn btn--cyan btn--lueur" href="catalogue.html">Composer ma sélection</a>
-        <a class="btn btn--ligne" href="contact.html">Nous écrire</a>
-      </div>
-      <p class="cta__note" data-cta-note></p>
-    </div>
-  </section>
 
 </main>
 

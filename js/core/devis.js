@@ -11,14 +11,15 @@
    dans le catalogue, pour qu'un changement de tarif ne laisse pas traîner
    un vieux montant dans le navigateur du visiteur.
 
-   PHASE 2 — `soumettre()` postera aussi la demande à l'API du logiciel de
-   gestion pour créer le Devis et sa fiche Client. Aujourd'hui, seul le
-   message WhatsApp part ; le point d'accroche est marqué plus bas.
+   PHASE 2 (faite) — `soumettre()` poste aussi la demande au logiciel de
+   gestion DiliApp (voir transmettreAuLogiciel plus bas), en plus du
+   message WhatsApp qui reste le canal garanti.
    ========================================================================= */
 
 import { creerStore } from './store.js';
 import { parId, niveauStock } from './catalogue.js';
-import { DEVIS, WHATSAPP, SITE, prix as fmtPrix } from '../config.js';
+import { API, DEVIS, WHATSAPP, SITE, prix as fmtPrix } from '../config.js';
+import { lignesBesoin } from './profil.js';
 
 /** Une ligne relue est acceptée seulement si le produit existe encore. */
 function validerEtatRelu(relu) {
@@ -124,6 +125,15 @@ export function messageTexte(coordonnees = {}) {
   if (coordonnees.email)     out.push(`E-mail : ${coordonnees.email}`);
   if (coordonnees.nom || coordonnees.telephone) out.push('');
 
+  /* Ce que le visiteur a dit de son usage sur le site (concierge ou puces
+     de la sélection) : le commercial sait à qui il parle avant de répondre. */
+  const besoin = lignesBesoin();
+  if (besoin.length) {
+    out.push('*Besoin exprimé sur le site*');
+    for (const b of besoin) out.push(`• ${b}`);
+    out.push('');
+  }
+
   if (l.length) {
     out.push(`*Sélection (${nombreArticles()} article${nombreArticles() > 1 ? 's' : ''})*`);
     for (const ligne of l) {
@@ -163,15 +173,36 @@ export function lienMail(coordonnees = {}, email) {
 }
 
 /**
- * Point de sortie unique de la demande.
+ * Transmet la demande au logiciel de gestion DiliApp (phase 2) : elle apparaît
+ * en direct dans le pipeline « Devis » des commerciaux, rattachée à la fiche
+ * client si le numéro est connu.
  *
- * PHASE 2 — insérer ici, avant l'ouverture de WhatsApp :
- *   await fetch('/api/devis', { method:'POST', headers:{'Content-Type':'application/json'},
- *     body: JSON.stringify({ client: coordonnees, lignes: store.etat.lignes }) });
- * Le back-office affichera alors la demande dans l'historique, et le CRM
- * créera la fiche client — l'enregistrement obligatoire exigé par le cahier
- * des charges. Le renvoi WhatsApp reste, il ne le remplace pas.
+ * Volontairement NON attendue : les formulaires ouvrent WhatsApp juste après
+ * `soumettre()`, et un navigateur bloque une fenêtre ouverte après une attente
+ * réseau (elle n'est plus rattachée au clic). `keepalive` laisse la requête
+ * aboutir même si la page change. Si l'API est injoignable, rien ne casse :
+ * WhatsApp reste le canal garanti.
  */
+function transmettreAuLogiciel(coordonnees) {
+  if (!API.url || !coordonnees.telephone) return;
+  fetch(`${API.url}/public/devis/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    keepalive: true,
+    body: JSON.stringify({
+      nom: coordonnees.nom || 'Visiteur du site',
+      telephone: coordonnees.telephone,
+      email: coordonnees.email || '',
+      ville: coordonnees.ville || '',
+      message: [coordonnees.structure && `Structure : ${coordonnees.structure}`, coordonnees.message]
+        .filter(Boolean).join('\n'),
+      recapitulatif: messageTexte(coordonnees).replace(/\*/g, '').replace(/_/g, ''),
+      lignes: store.etat.lignes.map((l) => ({ reference: l.id, quantite: l.qte })),
+    }),
+  }).catch(() => {});
+}
+
+/** Point de sortie unique de la demande : logiciel de gestion + WhatsApp. */
 export async function soumettre(coordonnees = {}) {
   definirClient({
     nom: coordonnees.nom ?? '',
@@ -180,6 +211,7 @@ export async function soumettre(coordonnees = {}) {
     telephone: coordonnees.telephone ?? '',
     email: coordonnees.email ?? '',
   });
+  transmettreAuLogiciel(coordonnees);
   return { lien: lienWhatsApp(coordonnees), texte: messageTexte(coordonnees) };
 }
 

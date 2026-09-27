@@ -122,6 +122,18 @@ export const grouperPar = (liste, cle) =>
     return acc;
   }, {});
 
+/**
+ * Ajoute, remplace ou retire un paramètre d'URL sans recharger la page —
+ * utilisé par les panneaux fiche produit / article pour rester partageables
+ * (voir js/components/panneau-produit.js et panneau-article.js).
+ */
+export function definirParametre(cle, valeur, { pousser = true } = {}) {
+  const url = new URL(location.href);
+  if (valeur == null) url.searchParams.delete(cle);
+  else url.searchParams.set(cle, valeur);
+  history[pousser ? 'pushState' : 'replaceState'](null, '', url);
+}
+
 /** Défilement vers une ancre en tenant compte de l'en-tête fixe. */
 export function allerA(selecteur) {
   const cible = typeof selecteur === 'string' ? $(selecteur) : selecteur;

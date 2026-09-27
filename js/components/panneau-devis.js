@@ -193,9 +193,11 @@ class PanneauDevis extends HTMLElement {
     const p = l.produit;
     return `
       <li class="pligne" data-id="${esc(p.id)}">
-        <span class="pligne__illus">${illustration(p.illus)}</span>
+        <span class="pligne__illus">${
+          p.img ? `<img src="${esc(p.img)}" alt="" loading="lazy">` : illustration(p.illus)
+        }</span>
         <div class="pligne__txt">
-          <a class="pligne__nom" href="produit.html?id=${encodeURIComponent(p.id)}">${esc(p.nom)}</a>
+          <a class="pligne__nom js-voir-produit" href="?produit=${encodeURIComponent(p.id)}" data-id="${esc(p.id)}">${esc(p.nom)}</a>
           <p class="pligne__ref">${esc(p.id)} · ${esc(fmtPrix(p.prix))}${p.unite ? ` / ${esc(p.unite)}` : ''}</p>
           <div class="qte">
             <button type="button" class="qte__b js-moins" aria-label="Retirer un">${icone('moins')}</button>

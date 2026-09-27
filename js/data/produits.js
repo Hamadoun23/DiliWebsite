@@ -151,6 +151,7 @@ export const PRODUITS = [
 
   /* ===== ORDINATEURS · portables études & bureautique ================ */
   {
+    img: 'assets/img/produits/ordinateurs/portables-etudes/hp-250.jpg', photoBoutique: true,
     cat: 'ordinateurs', sous: 'portables-etudes', marque: 'HP', illus: 'portable',
     nom: 'HP 250 G9', prix: 315000, etat: 'neuf', garantie: '12 mois',
     usages: ['etudes', 'bureautique'], tag: null,
@@ -161,6 +162,7 @@ export const PRODUITS = [
     dispo: { BKO: 15, ABJ: 8, DKR: 5, CKY: 4, LFW: 3, NDJ: 3, BGF: 2 },
   },
   {
+    img: 'assets/img/produits/ordinateurs/portables-etudes/lenovo-ideapad.jpg', photoBoutique: true,
     cat: 'ordinateurs', sous: 'portables-etudes', marque: 'Lenovo', illus: 'portable',
     nom: 'Lenovo IdeaPad Slim 3', prix: 285000, prixBarre: 325000, etat: 'neuf', garantie: '12 mois',
     usages: ['etudes', 'bureautique'], tag: 'promo',
@@ -171,6 +173,7 @@ export const PRODUITS = [
     dispo: { BKO: 11, ABJ: 6, DKR: 3, LFW: 2 },
   },
   {
+    img: 'assets/img/produits/ordinateurs/portables-etudes/acer-aspire.jpg', photoBoutique: true,
     cat: 'ordinateurs', sous: 'portables-etudes', marque: 'Acer', illus: 'portable',
     nom: 'Acer Aspire 3 A315', prix: 245000, etat: 'neuf', garantie: '12 mois',
     usages: ['etudes', 'bureautique'], tag: null,
@@ -192,6 +195,7 @@ export const PRODUITS = [
     dispo: { BKO: 14, ABJ: 5, CKY: 3, BGF: 2 },
   },
   {
+    img: 'assets/img/produits/ordinateurs/portables-etudes/asus-vivobook.jpg', photoBoutique: true,
     cat: 'ordinateurs', sous: 'portables-etudes', marque: 'Asus', illus: 'portable',
     nom: 'Asus Vivobook 15 X1504', prix: 335000, etat: 'neuf', garantie: '12 mois',
     usages: ['etudes', 'bureautique', 'professionnel'], tag: 'nouveau',
@@ -204,6 +208,7 @@ export const PRODUITS = [
 
   /* ===== ORDINATEURS · création & gaming ============================= */
   {
+    img: 'assets/img/produits/ordinateurs/portables-creation/asus-tuf.jpg', photoBoutique: true,
     cat: 'ordinateurs', sous: 'portables-creation', marque: 'Asus', illus: 'gamer',
     nom: 'Asus TUF Gaming F15', prix: 985000, etat: 'neuf', garantie: '12 mois',
     usages: ['gaming', 'creation'], tag: null,
@@ -214,6 +219,7 @@ export const PRODUITS = [
     dispo: { BKO: 5, ABJ: 3, DKR: 1 },
   },
   {
+    img: 'assets/img/produits/ordinateurs/portables-creation/lenovo-legion.jpg', photoBoutique: true,
     cat: 'ordinateurs', sous: 'portables-creation', marque: 'Lenovo', illus: 'gamer',
     nom: 'Lenovo Legion Pro 5', prix: 1495000, etat: 'neuf', garantie: '12 mois',
     usages: ['gaming', 'creation'], tag: 'nouveau',
@@ -235,6 +241,7 @@ export const PRODUITS = [
     dispo: { BKO: 2, ABJ: 1 },
   },
   {
+    img: 'assets/img/produits/ordinateurs/portables-creation/dell-precision.jpg', photoBoutique: true,
     cat: 'ordinateurs', sous: 'portables-creation', marque: 'Dell', illus: 'gamer',
     nom: 'Dell Precision 3580', prix: 1350000, etat: 'neuf', garantie: '12 mois',
     usages: ['creation', 'professionnel', 'entreprise'], tag: null,
@@ -247,6 +254,7 @@ export const PRODUITS = [
 
   /* ===== ORDINATEURS · postes fixes ================================== */
   {
+    img: 'assets/img/produits/ordinateurs/bureau/hp-prodesk.jpg', photoBoutique: true,
     cat: 'ordinateurs', sous: 'bureau', marque: 'HP', illus: 'bureau',
     nom: 'HP ProDesk 400 G9 SFF', prix: 425000, etat: 'neuf', garantie: '12 mois',
     usages: ['bureautique', 'entreprise'], tag: null,
@@ -257,6 +265,7 @@ export const PRODUITS = [
     dispo: { BKO: 10, ABJ: 5, DKR: 3, NDJ: 2 },
   },
   {
+    img: 'assets/img/produits/ordinateurs/bureau/dell-optiplex-tour.jpg', photoBoutique: true,
     cat: 'ordinateurs', sous: 'bureau', marque: 'Dell', illus: 'bureau',
     nom: 'Dell OptiPlex 7010 Tour', prix: 495000, etat: 'neuf', garantie: '12 mois',
     usages: ['bureautique', 'entreprise'], tag: null,
@@ -267,6 +276,7 @@ export const PRODUITS = [
     dispo: { BKO: 7, ABJ: 4, CKY: 2 },
   },
   {
+    img: 'assets/img/produits/ordinateurs/bureau/poste-dilitech.jpg', photoBoutique: true,
     cat: 'ordinateurs', sous: 'bureau', marque: 'Dilitech', illus: 'bureau',
     nom: 'Poste assemblé Dilitech Bureau', prix: 265000, etat: 'neuf', garantie: '12 mois',
     usages: ['bureautique', 'etudes', 'entreprise'], tag: 'best',
@@ -277,6 +287,7 @@ export const PRODUITS = [
     dispo: { BKO: 20 },
   },
   {
+    img: 'assets/img/produits/ordinateurs/bureau/dell-optiplex-aio.jpg', photoBoutique: true,
     cat: 'ordinateurs', sous: 'bureau', marque: 'Dell', illus: 'ecran',
     nom: 'Dell OptiPlex 7400 Tout-en-un 24"', prix: 720000, etat: 'neuf', garantie: '12 mois',
     usages: ['bureautique', 'entreprise'], tag: null,
