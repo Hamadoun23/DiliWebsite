@@ -283,7 +283,8 @@ function partenaires() {
 /* --- la boutique (siège & showroom) --------------------------------------
    Demandes client : parler de la boutique, pas du stock ; pas d'horaires.
    Une carte photo immersive : le mur de portables en fond, le texte sur un
-   dégradé marine, les coordonnées en pastilles, deux vignettes. */
+   dégradé marine, deux boutons. Coordonnées et vignettes retirées à la
+   demande du client (le pied de page porte déjà les coordonnées). */
 
 function siege() {
   const tel = CONTACT.telephones[0];
@@ -299,23 +300,12 @@ function siege() {
            Venez voir les machines, les prendre en main et repartir conseillé.
            Showroom, atelier et service après-vente sous le même toit.
          </p>
-         <ul class="boutique2__infos">
-           <li>${icone('broche')}<span>Commune V, ${esc(CONTACT.ville)}</span></li>
-           ${CONTACT.telephones
-             .map((t) => `<li>${icone('telephone')}<a href="tel:${esc(t.tel)}">${esc(t.label)}</a></li>`)
-             .join('')}
-           <li>${icone('mail')}<a href="mailto:${esc(CONTACT.email)}">${esc(CONTACT.email)}</a></li>
-         </ul>
          <div class="boutique2__actions">
            <a class="btn btn--cyan"
               href="https://www.google.com/maps/search/${encodeURIComponent(CONTACT.mapsQuery)}"
               target="_blank" rel="noopener">Venir à la boutique</a>
            <a class="btn boutique2__appel" href="tel:${esc(tel.tel)}">Appeler</a>
          </div>
-       </div>
-       <div class="boutique2__vignettes" aria-hidden="true">
-         <img src="assets/img/produits/galerie/boutique-etageres.jpg" alt="" loading="lazy">
-         <img src="assets/img/agent-sav.jpg" alt="" loading="lazy">
        </div>
      </div>`
   );

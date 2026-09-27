@@ -1146,7 +1146,10 @@ Demande : « la page d'accueil est trop longue, on va optimiser ».
   client), plus de stock. Carte photo immersive : mur de portables en fond,
   dégradé marine, coordonnées en pastilles, boutons « Venir à la boutique »
   (Maps) et « Appeler », deux vignettes inclinées à droite (bureau). Mobile :
-  photo en bandeau, texte dessous. `HORAIRES` n'est plus importé par
+  photo en bandeau, texte dessous. **3e passe** : pastilles de coordonnées
+  et vignettes retirées (demande client) — il reste titre, texte, deux
+  boutons. Réseau : texte (blanc) à gauche, carte à droite sur bureau
+  (`order: 2`), carte au-dessus sur mobile. `HORAIRES` n'est plus importé par
   accueil.js (toujours utilisé ailleurs via config.js si besoin).
 - **Conseils (aperçu)** : bureau = le plus récent en grand à gauche, les
   deux autres en lignes horizontales à droite (sans chapô ni réseau

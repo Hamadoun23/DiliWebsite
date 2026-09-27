@@ -3559,6 +3559,7 @@ button.bento__tile { font: inherit; text-align: left; cursor: pointer; width: 10
 
 @media (min-width: 900px) {
   .reseau3 { grid-template-columns: 1fr 1fr; }
+  .reseau3__carte { order: 2; }   /* texte à gauche, carte à droite */
   .reseau3__carte { aspect-ratio: auto; min-height: 460px; }
 }
 @media (max-width: 420px) {
@@ -3584,7 +3585,7 @@ button.bento__tile { font: inherit; text-align: left; cursor: pointer; width: 10
 .boutique2 .surtitre::before { background: #4FC3F0; }
 .boutique2 .titre { color: #fff; }
 .boutique2 .titre em { color: #4FC3F0; }
-.boutique2 .chapeau { color: rgba(255, 255, 255, .8); margin: 12px 0 20px; max-width: 460px; }
+.boutique2 .chapeau { color: rgba(255, 255, 255, .8); margin: 12px 0 26px; max-width: 460px; }
 .boutique2__infos { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
 .boutique2__infos li {
   display: inline-flex; align-items: center; gap: 8px; max-width: 100%;
@@ -3600,7 +3601,7 @@ button.bento__tile { font: inherit; text-align: left; cursor: pointer; width: 10
 .boutique2__vignettes { display: none; }
 
 @media (min-width: 900px) {
-  .boutique2 { min-height: 500px; grid-template-columns: 1.15fr .85fr; align-items: center; }
+  .boutique2 { min-height: 460px; grid-template-columns: minmax(0, 620px); align-items: center; }
   .boutique2__fond { position: absolute; inset: 0; height: 100%; z-index: -2; }
   .boutique2::before {
     content: ""; position: absolute; inset: 0; z-index: -1;
