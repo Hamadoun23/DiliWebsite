@@ -762,7 +762,7 @@ section:hover::before { opacity: 1; }
 }
 .menu__cats a:hover { background: rgba(var(--sur-rgb), .1); }
 
-.menu__pied { display: grid; gap: 14px; }
+.menu__pied { display: grid; gap: 14px; margin-top: clamp(40px, 8vh, 72px); }
 .menu__tel {
   display: inline-flex; align-items: center; gap: 9px; justify-content: center;
   font-weight: 700; color: var(--cyan-2);
