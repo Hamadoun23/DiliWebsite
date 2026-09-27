@@ -226,7 +226,7 @@ class PanneauProduit extends HTMLElement {
           </div>
 
           <ul class="pf__garanties">
-            <li>${icone('bouclier')}<span><b>Garantie ${esc(p.garantie ?? 'selon fabricant')}</b>${esc(cat.ETATS[p.etat].desc)}</span></li>
+            <li>${icone('bouclier')}<span><b>Garantie</b>${esc(cat.ETATS[p.etat].desc)}</span></li>
             <li>${icone('outil')}<span><b>SAV Dilitech</b>Par l’équipe qui vous l’a vendu, à ${esc(CONTACT.adresse.split(',')[0])}</span></li>
             <li>${icone('camion')}<span><b>Retrait ou livraison</b>Bamako, et acheminement vers les autres villes</span></li>
           </ul>

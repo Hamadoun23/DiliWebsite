@@ -44,7 +44,7 @@ export const ARTICLES = [
     slug: 'je-reste-avec-toi-apres-achat',
     titre: 'Des ordinateurs fiables — et quelqu’un après l’achat',
     citation: 'Je vends des ordinateurs fiables. Et surtout : je reste avec toi après l’achat.',
-    chapo: "Vendre une machine, beaucoup savent le faire. Répondre au téléphone six mois plus tard, beaucoup moins.",
+    chapo: "Vendre une machine, beaucoup savent le faire. Répondre au téléphone des mois plus tard, beaucoup moins.",
     rubrique: 'franc-parler',
     format: 'texte',
     source: { reseau: 'Facebook', url: 'https://www.facebook.com/share/p/1D7ueJA5HA/' },
@@ -55,7 +55,7 @@ export const ARTICLES = [
     corps: [
       { t: 'publication', v: "Je vends des ordinateurs fiables.\nEt surtout : je reste avec toi après l’achat." },
       { t: 'p', v: "Deux phrases, et toute notre façon de travailler. Une machine fiable, c'est la moitié du travail. L'autre moitié commence le jour où vous repartez avec : la garantie écrite, le SAV assuré par l'équipe qui vous a vendu la machine, le conseil quand vous hésitez à ajouter de la mémoire ou à changer la batterie." },
-      { t: 'note', v: "12 mois de garantie sur le neuf, 6 mois sur nos reconditionnés — et un numéro qui répond : +223 71 92 71 98." },
+      { t: 'note', v: "Une garantie sur le neuf comme sur nos reconditionnés — et un numéro qui répond : +223 71 92 71 98." },
     ],
   },
 
@@ -235,7 +235,7 @@ export const ARTICLES = [
         "Quelqu'un à Bamako qui répond au téléphone quand il y a un problème.",
         "Pour un reconditionné : le rapport de test de l'atelier (batterie, disque, écran, clavier).",
       ] },
-      { t: 'note', v: "Nos reconditionnés arrivent sans leur carton d'origine — mais avec batterie et SSD remplacés, un rapport de test et 6 mois de garantie Dilitech. Entre un beau carton et une machine vérifiée, choisissez la machine." },
+      { t: 'note', v: "Nos reconditionnés arrivent sans leur carton d'origine — mais avec batterie et SSD remplacés, un rapport de test et la garantie Dilitech. Entre un beau carton et une machine vérifiée, choisissez la machine." },
     ],
   },
 
@@ -262,7 +262,7 @@ export const ARTICLES = [
       { t: 'p', v: "Un ordinateur ne coûte pas seulement ce que vous payez le jour de l'achat. Il coûte aussi le jour où il tombe en panne : les jours sans machine, le travail perdu, le technicien qu'on ne retrouve plus, la garantie que personne n'honore." },
       { t: 'h', v: 'Ce que votre prix paie chez Dilitech' },
       { t: 'liste', v: [
-        "Une garantie écrite : 12 mois sur le neuf, 6 mois sur nos reconditionnés.",
+        "Une garantie écrite, sur le neuf comme sur nos reconditionnés.",
         "Un SAV assuré par l'équipe qui vous a vendu la machine — pas un numéro qui ne répond pas.",
         "Un conseil avant l'achat, pour ne pas payer une machine qui ne correspond pas à votre usage.",
         "Un prêt de matériel selon disponibilité pendant une réparation.",
@@ -296,7 +296,7 @@ export const ARTICLES = [
       { t: 'h', v: "4. Quelle autonomie réelle, et sur quel réseau électrique ?" },
       { t: 'p', v: "Les autonomies annoncées par les constructeurs sont mesurées en lecture vidéo, écran à mi-luminosité. Comptez 60 à 70 % de la valeur affichée en usage bureautique réel. Et si vous travaillez dans une zone à coupures fréquentes, l'autonomie du portable devient un critère de continuité d'activité, pas de confort." },
 
-      { t: 'note', v: "Le neuf n'est pas toujours le bon calcul. Un châssis professionnel reconditionné en atelier — batterie et SSD remplacés, garantie Dilitech de 6 mois — offre souvent une meilleure machine qu'un premier prix neuf au même tarif." },
+      { t: 'note', v: "Le neuf n'est pas toujours le bon calcul. Un châssis professionnel reconditionné en atelier — batterie et SSD remplacés, garantie Dilitech — offre souvent une meilleure machine qu'un premier prix neuf au même tarif." },
 
       { t: 'h', v: 'Ce que nous conseillons' },
       { t: 'liste', v: [
@@ -407,7 +407,7 @@ export const ARTICLES = [
       { t: 'h', v: 'Quand il faut du neuf' },
       { t: 'p', v: "Dès qu'un parc doit être homogène et suivi sur trois ans, dès qu'une garantie constructeur sur site est exigée par un bailleur ou un marché public, et pour tout ce qui touche à la création ou au calcul, où les générations de processeurs comptent vraiment." },
 
-      { t: 'note', v: "Tout reconditionné Dilitech part avec 6 mois de garantie atelier et un rapport de test remis avec la machine. Si une pièce lâche dans ce délai, nous la reprenons." },
+      { t: 'note', v: "Tout reconditionné Dilitech part avec la garantie de notre atelier et un rapport de test remis avec la machine. Si une pièce lâche, nous la reprenons." },
     ],
   },
 

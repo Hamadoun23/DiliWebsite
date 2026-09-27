@@ -98,7 +98,7 @@ export const QUESTIONS = {
   },
   etat: {
     titre: 'Neuf ou reconditionné ?',
-    aide: 'Nos reconditionnés sont testés en atelier et garantis 6 mois.',
+    aide: 'Nos reconditionnés sont testés en atelier et garantis.',
     options: [
       { code: 'neuf', nom: 'Neuf' },
       { code: 'reconditionne', nom: 'Reconditionné' },

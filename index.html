@@ -80,7 +80,7 @@
       <ul class="hero__trio entre" style="--i:3">
         <li>
           <span class="hero__trio-ic"><span class="ic" data-ic="bouclier"></span></span>
-          <span>Garantie 12 mois</span>
+          <span>Garantie</span>
         </li>
         <li>
           <span class="hero__trio-ic"><span class="ic" data-ic="outil"></span></span>
@@ -139,8 +139,8 @@
           <div class="bento__recu">
             <span class="bento__recu-ic"><span class="ic" data-ic="bouclier"></span></span>
             <span class="bento__recu-txt">
-              <span class="bento__recu-titre">12 mois</span>
-              <span class="bento__recu-sous">Garantie sur le neuf.</span>
+              <span class="bento__recu-titre">Garantie</span>
+              <span class="bento__recu-sous">Sur le neuf et le reconditionné.</span>
             </span>
           </div>
           <span class="bento__fleche" aria-hidden="true">
@@ -216,7 +216,9 @@
           <p class="surtitre" data-selection-surtitre>En ce moment</p>
           <h2 class="titre" data-selection-titre>Notre sélection <em>du moment.</em></h2>
         </div>
-        <div class="onglets" role="tablist" aria-label="Filtrer la sélection" data-onglets></div>
+        <a class="lien-fleche" href="catalogue.html?cat=ordinateurs">
+          Tous les ordinateurs <span class="ic" data-ic="fleche"></span>
+        </a>
       </header>
 
       <div class="usage-choix">
@@ -283,8 +285,8 @@
           <p class="arg__n">04</p>
           <h3>La garantie est écrite</h3>
           <p>
-            Douze mois sur le neuf, six mois sur nos reconditionnés — avec le
-            rapport de test remis avec la machine. Le service après-vente est
+            Sur le neuf comme sur nos reconditionnés, avec le rapport de
+            test remis avec la machine. Le service après-vente est
             assuré par la même équipe qui a vendu.
           </p>
         </article>
@@ -293,177 +295,79 @@
   </section>
 
   <!-- ===================================================================
-       SERVICES — contenu complet, repris de l'ancien services.html
+       NOS MÉTIERS — une seule grille, six cases courtes (condensé de six
+       blocs pleine largeur). Chaque case garde l'ancre de l'ancien bloc
+       (#vente, #maintenance, #sav, #service-reseau, #formation, #parc)
+       pour que les liens existants tombent toujours au bon endroit.
        =================================================================== -->
   <section id="services">
     <div class="wrap">
-      <header class="tete-sec">
-        <p class="surtitre">Nos métiers</p>
-        <h2 class="titre">Au-delà de <em>la vente.</em></h2>
-        <p class="chapeau">
-          Un matériel livré n'est pas un problème résolu. Dilitech accompagne
-          l'équipement de bout en bout : le conseil avant l'achat, l'installation,
-          la maintenance, et le service après-vente assuré par la même équipe.
-        </p>
-      </header>
-    </div>
-  </section>
-
-  <section id="vente">
-    <div class="wrap bloc-serv">
-      <div class="bloc-serv__txt">
-        <p class="surtitre">01 — Vente & conseil</p>
-        <h3 class="titre">La bonne machine, <em>pas la plus chère.</em></h3>
-        <p class="chapeau">
-          Nous distribuons toutes les grandes marques d'ordinateurs portables et
-          fixes, neufs ou reconditionnés en atelier, ainsi que l'ensemble des
-          accessoires du poste de travail. Mais notre travail commence avant :
-          comprendre ce que la machine devra encaisser.
-        </p>
-        <ul class="liste-p">
-          <li>Ordinateurs portables et postes fixes, toutes marques</li>
-          <li>Reconditionnés testés, batterie et disque remplacés, garantie 6 mois</li>
-          <li>Écrans, périphériques, stockage, onduleurs, sacoches, impression</li>
-          <li>Postes assemblés dans notre atelier, configurés selon le budget</li>
-          <li>Devis chiffré, avec les alternatives que nous aurions choisies</li>
-        </ul>
-        <a class="btn btn--plein" href="catalogue.html">Parcourir le catalogue</a>
-      </div>
-      <div class="bloc-serv__vis bloc-serv__vis--photo reveal" aria-hidden="true">
-        <img src="assets/img/vente-vitrine.jpg" alt="" loading="lazy" decoding="async">
-      </div>
-    </div>
-  </section>
-
-  <section class="sec--brume" id="maintenance">
-    <div class="wrap bloc-serv bloc-serv--inv">
-      <div class="bloc-serv__txt reveal">
-        <p class="surtitre">02 — Maintenance PC</p>
-        <h3 class="titre">Un atelier, <em>pas seulement un comptoir.</em></h3>
-        <p class="chapeau">
-          La plupart des machines que l'on croit bonnes à remplacer ne le sont
-          pas. Un diagnostic honnête coûte moins cher qu'un achat inutile — et
-          quand le remplacement s'impose, nous le disons aussi.
-        </p>
-        <ul class="liste-p">
-          <li>Diagnostic complet et devis établi <b>avant</b> toute intervention</li>
-          <li>Nettoyage, dépoussiérage, remplacement de la pâte thermique</li>
-          <li>Remplacement de batterie, de disque, ajout de mémoire</li>
-          <li>Réinstallation système et transfert des données</li>
-          <li>Récupération de données sur disque défaillant</li>
-          <li>Désinfection et remise en état après compromission</li>
-        </ul>
-        <a class="btn btn--plein" href="index.html#contact">Demander un diagnostic</a>
-      </div>
-      <div class="bloc-serv__vis reveal" data-illus="onduleur" aria-hidden="true"></div>
-    </div>
-  </section>
-
-  <section id="sav">
-    <div class="wrap bloc-serv">
-      <div class="bloc-serv__txt reveal">
-        <p class="surtitre">03 — Service après-vente</p>
-        <h3 class="titre">La garantie <em>est écrite.</em></h3>
-        <p class="chapeau">
-          Douze mois sur le matériel neuf, six mois sur nos reconditionnés, avec
-          le rapport de test remis à la livraison. Le suivi est assuré par
-          l'équipe qui a vendu : personne ne vous renverra vers un autre service.
-        </p>
-        <ul class="liste-p">
-          <li>Suivi des garanties constructeur et garantie atelier Dilitech</li>
-          <li>Prise en charge des retours et des échanges</li>
-          <li>Prêt de matériel selon disponibilité pendant l'immobilisation</li>
-          <li>Historique d'intervention conservé par machine</li>
-        </ul>
-      </div>
-      <div class="bloc-serv__vis bloc-serv__vis--photo reveal" aria-hidden="true">
-        <img src="assets/img/agent-sav.jpg" alt="" loading="lazy" decoding="async">
-      </div>
-    </div>
-  </section>
-
-  <section class="sec--brume" id="service-reseau">
-    <div class="wrap bloc-serv bloc-serv--inv">
-      <div class="bloc-serv__txt reveal">
-        <p class="surtitre">04 — Installation réseau</p>
-        <h3 class="titre">Du plan d'implantation <em>à la mise en service.</em></h3>
-        <p class="chapeau">
-          Un réseau qui coupe fait perdre plus de temps qu'un ordinateur lent.
-          Nous relevons la couverture réelle avant de proposer du matériel —
-          c'est la seule façon de ne pas vendre une borne qui ne changera rien.
-        </p>
-        <ul class="liste-p">
-          <li>Relevé de couverture Wi-Fi sur site et plan d'implantation</li>
-          <li>Câblage Cat 6 serti sur mesure, repéré et étiqueté</li>
-          <li>Baies brassées, panneaux, bandeaux de prises, onduleur de baie</li>
-          <li>Routeurs, switchs administrables, bornes Wi-Fi pilotées</li>
-          <li>Vidéosurveillance IP : caméras, enregistreur, accès à distance</li>
-          <li>Documentation du réseau remise à la livraison</li>
-        </ul>
-        <a class="btn btn--plein" href="catalogue.html?cat=reseau">Voir le matériel réseau</a>
-      </div>
-      <div class="bloc-serv__vis reveal" data-illus="baie" aria-hidden="true"></div>
-    </div>
-  </section>
-
-  <section id="formation">
-    <div class="wrap">
-      <header class="tete-sec tete-sec--centre">
-        <p class="surtitre">05 — Formations professionnelles</p>
-        <h3 class="titre">Le matériel ne suffit pas, <em>il faut savoir s'en servir.</em></h3>
-        <p class="chapeau">
-          Dilitech ouvre des sessions de formation professionnelle à Bamako.
-          Inscriptions ouvertes — contactez-nous pour le calendrier et les
-          conditions de la filière qui vous intéresse.
+      <header class="tete-duo">
+        <div>
+          <p class="surtitre">Nos métiers</p>
+          <h2 class="titre">Au-delà de <em>la vente.</em></h2>
+        </div>
+        <p class="chapeau metiers__chapeau">
+          Du conseil avant l'achat au service après-vente, la même équipe
+          suit votre matériel de bout en bout.
         </p>
       </header>
 
-      <div class="filieres" data-filieres></div>
-
-      <div class="cta__actions" style="margin-top:34px">
-        <a class="btn btn--plein" href="index.html#contact">Demander le calendrier</a>
-      </div>
-    </div>
-  </section>
-
-  <section class="nuit coupe-duo sur-nuit" id="parc">
-    <div class="motif circuit"></div>
-    <div class="wrap">
-      <header class="tete-sec tete-sec--centre">
-        <p class="surtitre">06 — Équipement de parc</p>
-        <h3 class="titre">Équiper dix postes, <em>ou cent.</em></h3>
-        <p class="chapeau">
-          Pour les entreprises, les administrations, les ONG et les écoles :
-          un chiffrage poste par poste, du matériel homogène, et une mise en
-          service coordonnée avec nos partenaires régionaux.
-        </p>
-      </header>
-
-      <div class="etapes">
-        <article class="etape reveal">
-          <p class="etape__n">1</p>
-          <h3>Recensement</h3>
-          <p>Nombre de postes, usages par service, existant à conserver, contraintes de budget et de délai.</p>
+      <div class="metiers">
+        <article class="metier metier--photo reveal" id="vente">
+          <img src="assets/img/vente-vitrine.jpg" alt="" loading="lazy" decoding="async">
+          <div class="metier__corps">
+            <p class="metier__n">01</p>
+            <h3>Vente & conseil</h3>
+            <p>Portables, postes fixes et accessoires, neufs ou reconditionnés. La bonne machine, pas la plus chère.</p>
+            <a class="lien-fleche" href="catalogue.html">Le catalogue <span class="ic" data-ic="fleche"></span></a>
+          </div>
         </article>
-        <article class="etape reveal">
-          <p class="etape__n">2</p>
-          <h3>Chiffrage</h3>
-          <p>Un devis ligne à ligne, avec les postes, le réseau, l'énergie et les licences — rien d'oublié en cours de route.</p>
-        </article>
-        <article class="etape reveal">
-          <p class="etape__n">3</p>
-          <h3>Livraison & installation</h3>
-          <p>Préparation des machines en atelier, image système commune, installation et câblage sur site.</p>
-        </article>
-        <article class="etape reveal">
-          <p class="etape__n">4</p>
-          <h3>Suivi</h3>
-          <p>Garanties centralisées, interventions de maintenance, et interlocuteur unique chez Dilitech.</p>
-        </article>
-      </div>
 
-      <div class="cta__actions" style="margin-top:38px">
-        <a class="btn btn--cyan btn--lueur" href="index.html#contact">Nous confier un chiffrage</a>
+        <article class="metier reveal" id="maintenance">
+          <span class="metier__ic"><span class="ic" data-ic="outil"></span></span>
+          <p class="metier__n">02</p>
+          <h3>Maintenance</h3>
+          <p>Diagnostic et devis avant toute intervention. Batterie, disque, mémoire, système, données.</p>
+        </article>
+
+        <article class="metier reveal" id="sav">
+          <span class="metier__ic"><span class="ic" data-ic="bouclier"></span></span>
+          <p class="metier__n">03</p>
+          <h3>Garantie & SAV</h3>
+          <p>Une garantie écrite et un rapport de test. Le suivi reste chez l'équipe qui a vendu.</p>
+        </article>
+
+        <article class="metier reveal" id="service-reseau">
+          <span class="metier__ic"><span class="ic" data-ic="reseau"></span></span>
+          <p class="metier__n">04</p>
+          <h3>Réseau & vidéosurveillance</h3>
+          <p>Relevé Wi-Fi sur site, câblage, baies, bornes et caméras IP, documentés à la livraison.</p>
+          <a class="lien-fleche" href="catalogue.html?cat=reseau">Le matériel <span class="ic" data-ic="fleche"></span></a>
+        </article>
+
+        <article class="metier metier--large reveal" id="formation">
+          <span class="metier__ic"><span class="ic" data-ic="diplome"></span></span>
+          <p class="metier__n">05</p>
+          <h3>Formations</h3>
+          <ul class="metier__puces">
+            <li>Bureautique</li><li>Données & Power BI</li><li>Programmation</li>
+            <li>Cybersécurité</li><li>Gestion de projet</li><li>Finance</li><li>Droit</li>
+          </ul>
+          <p>Sessions professionnelles à Bamako, inscriptions ouvertes.</p>
+          <a class="lien-fleche" href="index.html#contact">Demander le calendrier <span class="ic" data-ic="fleche"></span></a>
+        </article>
+
+        <article class="metier metier--nuit reveal" id="parc">
+          <span class="metier__ic"><span class="ic" data-ic="portable"></span></span>
+          <p class="metier__n">06</p>
+          <h3>Équipement de parc</h3>
+          <p>Dix postes ou cent, pour entreprises, écoles et ONG.</p>
+          <ol class="metier__etapes">
+            <li>Recensement</li><li>Chiffrage</li><li>Installation</li><li>Suivi</li>
+          </ol>
+          <a class="lien-fleche" href="index.html#contact">Demander un chiffrage <span class="ic" data-ic="fleche"></span></a>
+        </article>
       </div>
     </div>
   </section>

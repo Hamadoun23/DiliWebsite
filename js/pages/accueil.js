@@ -15,10 +15,9 @@ import * as profil from '../core/profil.js';
 import { PARTENAIRES, SIEGE } from '../data/partenaires.js';
 import { ARTICLES } from '../data/articles.js';
 import { carteConseil } from '../components/carte-conseil.js';
-import { illustration } from '../data/illustrations.js';
 import { carteProduit } from '../components/carte-produit.js';
 import { CONTACT, HORAIRES } from '../config.js';
-import { $, $$, esc, rendre } from '../core/dom.js';
+import { $, esc, rendre } from '../core/dom.js';
 import { icone } from '../core/icones.js';
 import { activerReveal, activerSpotlightHero, masquerBulleWaSurHero } from '../core/ui.js';
 
@@ -115,55 +114,56 @@ function univers() {
   bentoCarte();
 }
 
-/* --- sélection du moment (onglets) -------------------------------------- */
+/* --- la sélection : quatre ordinateurs, une seule rangée -----------------
+   Pas d'onglets : la rangée se compose seule.
+     — sans réponse : un ordinateur par gamme (pro, études, création,
+       bureau), le « Notre choix » de la gamme s'il y en a un, une
+       marque différente à chaque fois ;
+     — avec des réponses : les quatre ordinateurs qui leur correspondent le
+       mieux (profil.scoreProduit), complétés par les gammes par défaut si le
+       profil en trouve moins de quatre. */
 
-/* « Pour vous » n'existe que si le visiteur a dit quelque chose de son usage
-   (puces ci-dessous ou concierge) ; il passe alors en premier. */
-const VUES = {
-  pourvous: { nom: 'Pour vous',   liste: () => profil.pourVous(8) },
-  best:     { nom: 'Notre choix', liste: () => cat.recommandes() },
-  promo:    { nom: 'Promotions',  liste: () => cat.promotions() },
-  nouveau:  { nom: 'Nouveautés',  liste: () => cat.nouveautes() },
-};
+const GAMMES = ['portables-pro', 'portables-etudes', 'portables-creation', 'bureau'];
+const N_SELECTION = 4;
+
+function parGamme() {
+  const ordis = cat.filtrer({ cat: 'ordinateurs', tri: 'pertinence' });
+  /* Une marque différente par case quand c'est possible : quatre gammes
+     en quatre fois « HP » ne montreraient pas l'étendue du stock. */
+  const marques = new Set();
+  return GAMMES.map((g) => {
+    const gamme = ordis.filter((p) => p.sous === g);
+    const neuves = gamme.filter((p) => !marques.has(p.marque));
+    const p = neuves.find((x) => x.tag === 'best') ?? neuves[0] ?? gamme[0];
+    if (p) marques.add(p.marque);
+    return p;
+  }).filter(Boolean);
+}
+
+function quatreOrdinateurs() {
+  const defaut = parGamme();
+  if (profil.estVide()) return defaut;
+  const choisis = profil.pourVous(99).filter((p) => p.cat === 'ordinateurs').slice(0, N_SELECTION);
+  for (const p of defaut) {
+    if (choisis.length >= N_SELECTION) break;
+    if (!choisis.includes(p)) choisis.push(p);
+  }
+  return choisis;
+}
 
 function selection() {
-  const barre = $('[data-onglets]');
   const zone = $('[data-selection]');
   const puces = $('[data-usage-puces]');
   const resume = $('[data-usage-resume]');
-  if (!barre || !zone) return;
+  if (!zone) return;
 
-  let active = 'best';
-
-  const afficher = (cle) => {
-    active = cle;
-    for (const b of $$('.onglet', barre)) {
-      const actif = b.dataset.vue === cle;
-      b.classList.toggle('est-actif', actif);
-      b.setAttribute('aria-selected', String(actif));
-    }
-    const liste = VUES[cle].liste().slice(0, 8);
-    zone.innerHTML = `<div class="grille-produits">${liste
-      .map((p) => carteProduit(p))
-      .join('')}</div>`;
-    /* Les cartes viennent d'être créées : il faut les inscrire à
-       l'observateur d'apparition, sinon elles restent invisibles. */
-    activerReveal(zone);
-  };
-
-  /* Tout ce qui dépend des réponses : onglets, titre, puces, résumé. Rappelé
-     à chaque réponse, d'où qu'elle vienne (puces, concierge, autre onglet). */
+  /* Tout ce qui dépend des réponses : titre, puces, résumé, la rangée.
+     Rappelé à chaque réponse, d'où qu'elle vienne (puces, concierge, autre
+     onglet du navigateur). */
   const refleter = () => {
     const connu = !profil.estVide();
-    const cles = Object.keys(VUES).filter((k) => k !== 'pourvous' || connu);
-    barre.innerHTML = cles
-      .map(
-        (cle) => `<button type="button" role="tab" class="onglet${cle === 'pourvous' ? ' onglet--vous' : ''}"
-                          data-vue="${cle}" aria-selected="false">${esc(VUES[cle].nom)}</button>`
-      )
-      .join('');
 
-    $('[data-selection-surtitre]').textContent = connu ? 'D’après vos réponses' : 'En ce moment';
+    $('[data-selection-surtitre]').textContent = connu ? 'D’après vos réponses' : 'Un ordinateur par gamme';
     const prenom = profil.prenom();
     $('[data-selection-titre]').innerHTML = connu
       ? `Sélectionné <em>pour vous${prenom ? `, ${esc(prenom)}` : ''}.</em>`
@@ -184,13 +184,14 @@ function selection() {
         : '';
     }
 
-    afficher(connu ? 'pourvous' : active === 'pourvous' ? 'best' : active);
+    zone.innerHTML = `<div class="grille-produits grille-produits--rangee">${quatreOrdinateurs()
+      .map((p) => carteProduit(p))
+      .join('')}</div>`;
+    /* Les cartes viennent d'être créées : il faut les inscrire à
+       l'observateur d'apparition, sinon elles restent invisibles. */
+    activerReveal(zone);
   };
 
-  barre.addEventListener('click', (e) => {
-    const b = e.target.closest('[data-vue]');
-    if (b) afficher(b.dataset.vue);
-  });
   puces?.addEventListener('click', (e) => {
     const b = e.target.closest('[data-usage]');
     if (b) profil.basculerUsage(b.dataset.usage);
@@ -201,71 +202,14 @@ function selection() {
 
   /* Le magasin prévient aussi quand le concierge note ses propres compteurs
      (visites, question reportée…) : on ne refait la section que si les
-     RÉPONSES ont changé, sinon l'onglet choisi à la main sauterait. */
+     RÉPONSES ont changé. */
   let signature = null;
   profil.abonner((e) => {
-    const s = JSON.stringify([e.prenom, e.usages, e.lieu, e.postes, e.priorites, e.etat]);
+    const s = JSON.stringify([e.prenom, e.metier, e.usages, e.lieu, e.postes, e.priorites, e.etat]);
     if (s === signature) return;
     signature = s;
     refleter();
   });
-}
-
-/* --- services : illustrations des blocs (portée de services.js) --------- */
-
-function servicesIllustrations() {
-  for (const n of $$('[data-illus]')) {
-    n.innerHTML = illustration(n.dataset.illus);
-  }
-}
-
-/* --- filières de formation (portée de services.js) ----------------------- */
-
-const FILIERES = [
-  {
-    ic: 'clavierIc', nom: 'Informatique bureautique',
-    txt: "Word, Excel, PowerPoint et les usages du poste de travail. Le socle qui manque le plus souvent en entreprise.",
-  },
-  {
-    ic: 'etoile', nom: 'Analyse de données',
-    txt: "Tableurs avancés, tableaux croisés, tableaux de bord et restitution avec Power BI.",
-  },
-  {
-    ic: 'devis', nom: 'Programmation',
-    txt: "Bases de l'algorithmique et développement d'applications, pour débuter ou se reconvertir.",
-  },
-  {
-    ic: 'bouclier', nom: 'Cybersécurité',
-    txt: "Hygiène numérique, protection des postes et des données, réaction en cas d'incident.",
-  },
-  {
-    ic: 'boite', nom: 'Gestion de projet',
-    txt: "Cadrage, planification, suivi et pilotage budgétaire d'un projet, méthodes classiques et agiles.",
-  },
-  {
-    ic: 'etincelle', nom: 'Finance',
-    txt: "Lecture des états financiers, gestion budgétaire et analyse de la rentabilité.",
-  },
-  {
-    ic: 'diplome', nom: 'Droit',
-    txt: "Notions juridiques appliquées à la vie de l'entreprise et aux relations contractuelles.",
-  },
-];
-
-function filieres() {
-  rendre(
-    '[data-filieres]',
-    FILIERES.map(
-      (f) => `
-      <article class="filiere reveal">
-        <span class="filiere__ic">${icone(f.ic)}</span>
-        <div>
-          <h3>${esc(f.nom)}</h3>
-          <p>${esc(f.txt)}</p>
-        </div>
-      </article>`
-    ).join('')
-  );
 }
 
 /* --- réseau : le siège + les partenaires (portée de reseau.js) ----------- */
@@ -401,8 +345,6 @@ hero();
 marques();
 univers();
 selection();
-servicesIllustrations();
-filieres();
 preuvesReseau();
 siege();
 partenaires();

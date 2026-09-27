@@ -1083,6 +1083,35 @@ Demande : *« un meilleur design, et plusieurs images d'un ordi »*. Panneau
 - Piège : enfants de grille sans `min-width: 0` → la bande de vignettes
   élargissait la colonne au-delà de l'écran sur mobile.
 
+## Accueil raccourci (septembre 2026)
+
+Demande : « la page d'accueil est trop longue, on va optimiser ».
+
+- **Sélection = une seule rangée de 4 ordinateurs**, plus d'onglets
+  (Notre choix / Promotions / Nouveautés / Pour vous supprimés ; à la place,
+  un lien « Tous les ordinateurs » → `catalogue.html?cat=ordinateurs`).
+  `selection()` dans `js/pages/accueil.js` :
+  - sans réponse : `parGamme()` — un ordinateur par gamme (`portables-pro`,
+    `portables-etudes`, `portables-creation`, `bureau`), le « Notre choix »
+    de la gamme de préférence, **une marque différente par case** ;
+  - avec réponses : les 4 meilleurs `profil.pourVous()` limités aux
+    ordinateurs, complétés par les gammes par défaut s'il en manque.
+  CSS : `.grille-produits--rangee` (4 colonnes dès 1100 px, 2 en dessous).
+- **Garantie sans durée, partout** (consigne client : « ne dis pas 12 mois,
+  ne dis pas de date, mentionne juste la garantie ») : hero, tuile bento A,
+  argument 04, métiers, fiche produit (`<b>Garantie</b>`, le champ
+  `garantie` des produits reste en données mais n'est plus affiché),
+  résumés produits, articles, aide du concierge. **Ne pas réintroduire de
+  durée** dans un texte.
+- **« Nos métiers » condensé** : les six blocs pleine largeur
+  (`.bloc-serv`, filières, étapes du parc) remplacés par une grille
+  `.metiers` de six cases `.metier` (photo « Vente » haute à gauche,
+  Formations en large avec les filières en puces, Parc en case marine avec
+  les 4 étapes). Chaque case garde l'ancre de l'ancien bloc (`#vente`,
+  `#maintenance`, `#sav`, `#service-reseau`, `#formation`, `#parc`).
+  `servicesIllustrations()`, `FILIERES` et `filieres()` supprimés d'accueil.js
+  (les styles `.bloc-serv`/`.filiere` restent dans style.css, inutilisés).
+
 ## Stack
 
 - **100 % statique** : HTML / CSS / **modules ES natifs**. Aucun framework,
@@ -1107,7 +1136,7 @@ l'historique complet de cette passe.
 
 | Fichier | Contenu |
 |---|---|
-| `index.html` | hero, marques, univers, sélection du moment, « le conseil avant le produit », **services complets** (6 métiers, filières, parc), **réseau complet** (siège, 6 partenaires, vie locale, comment ça se passe), **conseils complets** (filtrable, 6 articles) — le contact tient dans le pied de page (`<site-pied>`, présent sur les deux pages), pas de grande section dédiée |
+| `index.html` | hero, marques, univers, sélection du moment, « le conseil avant le produit », **services condensés** (grille de 6 métiers), **réseau complet** (siège, 6 partenaires, vie locale, comment ça se passe), **conseils complets** (filtrable, 6 articles) — le contact tient dans le pied de page (`<site-pied>`, présent sur les deux pages), pas de grande section dédiée |
 | `catalogue.html` | filtres, recherche, tri, grille par tranches — seule page restée à part (filtres + recherche en justifient une) |
 | `404.html` | page d'erreur — gardée pour l'hébergeur, jamais un lien de nav |
 
