@@ -1112,6 +1112,26 @@ Demande : « la page d'accueil est trop longue, on va optimiser ».
   `servicesIllustrations()`, `FILIERES` et `filieres()` supprimés d'accueil.js
   (les styles `.bloc-serv`/`.filiere` restent dans style.css, inutilisés).
 
+### Réseau, boutique et vie locale condensés
+
+- **Réseau** (`#reseau`, `.reseau2`) : propos + trois chiffres écrits en dur
+  (villes, pays, partenaires — l'ancien compteur animé restait parfois à 0)
+  à gauche ; à droite six petites cases `.ville` (code pays, ville, pays),
+  chacune lien vers `catalogue.html?partenaire=CODE`. Les longues cartes
+  `.pdv` (notes, univers, nombre de références) ont disparu.
+- **Boutique** (`#boutique`, `.boutique`, rendue par `siege()`) : consigne
+  client « supprime les infos concernant le stock, parle juste de la
+  boutique » → plus aucune statistique (ordinateurs, accessoires,
+  références tenues au siège). Texte boutique, coordonnées + horaires en
+  deux colonnes, boutons Maps / Nous écrire, mosaïque de 3 photos
+  (mur de portables, rayonnages, conseiller SAV).
+- **Vie locale** (`#vie-locale`, `.vie`) : une grande photo des lauréates,
+  un chapeau court, la citation de l'attestation 2D Digitals raccourcie,
+  trois vignettes, un lien partenariat. Les anciens `.engagement*` sont
+  inutilisés.
+- Hauteur de l'accueil : ~11 400 → ~9 300 px (bureau), ~18 600 → ~14 400 px
+  (mobile).
+
 ## Stack
 
 - **100 % statique** : HTML / CSS / **modules ES natifs**. Aucun framework,

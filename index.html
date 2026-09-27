@@ -373,93 +373,61 @@
   </section>
 
   <!-- ===================================================================
-       LE RÉSEAU — contenu complet, repris de l'ancien reseau.html
+       LE RÉSEAU — condensé : à gauche le propos et trois chiffres, à droite
+       les six partenaires en petites cases (chacune filtre le catalogue).
        =================================================================== -->
   <section class="sec--brume" id="reseau">
-    <div class="wrap">
-      <header class="tete-sec">
+    <div class="wrap reseau2">
+      <div class="reseau2__txt">
         <p class="surtitre">Notre réseau</p>
         <h2 class="titre">Bamako, <em>et six capitales.</em></h2>
         <p class="chapeau">
-          Le stock ne dort pas dans un seul entrepôt. Dilitech s'appuie sur un
-          réseau de partenaires revendeurs en Afrique de l'Ouest et centrale :
-          ce que nous n'avons pas ici, un partenaire l'a souvent déjà.
+          Six partenaires revendeurs en Afrique de l'Ouest et centrale : ce
+          que nous n'avons pas ici, un partenaire l'a souvent déjà.
         </p>
-      </header>
-      <ul class="heros__preuves" data-preuves></ul>
+        <ul class="reseau2__chiffres" data-preuves></ul>
+      </div>
+      <div class="reseau2__villes" data-partenaires></div>
     </div>
   </section>
 
-  <section>
+  <!-- ============ LA BOUTIQUE (siège & showroom) ============ -->
+  <section id="boutique">
     <div class="wrap" data-siege></div>
   </section>
 
-  <section class="sec--brume">
-    <div class="wrap">
-      <header class="tete-sec">
-        <p class="surtitre">Partenaires revendeurs</p>
-        <h3 class="titre">Six points d'appui <em>dans la région.</em></h3>
-        <p class="chapeau">
-          Chaque partenaire tient son propre stock et sert sa zone. Les
-          quantités affichées sur les fiches produits sont consolidées sur
-          l'ensemble du réseau — vous savez d'où vient la machine avant de
-          commander.
-        </p>
-      </header>
-      <div class="reseau" data-partenaires></div>
-    </div>
-  </section>
+  <!-- ============ VIE LOCALE — une photo, un texte, trois vignettes ============ -->
+  <section class="sec--brume" id="vie-locale">
+    <div class="wrap vie">
+      <figure class="vie__photo reveal">
+        <img src="assets/img/engagement/engagement-vedette.jpg"
+             alt="Trois jeunes lauréates du Challenge Digital tenant leurs cadeaux, attestations et un ordinateur portable offert par Dilitech." loading="lazy">
+        <figcaption>Challenge Digital « Mini-Business Concept » — Bamako</figcaption>
+      </figure>
 
-  <!-- ============ VIE LOCALE / ENGAGEMENT ============ -->
-  <section>
-    <div class="wrap">
-      <header class="tete-sec tete-sec--centre">
+      <div class="vie__txt reveal">
         <p class="surtitre">Vie locale</p>
-        <h3 class="titre">Présents <em>auprès de vous, de nos clients.</em></h3>
+        <h2 class="titre">Présents <em>auprès de nos clients.</em></h2>
         <p class="chapeau">
-          Dilitech ne se limite pas à la boutique de Torokorobougou. L'entreprise
-          fournit régulièrement du matériel informatique — ordinateurs, tablettes,
-          accessoires — à des initiatives locales, et s'associe à des événements
-          qui font grandir de jeunes talents du numérique à Bamako.
+          Au-delà de la boutique, Dilitech équipe des initiatives locales et
+          soutient les jeunes talents du numérique à Bamako.
         </p>
-      </header>
-
-      <div class="engagement">
-        <div class="engagement__texte reveal">
-          <p>
-            Une présence qui va au-delà de la vente : sur le terrain, aux côtés
-            des porteurs de projets et des jeunes entrepreneurs qui font vivre
-            l'écosystème numérique malien.
-          </p>
-          <a class="lien-fleche" href="index.html#contact">
-            Parler d'un partenariat <span class="ic" data-ic="fleche"></span>
-          </a>
-        </div>
-
-        <div class="engagement__citation reveal">
-          <img src="assets/img/engagement/engagement-attestation.jpg"
-               alt="Un représentant Dilitech, casquette Dilitech, reçoit l'attestation de reconnaissance de 2D Digitals des mains d'une partenaire.">
-          <p class="engagement__label">Sponsor officiel — Challenge Digital « Mini-Business Concept »</p>
-          <blockquote>
-            <p>« En reconnaissance de son engagement remarquable et de son soutien
-              déterminant en tant que Sponsor officiel du Challenge Digital
-              « Mini-Business Concept », contribuant activement à la promotion
-              de l'innovation et de l'entrepreneuriat digital. »</p>
-          </blockquote>
-          <p class="engagement__signature">Attestation de reconnaissance — 2D Digitals, Bamako</p>
-        </div>
-      </div>
-
-      <div class="engagement-photos reveal">
-        <p class="engagement-photos__legende">Sur le terrain, avec nos partenaires</p>
-        <div class="engagement-photos__grille">
-          <img src="assets/img/engagement/engagement-vedette.jpg"
-               alt="Trois jeunes lauréates du Challenge Digital tenant leurs cadeaux, attestations et un ordinateur portable offert par Dilitech." loading="lazy">
-          <img src="assets/img/engagement/engagement-evenement.jpg"
-               alt="Table de remise de prix lors de l'événement, avec paniers cadeaux et carton d'ordinateur portable, devant la bannière 2D Digitals." loading="lazy">
+        <blockquote class="vie__citation">
+          <p>« Sponsor officiel du Challenge Digital, contribuant activement à la
+            promotion de l'innovation et de l'entrepreneuriat digital. »</p>
+          <cite>Attestation de reconnaissance — 2D Digitals</cite>
+        </blockquote>
+        <div class="vie__vignettes">
           <img src="assets/img/engagement/engagement-remise.jpg"
-               alt="Un représentant Dilitech, casquette Dilitech, remet un ordinateur portable et un panier cadeau à une jeune lauréate." loading="lazy">
+               alt="Un représentant Dilitech remet un ordinateur portable à une jeune lauréate." loading="lazy">
+          <img src="assets/img/engagement/engagement-evenement.jpg"
+               alt="Table de remise de prix devant la bannière 2D Digitals." loading="lazy">
+          <img src="assets/img/engagement/engagement-attestation.jpg"
+               alt="Un représentant Dilitech reçoit l'attestation de reconnaissance de 2D Digitals." loading="lazy">
         </div>
+        <a class="lien-fleche" href="index.html#contact">
+          Parler d'un partenariat <span class="ic" data-ic="fleche"></span>
+        </a>
       </div>
     </div>
   </section>
