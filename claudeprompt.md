@@ -1157,6 +1157,13 @@ Demande : « la page d'accueil est trop longue, on va optimiser ».
   mobile = le grand puis deux lignes compactes vignette + titre. Le lien
   « Tous nos conseils » repasse à droite du titre.
 
+### Menu mobile allégé
+
+Les pastilles de catégories (« Catalogue : Ordinateurs, Accessoires
+informatiques, Matériel réseau ») sont retirées du menu mobile
+(`js/components/chrome.js`, ex-`.menu__cats`) à la demande du client : il
+reste les 5 liens, WhatsApp et le téléphone.
+
 ## Stack
 
 - **100 % statique** : HTML / CSS / **modules ES natifs**. Aucun framework,

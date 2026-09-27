@@ -14,7 +14,6 @@
    ========================================================================= */
 
 import { SITE, CONTACT, WHATSAPP } from '../config.js';
-import { CATEGORIES } from '../data/produits.js';
 import { icone } from '../core/icones.js';
 import { esc, $, $$ } from '../core/dom.js';
 import { verrouillerDefilement, deverrouillerDefilement, piegerFocus, toast } from '../core/ui.js';
@@ -116,12 +115,6 @@ class SiteEntete extends HTMLElement {
                  </a>`
             ).join('')}
           </nav>
-          <div class="menu__cats">
-            <p class="menu__titre">Catalogue</p>
-            ${CATEGORIES.map(
-              (c) => `<a href="catalogue.html?cat=${c.code}">${esc(c.nom)}</a>`
-            ).join('')}
-          </div>
           <div class="menu__pied">
             <a class="btn btn--wa" href="https://wa.me/${WHATSAPP}" target="_blank" rel="noopener">
               ${icone('whatsapp')} Écrire sur WhatsApp
