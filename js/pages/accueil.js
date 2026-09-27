@@ -16,7 +16,7 @@ import { PARTENAIRES, SIEGE } from '../data/partenaires.js';
 import { ARTICLES } from '../data/articles.js';
 import { carteConseil } from '../components/carte-conseil.js';
 import { carteProduit } from '../components/carte-produit.js';
-import { CONTACT, HORAIRES } from '../config.js';
+import { CONTACT } from '../config.js';
 import { $, esc, rendre } from '../core/dom.js';
 import { icone } from '../core/icones.js';
 import { activerReveal, activerSpotlightHero, masquerBulleWaSurHero } from '../core/ui.js';
@@ -212,9 +212,12 @@ function selection() {
   });
 }
 
-/* --- réseau : trois chiffres + six partenaires en petites cases ----------
+/* --- réseau : carte, chiffres, liste des villes -------------------------
    Les chiffres sont écrits directement (plus de compteur animé : il
-   restait parfois à 0 quand la section passait trop vite à l'écran). */
+   restait parfois à 0 quand la section passait trop vite à l'écran).
+   La carte : les lignes sont en SVG étiré (`preserveAspectRatio="none"` +
+   trait non déformé), les points et les noms en HTML positionnés en %,
+   pour rester ronds et lisibles quelle que soit la largeur. */
 
 function preuvesReseau() {
   const partenaires = PARTENAIRES.filter((p) => p.role !== 'siege');
@@ -230,17 +233,46 @@ function preuvesReseau() {
   );
 }
 
+function carteReseau() {
+  const autres = PARTENAIRES.filter((p) => p.role !== 'siege');
+  /* Les coordonnées d'origine n'occupent qu'une partie du plan : on les
+     étire sur toute la surface (0–100 dans les deux sens), sinon les villes
+     se tassent au milieu du panneau. */
+  const xs = PARTENAIRES.map((p) => p.coords.x);
+  const ys = PARTENAIRES.map((p) => p.coords.y);
+  const etire = (v, min, max) => ((v - min) / (max - min || 1)) * 100;
+  const pos = (p) => ({
+    x: etire(p.coords.x, Math.min(...xs), Math.max(...xs)),
+    y: etire(p.coords.y, Math.min(...ys), Math.max(...ys)),
+  });
+  const s = pos(SIEGE);
+  const lignes = autres
+    .map((p) => {
+      const c = pos(p);
+      return `<line x1="${s.x}" y1="${s.y}" x2="${c.x}" y2="${c.y}" vector-effect="non-scaling-stroke"/>`;
+    })
+    .join('');
+  const point = (p) => `
+    <span class="point${p.role === 'siege' ? ' point--siege' : ''}" style="left:${10 + pos(p).x * 0.66}%; top:${12 + pos(p).y * 0.76}%">
+      <i></i><b>${esc(p.ville)}</b>
+    </span>`;
+  rendre(
+    '[data-reseau-carte]',
+    `<svg viewBox="0 0 100 100" preserveAspectRatio="none">${lignes}</svg>
+     ${autres.map(point).join('')}${point(SIEGE)}`
+  );
+}
+
 function partenaires() {
   rendre(
     '[data-partenaires]',
     PARTENAIRES.filter((p) => p.role !== 'siege')
       .map(
         (p) => `
-        <a class="ville reveal" href="catalogue.html?partenaire=${p.code}"
+        <a class="ville" href="catalogue.html?partenaire=${p.code}"
            title="Voir ce qui est disponible à ${esc(p.ville)}">
           <span class="ville__iso" aria-hidden="true">${esc(p.iso)}</span>
-          <span class="ville__nom">${esc(p.ville)}</span>
-          <span class="ville__pays">${esc(p.pays)}</span>
+          <span class="ville__nom">${esc(p.ville)}<small>${esc(p.pays)}</small></span>
           <span class="ville__fleche" aria-hidden="true">${icone('fleche')}</span>
         </a>`
       )
@@ -249,50 +281,41 @@ function partenaires() {
 }
 
 /* --- la boutique (siège & showroom) --------------------------------------
-   Demande client : parler de la boutique, pas du stock. Aucune statistique
-   de références ici — le catalogue s'en charge. */
+   Demandes client : parler de la boutique, pas du stock ; pas d'horaires.
+   Une carte photo immersive : le mur de portables en fond, le texte sur un
+   dégradé marine, les coordonnées en pastilles, deux vignettes. */
 
 function siege() {
+  const tel = CONTACT.telephones[0];
   rendre(
     '[data-siege]',
-    `<div class="boutique">
-       <div class="boutique__txt reveal">
+    `<div class="boutique2 reveal">
+       <img class="boutique2__fond" src="assets/img/atelier/atelier-2.jpg"
+            alt="Le mur de portables exposés dans la boutique Dilitech" loading="lazy">
+       <div class="boutique2__txt">
          <p class="surtitre">Siège & showroom</p>
          <h2 class="titre">Notre boutique, <em>à Torokorobougou.</em></h2>
          <p class="chapeau">
            Venez voir les machines, les prendre en main et repartir conseillé.
-           Showroom, atelier de maintenance et service après-vente sous le même toit.
+           Showroom, atelier et service après-vente sous le même toit.
          </p>
-
-         <div class="boutique__infos">
-           <ul class="siege__infos">
-             <li>${icone('broche')}<span>Commune V, ${esc(CONTACT.ville)}</span></li>
-             ${CONTACT.telephones
-               .map((t) => `<li>${icone('telephone')}<a href="tel:${esc(t.tel)}">${esc(t.label)}</a></li>`)
-               .join('')}
-             <li>${icone('mail')}<a href="mailto:${esc(CONTACT.email)}">${esc(CONTACT.email)}</a></li>
-           </ul>
-           <ul class="siege__horaires">
-             ${HORAIRES.map(
-               (h) => `<li${h.ouvert ? '' : ' class="est-ferme"'}>
-                         ${icone('horloge')}<span>${esc(h.jours)}</span><b>${esc(h.h)}</b>
-                       </li>`
-             ).join('')}
-           </ul>
-         </div>
-
-         <div class="cta__actions" style="justify-content:flex-start">
-           <a class="btn btn--plein"
+         <ul class="boutique2__infos">
+           <li>${icone('broche')}<span>Commune V, ${esc(CONTACT.ville)}</span></li>
+           ${CONTACT.telephones
+             .map((t) => `<li>${icone('telephone')}<a href="tel:${esc(t.tel)}">${esc(t.label)}</a></li>`)
+             .join('')}
+           <li>${icone('mail')}<a href="mailto:${esc(CONTACT.email)}">${esc(CONTACT.email)}</a></li>
+         </ul>
+         <div class="boutique2__actions">
+           <a class="btn btn--cyan"
               href="https://www.google.com/maps/search/${encodeURIComponent(CONTACT.mapsQuery)}"
               target="_blank" rel="noopener">Venir à la boutique</a>
-           <a class="btn btn--ligne" href="index.html#contact">Nous écrire</a>
+           <a class="btn boutique2__appel" href="tel:${esc(tel.tel)}">Appeler</a>
          </div>
        </div>
-
-       <div class="boutique__photos reveal">
-         <img src="assets/img/atelier/atelier-2.jpg" alt="Le mur de portables exposés dans la boutique Dilitech" loading="lazy">
-         <img src="assets/img/produits/galerie/boutique-etageres.jpg" alt="Les rayonnages de portables de la boutique Dilitech" loading="lazy">
-         <img src="assets/img/agent-sav.jpg" alt="Un conseiller Dilitech au service après-vente" loading="lazy">
+       <div class="boutique2__vignettes" aria-hidden="true">
+         <img src="assets/img/produits/galerie/boutique-etageres.jpg" alt="" loading="lazy">
+         <img src="assets/img/agent-sav.jpg" alt="" loading="lazy">
        </div>
      </div>`
   );
@@ -311,6 +334,7 @@ marques();
 univers();
 selection();
 preuvesReseau();
+carteReseau();
 siege();
 partenaires();
 apercuConseils();

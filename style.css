@@ -3496,3 +3496,174 @@ button.bento__tile { font: inherit; text-align: left; cursor: pointer; width: 10
 .vie__vignettes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 22px; }
 .vie__vignettes img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; }
 @media (min-width: 900px) { .vie { grid-template-columns: .9fr 1.1fr; } }
+
+/* =========================================================================
+   RÉSEAU (v3) — un panneau : carte marine à gauche, texte + villes à droite
+   Mobile : la carte passe au-dessus, les villes en 2 colonnes.
+   Repère de la carte : le SVG occupe 80 % × 82 % avec 10 % / 9 % de marge
+   (les points ne collent jamais au bord) ; carteReseau() applique le même
+   calcul aux points HTML.
+   ========================================================================= */
+.reseau3 {
+  display: grid; overflow: hidden;
+  background: var(--paper); border: 1px solid var(--line-2); border-radius: 24px;
+  box-shadow: 0 30px 60px -48px rgba(18, 19, 43, .45);
+}
+.reseau3__carte {
+  position: relative; min-height: 260px; aspect-ratio: 4 / 3;
+  background:
+    radial-gradient(420px 300px at 30% 40%, rgba(0, 159, 227, .28) 0%, transparent 70%),
+    linear-gradient(155deg, var(--navy) 0%, var(--navy-3) 100%);
+}
+.reseau3__carte svg { position: absolute; left: 10%; top: 12%; width: 66%; height: 76%; overflow: visible; }
+.reseau3__carte line { stroke: rgba(79, 195, 240, .45); stroke-width: 1.2; stroke-dasharray: 4 4; }
+.reseau3__carte .point {
+  position: absolute; display: flex; align-items: center; gap: 7px;
+  transform: translate(-6px, -50%);
+}
+.reseau3__carte .point i {
+  flex: none; width: 12px; height: 12px; border-radius: 50%;
+  background: #fff; box-shadow: 0 0 0 4px rgba(255, 255, 255, .14);
+}
+.reseau3__carte .point b { font-size: .74rem; font-weight: 700; color: rgba(255, 255, 255, .88); white-space: nowrap; }
+.reseau3__carte .point--siege { transform: translate(-8px, -50%); z-index: 1; }
+.reseau3__carte .point--siege i {
+  width: 16px; height: 16px; background: #4FC3F0;
+  box-shadow: 0 0 0 6px rgba(79, 195, 240, .22);
+  animation: pouls 2.4s ease-in-out infinite;
+}
+.reseau3__carte .point--siege b { padding: 4px 10px; border-radius: 99px; background: #fff; color: var(--navy); font-weight: 800; }
+@keyframes pouls { 50% { box-shadow: 0 0 0 12px rgba(79, 195, 240, 0); } }
+@media (prefers-reduced-motion: reduce) { .reseau3__carte .point--siege i { animation: none; } }
+
+.reseau3__txt { padding: clamp(24px, 4vw, 48px); display: flex; flex-direction: column; min-width: 0; }
+.reseau3__txt .chapeau { margin-top: 12px; }
+.reseau3__chiffres { display: flex; gap: clamp(20px, 4vw, 40px); margin: 22px 0 18px; padding-bottom: 20px; border-bottom: 1px solid var(--line-2); }
+.reseau3__chiffres li { display: grid; gap: 2px; }
+.reseau3__chiffres b { font-size: clamp(1.7rem, 3vw, 2.2rem); font-weight: 800; letter-spacing: -.03em; color: var(--navy); line-height: 1; }
+.reseau3__chiffres span { font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--tx-3); }
+
+.reseau3__villes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px 18px; }
+.reseau3 .ville { display: flex; align-items: center; gap: 11px; padding: 10px 6px; border-radius: 10px; transition: background .2s ease; }
+.reseau3 .ville:hover { background: var(--mist); }
+.reseau3 .ville__iso {
+  flex: none; display: grid; place-items: center; width: 34px; height: 26px;
+  font-size: .64rem; font-weight: 800; letter-spacing: .06em;
+  border-radius: 7px; background: rgba(48, 39, 132, .08); color: var(--navy);
+}
+.reseau3 .ville__nom { flex: 1; min-width: 0; display: grid; font-size: .92rem; font-weight: 800; color: var(--tx-1); line-height: 1.2; }
+.reseau3 .ville__nom small { font-size: .74rem; font-weight: 500; color: var(--tx-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.reseau3 .ville__fleche { flex: none; color: var(--tx-3); transition: transform .2s ease, color .2s ease; }
+.reseau3 .ville__fleche svg { width: 15px; height: 15px; display: block; }
+.reseau3 .ville:hover .ville__fleche { color: var(--cyan-ink); transform: translateX(3px); }
+
+@media (min-width: 900px) {
+  .reseau3 { grid-template-columns: 1fr 1fr; }
+  .reseau3__carte { aspect-ratio: auto; min-height: 460px; }
+}
+@media (max-width: 420px) {
+  .reseau3__carte .point b { font-size: .64rem; }
+  .reseau3__villes { gap: 0 8px; }
+  .reseau3 .ville { gap: 8px; padding: 9px 2px; }
+  .reseau3 .ville__iso { width: 30px; }
+  .reseau3 .ville__fleche { display: none; }
+}
+
+/* =========================================================================
+   BOUTIQUE (v2) — carte photo immersive
+   Bureau : texte à gauche sur dégradé marine, deux vignettes à droite.
+   Mobile : photo en bandeau haut, texte dessous sur fond marine.
+   ========================================================================= */
+.boutique2 {
+  position: relative; overflow: hidden; isolation: isolate;
+  display: grid; border-radius: 24px; background: var(--navy-3); color: #fff;
+}
+.boutique2__fond { display: block; width: 100%; height: 220px; object-fit: cover; }
+.boutique2__txt { position: relative; z-index: 1; padding: 26px 22px 28px; min-width: 0; }
+.boutique2 .surtitre { color: #4FC3F0; }
+.boutique2 .surtitre::before { background: #4FC3F0; }
+.boutique2 .titre { color: #fff; }
+.boutique2 .titre em { color: #4FC3F0; }
+.boutique2 .chapeau { color: rgba(255, 255, 255, .8); margin: 12px 0 20px; max-width: 460px; }
+.boutique2__infos { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+.boutique2__infos li {
+  display: inline-flex; align-items: center; gap: 8px; max-width: 100%;
+  padding: 8px 13px; border-radius: 99px; font-size: .82rem;
+  background: rgba(255, 255, 255, .1); border: 1px solid rgba(255, 255, 255, .14);
+}
+.boutique2__infos li a, .boutique2__infos li span { overflow-wrap: anywhere; }
+.boutique2__infos svg { width: 15px; height: 15px; flex: none; color: #4FC3F0; }
+.boutique2__infos a:hover { color: #4FC3F0; }
+.boutique2__actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.boutique2__appel { --btn-fond: transparent; --btn-txt: #fff; border: 1px solid rgba(255, 255, 255, .35); }
+.boutique2__appel:hover { background: rgba(255, 255, 255, .1); }
+.boutique2__vignettes { display: none; }
+
+@media (min-width: 900px) {
+  .boutique2 { min-height: 500px; grid-template-columns: 1.15fr .85fr; align-items: center; }
+  .boutique2__fond { position: absolute; inset: 0; height: 100%; z-index: -2; }
+  .boutique2::before {
+    content: ""; position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(90deg, rgba(16, 11, 51, .95) 0%, rgba(16, 11, 51, .84) 48%, rgba(16, 11, 51, .2) 100%);
+  }
+  .boutique2__txt { padding: 52px 56px; }
+  .boutique2__vignettes {
+    display: grid; gap: 12px; align-self: end; justify-self: end;
+    grid-template-columns: repeat(2, 150px); padding: 0 28px 28px 0;
+  }
+  .boutique2__vignettes img {
+    width: 150px; height: 190px; object-fit: cover; border-radius: 16px;
+    border: 3px solid rgba(255, 255, 255, .9); box-shadow: 0 20px 40px -20px rgba(0, 0, 0, .6);
+  }
+  .boutique2__vignettes img:last-child { object-position: 30% 20%; transform: translateY(-26px); }
+}
+
+/* =========================================================================
+   CONSEILS (aperçu d'accueil) — un grand à gauche, deux en ligne à droite
+   Tablette : le grand sur toute la largeur, deux dessous.
+   Mobile : le grand, puis deux lignes compactes (vignette + titre).
+   ========================================================================= */
+.posts--apercu .post:not(:first-child) .post__chapo { display: none; }
+@media (min-width: 640px) and (max-width: 979px) {
+  .posts--apercu { grid-template-columns: repeat(2, 1fr); }
+  .posts--apercu .post:first-child { grid-column: 1 / -1; }
+}
+@media (max-width: 639px) {
+  .posts--apercu { gap: 14px; }
+  .posts--apercu .post:not(:first-child) { flex-direction: row; }
+  .posts--apercu .post:not(:first-child) .post__visuel { flex: 0 0 112px; aspect-ratio: auto; min-height: 120px; }
+  .posts--apercu .post:not(:first-child) .post__rubrique,
+  .posts--apercu .post:not(:first-child) .post__source,
+  .posts--apercu .post:not(:first-child) .post__avatar,
+  .posts--apercu .post:not(:first-child) .post__lire { display: none; }
+  .posts--apercu .post:not(:first-child) .post__texte { font-size: .62rem; padding: 8px; }
+  .posts--apercu .post:not(:first-child) .post__corps { padding: 12px 14px; gap: 6px; min-width: 0; justify-content: center; }
+  .posts--apercu .post:not(:first-child) .post__titre,
+  .posts--apercu .post:not(:first-child) .post__citation { font-size: .92rem; }
+}
+@media (min-width: 980px) {
+  .posts--apercu { grid-template-columns: 1.2fr 1fr; }
+  .posts--apercu .post:first-child { grid-row: span 2; }
+  .posts--apercu .post:first-child .post__visuel { aspect-ratio: 16 / 10; }
+  .posts--apercu .post:first-child .post__corps { padding: 24px 26px 26px; }
+  .posts--apercu .post:not(:first-child) { flex-direction: row; }
+  .posts--apercu .post:not(:first-child) .post__visuel { flex: 0 0 42%; aspect-ratio: auto; min-height: 200px; }
+  .posts--apercu .post:not(:first-child) .post__corps { min-width: 0; }
+  .posts--apercu .post:not(:first-child) .post__texte { font-size: .95rem; padding: 16px; }
+}
+
+/* conseils : le lien à droite du titre, citation lisible dans la grande case,
+   cases de droite allégées (date seule, sans le réseau d'origine) */
+#conseils .tete-duo > div { max-width: 760px; }
+.posts--apercu .post:first-child .post__texte { font-size: clamp(1.15rem, 2.2vw, 1.8rem); max-width: 20ch; }
+.posts--apercu .post:not(:first-child) .post__source { display: none; }
+@media (min-width: 980px) {
+  .posts--apercu .post:first-child .post__visuel { aspect-ratio: 16 / 9; }
+}
+
+/* tablette : carte du réseau moins haute, bandeau boutique plus généreux */
+@media (min-width: 560px) and (max-width: 899px) {
+  .reseau3__carte { aspect-ratio: 16 / 9; }
+  .boutique2__fond { height: 280px; }
+}
+.posts--apercu .post:first-child .post__texte { font-size: clamp(1.25rem, 2.8vw, 1.8rem); }

@@ -1132,6 +1132,28 @@ Demande : « la page d'accueil est trop longue, on va optimiser ».
 - Hauteur de l'accueil : ~11 400 → ~9 300 px (bureau), ~18 600 → ~14 400 px
   (mobile).
 
+### Réseau, boutique et conseils — 2e passe (« pas top »)
+
+- **Réseau** (`.reseau3`) : un seul panneau. À gauche, carte marine
+  (`carteReseau()`) : les coordonnées de `partenaires.js` sont **étirées**
+  sur toute la surface (sinon tout se tasse au centre), lignes pointillées
+  en SVG `preserveAspectRatio="none"` + `vector-effect`, points et noms en
+  HTML positionnés en % (ronds à toutes les largeurs), Bamako en pastille
+  blanche pulsante. À droite : titre, chiffres, 6 villes en liste 2
+  colonnes (lien catalogue filtré). Mobile : carte au-dessus, flèches
+  masquées sous 420 px.
+- **Boutique** (`.boutique2`, `siege()`) : **plus d'horaires** (demande
+  client), plus de stock. Carte photo immersive : mur de portables en fond,
+  dégradé marine, coordonnées en pastilles, boutons « Venir à la boutique »
+  (Maps) et « Appeler », deux vignettes inclinées à droite (bureau). Mobile :
+  photo en bandeau, texte dessous. `HORAIRES` n'est plus importé par
+  accueil.js (toujours utilisé ailleurs via config.js si besoin).
+- **Conseils (aperçu)** : bureau = le plus récent en grand à gauche, les
+  deux autres en lignes horizontales à droite (sans chapô ni réseau
+  d'origine) ; tablette = le grand en pleine largeur puis deux cartes ;
+  mobile = le grand puis deux lignes compactes vignette + titre. Le lien
+  « Tous nos conseils » repasse à droite du titre.
+
 ## Stack
 
 - **100 % statique** : HTML / CSS / **modules ES natifs**. Aucun framework,
